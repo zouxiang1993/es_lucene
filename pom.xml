@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.zx.es_lucene</groupId>
+    <artifactId>parent</artifactId>
+    <packaging>pom</packaging>
+    <version>${es.lucene.version}</version>
+
+    <properties>
+        <es.lucene.version>1.0-SNAPSHOT</es.lucene.version>
+        <jdk.version>1.8</jdk.version>
+
+        <versions.es>5.6.4</versions.es>
+        <versions.lucene>6.6.1</versions.lucene>
+
+        <versions.spatial4j>0.6</versions.spatial4j>
+        <versions.jts>1.13</versions.jts>
+        <versions.jackson>2.8.6</versions.jackson>
+        <versions.snakeyaml>1.15</versions.snakeyaml>
+
+        <versions.log4j>2.9.1</versions.log4j>
+        <versions.slf4j>1.6.2</versions.slf4j>
+
+        <versions.jna>4.4.0-1</versions.jna>
+
+        <versions.randomizedrunner>2.5.0</versions.randomizedrunner>
+        <versions.junit>4.12</versions.junit>
+        <versions.httpclient>4.5.2</versions.httpclient>
+        <versions.httpcore>4.4.5</versions.httpcore>
+        <versions.commonslogging>1.1.3</versions.commonslogging>
+        <versions.commonscodec>1.10</versions.commonscodec>
+        <versions.hamcrest>1.3</versions.hamcrest>
+        <versions.securemock>1.2</versions.securemock>
+
+        <versions.jmh>1.12</versions.jmh>
+    </properties>
+
+    <modules>
+        <module>core</module>
+        <module>lucene-analysis</module>
+        <module>lucene-backward-codecs</module>
+        <module>lucene-grouping</module>
+        <module>lucene-core</module>
+        <module>lucene-highlighter</module>
+        <module>lucene-join</module>
+        <module>lucene-memory</module>
+        <module>lucene-misc</module>
+        <module>lucene-queries</module>
+        <module>lucene-queryparser</module>
+        <module>lucene-sandbox</module>
+        <module>lucene-spatial</module>
+        <module>lucene-spatial3d</module>
+        <module>lucene-spatial-extras</module>
+        <module>lucene-suggest</module>
+    </modules>
+
+    <build>
+        <finalName>esearch-server</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
