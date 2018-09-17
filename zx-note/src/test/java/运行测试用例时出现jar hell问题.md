@@ -1,0 +1,1 @@
+运行测试用例时出现的 jar hell 问题 https://github.com/elastic/elasticsearch/blob/master/CONTRIBUTING.md

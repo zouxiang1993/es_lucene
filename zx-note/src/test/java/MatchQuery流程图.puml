@@ -1,0 +1,29 @@
+@startuml
+start
+if (numTokens == 0?) then (yes)
+  :return null;
+else (no)
+  if (numTokens==1?) then (yes)
+    :analyzeTerm;
+  else (no)
+    if (isGraph?) then (yes)
+      if (quoted?) then (yes)
+        :analyzeGraphPhrase;
+      else (no)
+        #HotPink:analyzeGraphBoolean;
+      endif
+    else (no)
+      if (quoted && positionCount > 1?) then (yes)
+        :......;
+      else (no)
+        if (positionCount == 1?) then (yes)
+          :analyzeBoolean;
+        else (no)
+          #HotPink:analyzeMultiBoolean;
+        endif
+      endif
+    endif
+  endif
+endif
+stop
+@enduml
