@@ -56,6 +56,7 @@
         <module>lucene-spatial-extras</module>
         <module>lucene-suggest</module>
         <module>zx-note</module>
+        <module>custom-plugins</module>
     </modules>
 
     <build>
