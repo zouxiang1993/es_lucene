@@ -1,0 +1,19 @@
+@startuml
+
+participant InternalSettingsPreparer
+participant Elasticsearch
+participant Bootstrap
+participant Node
+
+autonumber
+Elasticsearch -> Elasticsearch : 加载VM Options
+Elasticsearch -> InternalSettingsPreparer : Environment prepareEnvironment()\n加载配置文件，构造Environment对象
+Elasticsearch -> Bootstrap : init()
+Bootstrap -> Bootstrap : setup()
+activate Bootstrap
+create Node
+Bootstrap -> Node : new() 创建节点
+deactivate Bootstrap
+Bootstrap -> Bootstrap : start()
+
+@enduml

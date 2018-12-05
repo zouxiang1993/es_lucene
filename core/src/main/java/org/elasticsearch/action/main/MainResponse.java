@@ -114,7 +114,7 @@ public class MainResponse extends ActionResponse implements ToXContentObject {
             .field("build_snapshot", build.isSnapshot())
             .field("lucene_version", version.luceneVersion.toString())
             .endObject();
-        builder.field("tagline", "You Know, for Search");
+        builder.field("tagline", "Globalegrow ESearch");
         builder.endObject();
         return builder;
     }

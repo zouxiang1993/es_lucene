@@ -1,0 +1,46 @@
+@startuml
+participant Node
+participant PluginsService
+participant ThreadPool
+participant NodeClient
+participant ResourceWatcherService
+participant NetworkService
+autonumber
+create PluginsService
+Node --> PluginsService: new
+        note right
+        加载modules & plugins
+        end note
+create ThreadPool
+Node -> ThreadPool: new
+    note right
+    线程池
+    end note
+create NodeClient
+Node -> NodeClient: new
+    note right
+    NodeClient用于执行
+    各种Action
+    end note
+create ResourceWatcherService
+Node -> ResourceWatcherService
+    note right
+    TODO:
+    资源监控
+    end note
+create NetworkService
+Node -> NetworkService
+    note right
+    TODO: 网络
+    end note
+create ClusterService
+Node -> ClusterService
+    note right
+    集群服务
+    end note
+@enduml
+
+
+创建NodeClient        new NodeClient()
+创建各种Modules和Services
+创建RestController    actionModule.getRestController()

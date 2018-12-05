@@ -83,7 +83,7 @@ public class ThreadPool extends AbstractComponent implements Closeable {
     }
 
     public enum ThreadPoolType {
-        DIRECT("direct"),
+        DIRECT("direct"),   // 直接在提交任务的线程内执行该任务
         FIXED("fixed"),
         SCALING("scaling");
 

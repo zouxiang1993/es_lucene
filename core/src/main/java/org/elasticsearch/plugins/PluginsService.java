@@ -375,7 +375,8 @@ public class PluginsService extends AbstractComponent {
                 // check we don't have conflicting classes
                 Set<URL> union = new HashSet<>(classpath);
                 union.addAll(bundle.urls);
-                JarHell.checkJarHell(union);
+                // TODO-zouxiang: 测试时关闭此检测，减少启动时间。
+//                JarHell.checkJarHell(union);
             } catch (Exception e) {
                 throw new IllegalStateException("failed to load plugin " + bundle.plugin +
                                                 " due to jar hell", e);

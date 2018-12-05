@@ -309,7 +309,7 @@ public class Node implements Closeable {
                 dLogger.deprecated("[{}] has been set, but will be removed in Elasticsearch 6.0.0",
                     JsonXContent.JSON_ALLOW_UNQUOTED_FIELD_NAMES);
             }
-
+            // 加载插件
             this.pluginsService = new PluginsService(tmpSettings, environment.modulesFile(), environment.pluginsFile(), classpathPlugins);
             this.settings = pluginsService.updatedSettings();
             localNodeFactory = new LocalNodeFactory(settings, nodeEnvironment.nodeId());
@@ -321,7 +321,7 @@ public class Node implements Closeable {
 
 
             final List<ExecutorBuilder<?>> executorBuilders = pluginsService.getExecutorBuilders(settings);
-
+            // 创建线程池
             final ThreadPool threadPool = new ThreadPool(settings, executorBuilders.toArray(new ExecutorBuilder[0]));
             resourcesToClose.add(() -> ThreadPool.terminate(threadPool, 10, TimeUnit.SECONDS));
             // adds the context to the DeprecationLogger so that it does not need to be injected everywhere
@@ -333,7 +333,7 @@ public class Node implements Closeable {
             for (final ExecutorBuilder<?> builder : threadPool.builders()) {
                 additionalSettings.addAll(builder.getRegisteredSettings());
             }
-            client = new NodeClient(settings, threadPool);
+            client = new NodeClient(settings, threadPool); // 创建Client，用来处理Action
             final ResourceWatcherService resourceWatcherService = new ResourceWatcherService(settings, threadPool);
             final ScriptModule scriptModule = ScriptModule.create(settings, this.environment, resourceWatcherService,
                 pluginsService.filterPlugins(ScriptPlugin.class));

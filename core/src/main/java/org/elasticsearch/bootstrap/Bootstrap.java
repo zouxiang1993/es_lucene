@@ -230,7 +230,7 @@ final class Bootstrap {
             throw new BootstrapException(e);
         }
 
-        node = new Node(environment) {
+        node = new Node(environment) { // 创建Node！！！
             @Override
             protected void validateNodeBeforeAcceptingRequests(
                 final Settings settings,
