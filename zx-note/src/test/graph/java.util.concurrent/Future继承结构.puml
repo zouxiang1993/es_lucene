@@ -1,0 +1,33 @@
+@startuml
+interface Future<V>{
+    // Future表示一个异步的任务
+    ---
+    // 尝试取消
+    +boolean cancel(boolean mayInterruptIfRunning)
+    // 是否在完成之前被取消
+    +boolean isCancelled()
+    // 是否已经完成
+    +boolean isDone()
+    // 获取结果，如果还未完成则阻塞
+    +V get()
+    //
+    +V get(long timeout, TimeUnit unit)
+}
+
+interface RunnableFuture<V> extends Runnable, Future{
+    +void run()
+}
+
+class FutureTask<V> implements RunnableFuture{
+}
+
+abstract class ForkJoinTask<V> implements Future{
+
+}
+
+abstract class RecursiveTask<V> extends ForkJoinTask{
+}
+
+abstract class RecursiveAction extends ForkJoinTask{
+}
+@enduml

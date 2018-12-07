@@ -1,0 +1,87 @@
+@startuml
+interface Executor
+interface ExecutorService
+class Executors
+class ThreadPoolExecutor
+class ForkJoinPool
+interface ScheduledExecutorService
+class ScheduledThreadPoolExecutor
+
+interface Executor{
+    // 执行一个命令，可能在当前线程，也可能在其他线程执行
+    // 可能立即执行，也可能延迟在某个时间执行
+    +void execute(Runnable command)
+}
+
+interface ExecutorService extends Executor{
+    // 关闭。之前提交的任务将继续执行，但不会接受新任务。
+    // 此方法不会等待之前任务的结束，而是立即返回
+    +void shutdown();
+    --
+    // 尝试停止正在执行的任务，终止正在等待的任务的执行，
+    // 并返回正在等待的任务的list
+    +List<Runnable> shutdownNow();
+    --
+    // 是否已经关闭
+    +boolean isShutdown();
+    // 关闭之后，如果所有任务都执行完毕则返回true
+    +boolean isTerminated();
+    // 阻塞直至下列事件之一发生： 所有任务都执行完毕、超过某个时间
+    // 限制、或者当前线程被中断
+    +boolean awaitTermination(long timeout, TimeUnit unit)
+    // 提交一个任务，返回一个Future。 Future.get()获取结果
+    +<T> Future<T> submit(Callable<T> task)
+    +<T> Future<T> submit(Runnable task, T result)
+    +Future<?> submit(Runnable task)
+    +<T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
+    +<T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
+                                       long timeout, TimeUnit unit)
+    +<T> T invokeAny(Collection<? extends Callable<T>> tasks)
+    +T invokeAny(Collection<? extends Callable<T>> tasks,
+                         long timeout, TimeUnit unit)
+}
+
+abstract class AbstractExecutorService implements ExecutorService{
+
+}
+
+class Executors{
+    // Executor的一些工厂和工具方法
+    ---
+    // 创建一个线程池，重用固定数目的线程。在任一时刻
+    // 最多nThreads个线程在执行任务，其他的任务需要在
+    // 一个无界队列中等待
+    +ExecutorService newFixedThreadPool(int nThreads)
+    // 单线程 + 无界队列。 用于顺序执行
+    +ExecutorService newSingleThreadExecutor()
+    // ???? fork join
+    +ExecutorService newWorkStealingPool(int parallelism)
+    // 每提交一个任务：如果有空闲线程，则重用；如果没有，则新建线程
+    // 空闲线程最多保留60秒
+    +ExecutorService newCachedThreadPool()
+    // 创建一个固定线程数的线程池，可以在固定的延迟时间之后执行任务
+    // 或者周期性的执行任务。空闲线程不会回收。
+    +ScheduledExecutorService newScheduledThreadPool(int corePoolSize)
+    // 对executor的一层包装，禁止访问除ExecutorService之外的方法。
+    +ExecutorService unconfigurableExecutorService(ExecutorService executor)
+    // 默认的ThreadFactory实现
+    +ThreadFactory defaultThreadFactory()
+    // Runnable 到 Callable 的适配器
+    +<T> Callable<T> callable(Runnable task, T result)
+}
+
+
+class ThreadPoolExecutor extends AbstractExecutorService{
+
+}
+
+class ForkJoinPool extends AbstractExecutorService{
+
+}
+
+interface ScheduledExecutorService extends ExecutorService{
+
+}
+
+class ScheduledThreadPoolExecutor extends ThreadPoolExecutor implements ScheduledExecutorService
+@enduml
