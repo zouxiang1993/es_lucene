@@ -1,0 +1,36 @@
+@startuml
+abstract class Reference<T>{
+    +T get()
+    +void clear()
+}
+
+class 强引用 extends Reference{
+    ---
+    // <size:15><b>强引用</b></size>
+    // 类似Object obj = new Object()这样的直接引用
+    // 只要强引用还存在，
+    // 垃圾收集器永远不会回收被引用的对象
+}
+
+class SoftReference<T> extends Reference{
+    ---
+    // <size:15><b>软引用</b></size>,用来描述一些还有用但非必须的对象
+    // 对于软引用关联的对象，
+    // 在内存充足的情况下不会被回收
+    // 系统在发生OOM异常之前
+    // 会将这些对象列入回收范围进行第二次回收
+    // 如果这次回收还没有足够的内存，才会抛出OOM异常
+}
+
+class WeakReference<T> extends Reference{
+    // <size:15><b>弱引用</b></size>也是用来描述非必须对象，
+    // 但它的强度比软引用更弱一些
+    // 被弱引用关联的对象只能活到下一次GC
+}
+
+class PhantomReference<T> extends Reference{
+    // <size:15><b>虚引用</b></size>
+    // TODO:
+}
+
+@enduml

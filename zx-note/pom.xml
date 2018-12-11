@@ -11,5 +11,11 @@
 
     <artifactId>zx-note</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.9</version>
+        </dependency>
+    </dependencies>
 </project>

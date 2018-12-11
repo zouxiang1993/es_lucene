@@ -1,0 +1,118 @@
+@startuml
+package java.util.concurrent{
+    class ExecutorService
+    interface RejectedExecutionHandler{
+        +void rejectedExecution(Runnable r, ThreadPoolExecutor executor)
+    }
+    class ThreadPoolExecutor
+    interface BlockingQueue
+}
+
+package org.elasticsearch.common.util.concurrent{
+    interface XRejectedExecutionHandler extends RejectedExecutionHandler{
+        +long rejected(); // 被拒绝的任务总数
+    }
+    class EsAbortPolicy implements XRejectedExecutionHandler
+    class EsExecutors{
+        // 构造Executor的工厂和工具方法
+    }
+    class EsThreadPoolExecutor extends ThreadPoolExecutor
+    class PrioritizedEsThreadPoolExecutor extends EsThreadPoolExecutor
+    class SizeBlockingQueue<E> implements BlockingQueue{
+        // 包装另一个BlockingQueue，并为其提供size检查的功能。
+        // 由于没有任何的同步措施，这里的size检查是比较宽松的。
+    }
+    class ThreadContext
+}
+
+package org.elasticsearch.threadpool{
+    class ThreadPool
+    class ThreadPoolStats
+
+    class ThreadPool.Info{
+        -String name;
+        -ThreadPoolType type;
+        -int min;
+        -int max;
+        -TimeValue keepAlive;
+        -SizeValue queueSize;
+    }
+
+    enum ThreadPool.ThreadPoolType{
+        ---
+        // 直接在提交任务的线程内执行该任务
+        DIRECT("direct")
+        // 固定线程数目
+        FIXED("fixed"),
+        // 可收缩的线程数目
+        SCALING("scaling");
+    }
+
+    abstract class ExecutorBuilder{
+        ---
+        +abstract U getSettings(Settings settings)
+        // 构造一个执行器
+        +abstract ThreadPool.ExecutorHolder build(U settings, ThreadContext threadContext)
+    }
+
+    class FixedExecutorBuilder extends ExecutorBuilder{
+        // 用于构造 固定线程数的执行器
+    }
+
+    class ScalingExecutorBuilder extends ExecutorBuilder{
+        // 用于构造 可收缩的执行器
+    }
+
+    abstract class ExecutorBuilder.ExecutorSettings{
+        #String nodeName
+    }
+
+    class ScalingExecutorBuilder.ScalingExecutorSettings  extends ExecutorBuilder.ExecutorSettings{
+        // 核心线程数，最小线程数
+        -int core
+        // 最大线程数
+        -int max
+        // 空闲线程保留多久
+        -TimeValue keepAlive
+    }
+
+    class FixedExecutorBuilder.FixedExecutorSettings extends ExecutorBuilder.ExecutorSettings{
+        // 线程数目
+        -int size
+        // 队列长度
+        -int queueSize
+    }
+
+    class ThreadPoolStats.Stats{
+        -String name;
+        -int threads; // 当前线程总数
+        -int queue;  // 队列长度
+        -int active;  // 正在执行任务的线程数
+        -long rejected; // 已经拒绝的任务数
+        -int largest; // 最大线程数
+        -long completed; // 已经完成的任务数
+    }
+
+    ExecutorBuilder "1" *-- "1" ExecutorBuilder.ExecutorSettings
+
+    ScalingExecutorBuilder "1" *-- "1" ScalingExecutorBuilder.ScalingExecutorSettings
+
+    FixedExecutorBuilder "1" *-- "1" FixedExecutorBuilder.FixedExecutorSettings
+
+    ThreadPool.Info "1" *-- "1" ThreadPool.ThreadPoolType
+
+    ThreadPoolInfo "1" *-- "n" ThreadPool.Info
+
+    ThreadPool "1" -- "1" ThreadPoolInfo
+
+    ThreadPool "1" -- "1" ThreadPoolStats
+
+    ThreadPool "1" -- "n" ThreadPool.ExecutorHolder
+
+    ThreadPool.ExecutorHolder "1" -down-- "1" ExecutorService
+
+    ThreadPool.ExecutorHolder "1" -- "1" ThreadPool.Info
+
+    ThreadPoolStats "1" -- "n" ThreadPoolStats.Stats
+}
+@enduml

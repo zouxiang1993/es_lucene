@@ -1,0 +1,40 @@
+@startuml
+package java.lang{
+    class ThreadLocal<T>
+
+    interface Closeable
+}
+
+package org.apache.lucene.util{
+    class CloseableThreadLocal<T>  implements Closeable {
+        ---
+        // java内置的ThreadLocal类有缺陷，
+        // 由于线程内全局的ThreadLocalMap的缘故
+        // 已经不再被引用的ThreadLocal可能不能被及时的回收
+        // 此类提供close方法，使对象可以及时的被回收。
+        ---
+        +T get()
+        +void set(T object)
+        +void close()
+    }
+
+    CloseableThreadLocal "1" *-- "1" ThreadLocal
+}
+
+package org.elasticsearch.common.util.concurrent{
+    class ThreadContext{
+        // 作用？？？
+    }
+
+    interface StoredContext
+
+    class ThreadContextStruct{
+        // ?????
+    }
+
+    class ContextThreadLocal extends CloseableThreadLocal{
+        // 每个线程的ThreadContextStruct
+    }
+}
+
+@enduml

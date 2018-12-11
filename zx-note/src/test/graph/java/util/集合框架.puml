@@ -1,0 +1,93 @@
+@startuml
+interface Iterable {
+    +Iterator<T> iterator()
+    +void forEach(Consumer<? super T> action)
+}
+
+interface Collection<E> extends Iterable{
+    +int size() // 集合中元素数目
+    +boolean isEmpty()  // 是否为空
+    +boolean contains(Object o) // 是否包含obj
+    +Iterator<E> iterator()
+    +Object[] toArray()
+    +<T> T[] toArray(T[] a)
+    +boolean add(E e)
+    +boolean remove(Object o)
+    +boolean containsAll(Collection<?> c)
+    +boolean addAll(Collection<? extends E> c)
+    +boolean removeAll(Collection<?> c)
+    +boolean removeIf(Predicate<? super E> filter)
+    // 只保存c中存在的元素
+    +boolean retainAll(Collection<?> c)
+    +void clear()
+}
+
+interface Queue<E> extends Collection{
+    ---
+    // 添加一个元素,失败抛出异常
+    +boolean add(E e)
+    // 添加一个元素，失败返回false
+    +boolean offer(E e)
+    // 移除队首元素，如果队列为空则抛出异常
+    +E remove()
+    // 移除队首元素，如果队列为空则返回null
+    +E poll()
+    // 返回但不删除队首元素，如果队列为空则抛出异常
+    +E element()
+    // 返回但不删除队首元素，如果队列为空则返回null
+    +E peek()
+}
+
+interface Set<E> extends Collection{
+}
+
+interface List<E> extends Collection{
+}
+
+abstract class AbstractCollection<E> implements Collection{
+}
+
+abstract class AbstractQueue<E> extends AbstractCollection implements Queue
+
+note right of BlockingQueue
+<img BlockingQueueMethods.png>
+end note
+interface BlockingQueue<E> extends Queue{
+    ---
+    // 在不阻塞的情况下还可以插入的元素个数
+    +int remainingCapacity()
+    // 将队列中的所有元素抽到c中
+    +int drainTo(Collection<? super E> c)
+}
+
+interface TransferQueue<E> extends BlockingQueue{
+    ---
+    // 将一个元素传递给消费者，如果当前没有消费者可以接收，则返回false
+    +boolean tryTransfer(E e)
+    // 将一个元素传递给消费者，如果当前没有消费者可以接收，则阻塞
+    +void transfer(E e) throws InterruptedException
+    // 当前是否有消费者准备好接收数据
+    +boolean hasWaitingConsumer()
+    // 准备好接收数据的消费者数目
+    +int getWaitingConsumerCount()
+}
+
+class LinkedTransferQueue<E> extends AbstractQueue implements TransferQueue
+
+class ArrayBlockingQueue<E> extends AbstractQueue implements BlockingQueue{
+    ---
+    // 数组实现
+    // 一个ReentrantLock，两个Condition: notEmpty & notFull
+}
+
+class LinkedBlockingQueue<E> extends AbstractQueue implements BlockingQueue{
+    ---
+    // 链表实现
+    // 生产者、消费者分别使用两个锁
+    // takeLock notEmpty
+    // putLock notFull
+    // 吞吐量比ArrayBlockingQueue大
+}
+
+
+@enduml

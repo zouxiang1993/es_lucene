@@ -1,0 +1,15 @@
+@startuml
+class Thread
+class ThreadLocal
+class ThreadLocal.ThreadLocalMap
+
+note left
+    每一个Thread持有一个ThreadLocalMap,
+    ThreadLocalMap是一个ThreadLocal -> Value的映射关系
+    每一个ThreadLocal对象作为一个变量的key,
+    一个线程的ThreadLocalMap.get(ThreadLocal)得到该线程这个变量的值
+end note
+Thread "1" *-- "1" ThreadLocal.ThreadLocalMap
+
+ThreadLocal.ThreadLocalMap "1" *-- "n" ThreadLocal
+@enduml
