@@ -1,93 +1,156 @@
 @startuml
-interface Iterable {
-    +Iterator<T> iterator()
-    +void forEach(Consumer<? super T> action)
+
+set namespaceSeparator ::
+
+namespace base{
+    interface Iterable {
+        +Iterator<T> iterator()
+        +void forEach(Consumer<? super T> action)
+    }
+
+    interface Collection<E> extends Iterable{
+        +int size() // 集合中元素数目
+        +boolean isEmpty()  // 是否为空
+        +boolean contains(Object o) // 是否包含obj
+        +Iterator<E> iterator()
+        +Object[] toArray()
+        +<T> T[] toArray(T[] a)
+        +boolean add(E e)
+        +boolean remove(Object o)
+        +boolean containsAll(Collection<?> c)
+        +boolean addAll(Collection<? extends E> c)
+        +boolean removeAll(Collection<?> c)
+        +boolean removeIf(Predicate<? super E> filter)
+        // 只保存c中存在的元素
+        +boolean retainAll(Collection<?> c)
+        +void clear()
+    }
 }
 
-interface Collection<E> extends Iterable{
-    +int size() // 集合中元素数目
-    +boolean isEmpty()  // 是否为空
-    +boolean contains(Object o) // 是否包含obj
-    +Iterator<E> iterator()
-    +Object[] toArray()
-    +<T> T[] toArray(T[] a)
-    +boolean add(E e)
-    +boolean remove(Object o)
-    +boolean containsAll(Collection<?> c)
-    +boolean addAll(Collection<? extends E> c)
-    +boolean removeAll(Collection<?> c)
-    +boolean removeIf(Predicate<? super E> filter)
-    // 只保存c中存在的元素
-    +boolean retainAll(Collection<?> c)
-    +void clear()
+
+namespace queue{
+    interface Queue<E> extends base::Collection{
+        ---
+        // 添加一个元素,失败抛出异常
+        +boolean add(E e)
+        // 添加一个元素，失败返回false
+        +boolean offer(E e)
+        // 移除队首元素，如果队列为空则抛出异常
+        +E remove()
+        // 移除队首元素，如果队列为空则返回null
+        +E poll()
+        // 返回但不删除队首元素，如果队列为空则抛出异常
+        +E element()
+        // 返回但不删除队首元素，如果队列为空则返回null
+        +E peek()
+    }
+    interface BlockingQueue<E> extends Queue{
+        // 参照BlockingQueueMethods.png
+        ---
+        // 在不阻塞的情况下还可以插入的元素个数
+        +int remainingCapacity()
+        // 将队列中的所有元素抽到c中
+        +int drainTo(Collection<? super E> c)
+    }
+
+    interface TransferQueue<E> extends BlockingQueue{
+        ---
+        // 将一个元素传递给消费者，如果当前没有消费者可以接收，则返回false
+        +boolean tryTransfer(E e)
+        // 将一个元素传递给消费者，如果当前没有消费者可以接收，则阻塞
+        +void transfer(E e) throws InterruptedException
+        // 当前是否有消费者准备好接收数据
+        +boolean hasWaitingConsumer()
+        // 准备好接收数据的消费者数目
+        +int getWaitingConsumerCount()
+    }
+
+    class LinkedTransferQueue<E> implements TransferQueue
+
+    class ArrayBlockingQueue<E>  implements BlockingQueue{
+        ---
+        // 数组实现
+        // 一个ReentrantLock，两个Condition: notEmpty & notFull
+    }
+
+    class LinkedBlockingQueue<E> implements BlockingQueue{
+        ---
+        // 链表实现
+        // 生产者、消费者分别使用两个锁
+        // takeLock notEmpty
+        // putLock notFull
+        // 吞吐量比ArrayBlockingQueue大
+    }
+
+    interface Deque<E> extends Queue{
+        // 双端队列
+        ---
+        +void addFirst(E e)
+        +boolean offerFirst(E e)
+        +E removeFirst()
+        +E pollFirst()
+        // ...last也有对应的操作
+    }
 }
 
-interface Queue<E> extends Collection{
-    ---
-    // 添加一个元素,失败抛出异常
-    +boolean add(E e)
-    // 添加一个元素，失败返回false
-    +boolean offer(E e)
-    // 移除队首元素，如果队列为空则抛出异常
-    +E remove()
-    // 移除队首元素，如果队列为空则返回null
-    +E poll()
-    // 返回但不删除队首元素，如果队列为空则抛出异常
-    +E element()
-    // 返回但不删除队首元素，如果队列为空则返回null
-    +E peek()
+namespace list{
+    interface List<E> extends base::Collection{
+        ---
+
+        +void sort(Comparator<? super E> c)
+        +E get(int index)
+        +E set(int index, E element)
+        // 将元素插入到指定位置，
+        // 该位置原来的元素以及后面的元素都后移一位
+        +void add(int index, E element)
+        // 移除指定位置的元素，后面的元素都前移一位
+        +E remove(int index)
+        // 返回第一个o元素的下标，如果没有则返回-1
+        +int indexOf(Object o)
+        // 返回最后一个o元素的下标，如果没有则返回-1
+        +int lastIndexOf(Object o)
+        // List专用的迭代器
+        +ListIterator<E> listIterator()
+        // 截取一段
+        +List<E> subList(int fromIndex, int toIndex)
+    }
+    class ArrayList implements List{
+        // 数组实现，数组resize
+        ---
+        // 缩小到最小的size, 节省空间
+        + void trimToSize()
+        // 扩容，最少要能容纳minCapacity个元素
+        + void ensureCapacity(int minCapacity)
+    }
+
+    class CopyOnWriteArrayList implements List{
+        // TODO:
+    }
+
+    class LinkedList implements List,queue::Deque{
+        // 链表实现
+    }
+
+    class Vector<E> implements List{
+    }
+
+    class Stack<E> extends Vector{
+    }
 }
 
-interface Set<E> extends Collection{
+namespace set{
+    interface Set<E> extends base::Collection{
+    }
+    interface SortedSet<E> extends Set{
+    }
+    class HashSet<E> implements Set{
+    }
+    class LinkedHashSet<E> extends HashSet{
+    }
+    interface NavigableSet<E> extends SortedSet{
+    }
+    class TreeSet<E> implements NavigableSet{
+    }
 }
-
-interface List<E> extends Collection{
-}
-
-abstract class AbstractCollection<E> implements Collection{
-}
-
-abstract class AbstractQueue<E> extends AbstractCollection implements Queue
-
-note right of BlockingQueue
-<img BlockingQueueMethods.png>
-end note
-interface BlockingQueue<E> extends Queue{
-    ---
-    // 在不阻塞的情况下还可以插入的元素个数
-    +int remainingCapacity()
-    // 将队列中的所有元素抽到c中
-    +int drainTo(Collection<? super E> c)
-}
-
-interface TransferQueue<E> extends BlockingQueue{
-    ---
-    // 将一个元素传递给消费者，如果当前没有消费者可以接收，则返回false
-    +boolean tryTransfer(E e)
-    // 将一个元素传递给消费者，如果当前没有消费者可以接收，则阻塞
-    +void transfer(E e) throws InterruptedException
-    // 当前是否有消费者准备好接收数据
-    +boolean hasWaitingConsumer()
-    // 准备好接收数据的消费者数目
-    +int getWaitingConsumerCount()
-}
-
-class LinkedTransferQueue<E> extends AbstractQueue implements TransferQueue
-
-class ArrayBlockingQueue<E> extends AbstractQueue implements BlockingQueue{
-    ---
-    // 数组实现
-    // 一个ReentrantLock，两个Condition: notEmpty & notFull
-}
-
-class LinkedBlockingQueue<E> extends AbstractQueue implements BlockingQueue{
-    ---
-    // 链表实现
-    // 生产者、消费者分别使用两个锁
-    // takeLock notEmpty
-    // putLock notFull
-    // 吞吐量比ArrayBlockingQueue大
-}
-
 
 @enduml

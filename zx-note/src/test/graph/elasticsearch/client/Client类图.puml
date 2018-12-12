@@ -1,0 +1,58 @@
+@startuml
+
+set namespaceSeparator ::
+
+interface ElasticsearchClient{
+    // 泛型参数：
+    // Request extends ActionRequest
+    // Response extends ActionResponse
+    // RequestBuilder extends ActionRequestBuilder<Request, Response, RequestBuilder>
+    ---
+    // action：命令种类   request: 请求参数
+    +ActionFuture<Response> execute(Action<Request, Response, RequestBuilder> action, Request request)
+    // 同上，listener是收到结果后的回调函数
+    +void execute(Action<Request, Response, RequestBuilder> action, Request request, ActionListener<Response> listener)
+    // 初始化一个RequestBuilder, 用来构造Request
+    +RequestBuilder prepareExecute(Action<Request, Response, RequestBuilder> action)
+    // 返回该client用于执行请求的线程池
+    ThreadPool threadPool()
+}
+
+interface Client extends ElasticsearchClient{
+    ---
+    +AdminClient admin()
+    +Settings settings()
+    // 每种操作都有两种形式
+    // 1. 返回ActionFuture  2. 回调 Listener
+    +ActionFuture<IndexResponse> index(IndexRequest request)
+    +IndexRequestBuilder prepareIndex(String index, String type)
+    +ActionFuture<GetResponse> get(GetRequest request)
+    +GetRequestBuilder prepareGet()
+    +ActionFuture<SearchResponse> search(SearchRequest request)
+    +SearchRequestBuilder prepareSearch(String... indices)
+    // 其他操作...
+}
+
+abstract class AbstractClient implements Client{
+}
+
+interface ClusterAdminClient extends ElasticsearchClient{
+}
+
+class AbstractClient.ClusterAdmin implements ClusterAdminClient{
+}
+
+interface IndicesAdminClient extends ElasticsearchClient{
+}
+
+class AbstractClient.IndicesAdmin implements IndicesAdminClient{
+}
+
+abstract class TransportClient extends AbstractClient{
+}
+
+class NodeClient extends AbstractClient{
+    // 在本地Node执行Action
+    ---
+}
+@enduml
