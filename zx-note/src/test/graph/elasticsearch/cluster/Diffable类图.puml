@@ -1,0 +1,17 @@
+@startuml
+
+interface Diffable<T>{
+    // 返回两个状态之间的差异
+    +Diff<T> diff(T previousState)
+}
+
+interface Diff<T>{
+    // 表示两个状态之间的差异
+    ---
+    // 将差异应用到part上
+    +T apply(T part)
+}
+
+abstract class AbstractDiffable<T extends Diffable<T>> implements Diffable{
+}
+@enduml

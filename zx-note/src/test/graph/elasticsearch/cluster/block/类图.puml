@@ -1,0 +1,31 @@
+@startuml
+class ClusterBlocks{
+    // 表示集群级别的阻塞，用来阻止对集群的脏操作。
+}
+
+class ClusterBlock{
+    -int id
+    -String description
+    -EnumSet<ClusterBlockLevel> levels
+    // Should operations get into retry state if this block is present
+    -boolean retryable
+    //Should global state persistence be disabled when this block is present.
+    //Note, only relevant for global blocks.
+    -boolean disableStatePersistence
+    -boolean allowReleaseResources
+    -RestStatus status
+}
+
+enum ClusterBlockLevel {
+    // 阻塞级别
+    ---
+    READ
+    WRITE
+    METADATA_READ
+    METADATA_WRITE
+}
+
+ClusterBlocks "1" *-- "n" ClusterBlock
+
+ClusterBlock *-- ClusterBlockLevel
+@enduml

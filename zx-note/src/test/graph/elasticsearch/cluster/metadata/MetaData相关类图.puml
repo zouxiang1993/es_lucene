@@ -1,0 +1,59 @@
+@startuml
+
+class MetaData{
+    -Settings settings
+    -ImmutableOpenMap<String, IndexMetaData> indices
+    -String[] allIndices
+    -SortedMap<String, AliasOrIndex> aliasAndIndexLookup
+}
+
+class IndexMetaData{
+    ---
+    -int routingNumShards
+    -int routingFactor
+    -int routingPartitionSize
+    ---
+    -int numberOfShards
+    -int numberOfReplicas
+    ---
+    -Index index
+    -long version
+    // 每一个主分片的编号？ 非负，每次主分配分配时递增
+    // (可能是集群重启，也可能是副本分片提升为主分片)
+    -long[] primaryTerms
+    -State state // Open / Close
+    -ImmutableOpenMap<String, AliasMetaData> aliases
+    ---
+    -Settings settings
+    -ImmutableOpenMap<String, MappingMetaData> mappings
+    ---
+    DiscoveryNodeFilters requireFilters;
+    DiscoveryNodeFilters includeFilters;
+    DiscoveryNodeFilters excludeFilters;
+    DiscoveryNodeFilters initialRecoveryFilters;
+    ---
+    ActiveShardCount waitForActiveShards
+}
+
+interface AliasOrIndex{
+    ---
+    // 是别名还是一个真正的索引
+    +boolean isAlias()
+    // 如果是索引，则返回自身，
+    // 如果是别名，则返回它关联的所有索引
+    +List<IndexMetaData> getIndices()
+}
+
+class Settings{
+
+}
+
+class MappingMetaData{
+
+}
+
+MetaData "1" *-- "1" Settings
+MetaData "1" *-- "n" IndexMetaData
+MetaData "1" *-- "n" AliasOrIndex
+IndexMetaData "1" *-- "n" MappingMetaData
+@enduml

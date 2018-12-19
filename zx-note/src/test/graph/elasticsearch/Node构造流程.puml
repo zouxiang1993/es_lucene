@@ -25,7 +25,6 @@ Node -> NodeClient: new
 create ResourceWatcherService
 Node -> ResourceWatcherService
     note right
-    TODO:
     资源监控
     end note
 create NetworkService
@@ -36,7 +35,7 @@ Node -> NetworkService
 create ClusterService
 Node -> ClusterService
     note right
-    集群服务
+    TODO: 集群服务 !!!
     end note
 @enduml
 

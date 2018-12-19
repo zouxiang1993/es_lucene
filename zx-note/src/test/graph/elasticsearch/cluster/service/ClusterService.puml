@@ -1,0 +1,70 @@
+@startuml
+
+
+class ClusterService{
+    ---
+    // 三种优先级的集群状态更改
+    -Collection<ClusterStateApplier> highPriorityStateAppliers
+    -Collection<ClusterStateApplier> normalPriorityStateAppliers
+    -Collection<ClusterStateApplier> lowPriorityStateAppliers
+    -AtomicReference<ClusterState> state
+}
+
+class ClusterSettings{
+    // 封装了所有Cluster级别的设置
+    ---
+
+}
+
+interface ClusterStateApplier{
+    ---
+    // 当接收到一个新的集群状态时
+    // 应用此方法来修改本地的集群状态
+    +void applyClusterState(ClusterChangedEvent event)
+}
+
+class ClusterState implements Diffable{
+    // 集群状态。 不可变对象。
+    // 只能通过master来进行更新，所有更新操作由单个线程顺序执行
+    // 每次更新完毕后。由Discovery.publish方法通知其他结点。
+    // 实现Diffable接口，可以只发送增量
+    ---
+    -String stateUUID // 增量更新时需比较的版本id
+    -ClusterName clusterName
+    -RoutingTable routingTable
+    -DiscoveryNodes nodes
+    -MetaData metaData
+    -ClusterBlocks blocks
+}
+
+class RoutingTable{
+    // 每一个索引中的每一个分片，处在哪一个节点上
+    // 见elasticsearch.cluster.routing包
+}
+
+class DiscoveryNodes{
+    // 集群中所有的节点
+    // 见elasticsearch.cluster.node包
+}
+
+class ClusterBlocks{
+    // 表示集群级别的阻塞，用来阻止对集群的脏操作
+    // 见elasticsearch.cluster.block包
+}
+ClusterService *-- ClusterSettings
+
+ClusterService "1" *-- "n" ClusterStateApplier
+
+ClusterService *-- ClusterState
+
+ClusterState *-- RoutingTable
+
+ClusterState *-- DiscoveryNodes
+
+ClusterState *-- MetaData
+
+ClusterState *-- ClusterBlocks
+
+
+
+@enduml

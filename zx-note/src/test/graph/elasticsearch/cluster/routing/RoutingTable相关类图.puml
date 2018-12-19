@@ -1,0 +1,57 @@
+@startuml
+class RoutingTable{
+    // 全局的路由表，
+    // 封装了所有Index的路由信息
+}
+class IndexRoutingTable{
+    // 封装了单个索引的路由信息
+    ---
+}
+class IndexShardRoutingTable{
+    // 封装了单个Shard的所有副本实例
+    ---
+    -ShardId shardId
+    -ShardRouting primary
+    -List<ShardRouting> replicas
+    -List<ShardRouting> shards
+    -List<ShardRouting> activeShards
+    -List<ShardRouting> assignedShards
+    -boolean allShardsStarted
+}
+class ShardRouting{
+    // 单个Shard的路由信息
+    ---
+    -ShardId shardId
+    -String currentNodeId
+    -String relocatingNodeId
+    -boolean primary
+    // 在不同的状态持有不同的字段
+    -ShardRoutingState state
+    -RecoverySource recoverySource
+    -UnassignedInfo unassignedInfo
+    -AllocationId allocationId
+}
+class ShardId{
+    -Index index;
+    -int shardId;
+}
+class Index{
+    -String name;
+    -String uuid;
+}
+
+enum ShardRoutingState{
+    UNASSIGNED
+    INITIALIZING
+    STARTED
+    RELOCATING
+}
+
+RoutingTable "1" *--right-- "n" IndexRoutingTable
+IndexRoutingTable "1" *-- "n" IndexShardRoutingTable
+IndexShardRoutingTable "1" *--left-- "n" ShardRouting
+ShardRouting *-- ShardId
+ShardId *-- Index
+ShardRouting *-- ShardRoutingState
+
+@enduml

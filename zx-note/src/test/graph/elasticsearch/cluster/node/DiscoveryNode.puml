@@ -1,0 +1,32 @@
+@startuml
+class DiscoveryNode{
+    // 代表集群中的一个节点
+    ---
+    -String nodeName
+    -String nodeId
+    -String ephemeralId;
+    -String hostName;
+    -String hostAddress;
+    -TransportAddress address;
+    -Map<String, String> attributes;
+    -Set<Role> roles; // 角色：Master? Data? Ingest?
+}
+
+class DiscoveryNodes extends AbstractDiffable{
+    // 包含集群中所有的节点
+    ---
+    -ImmutableOpenMap<String, DiscoveryNode> nodes;
+    -ImmutableOpenMap<String, DiscoveryNode> dataNodes;
+    -ImmutableOpenMap<String, DiscoveryNode> masterNodes;
+    -ImmutableOpenMap<String, DiscoveryNode> ingestNodes;
+    -String masterNodeId;
+    -String localNodeId;
+    ---
+    // 本地节点是否被选举成Master
+    +boolean isLocalNodeElectedMaster()
+    +int getSize() // 节点数目
+    +Delta delta(DiscoveryNodes other)
+}
+
+DiscoveryNodes "1" *-right-- "n" DiscoveryNode : contains
+@enduml
