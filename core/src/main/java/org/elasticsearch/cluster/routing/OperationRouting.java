@@ -40,6 +40,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * 路由操作
+ */
 public class OperationRouting extends AbstractComponent {
 
     private String[] awarenessAttributes;
@@ -55,19 +58,52 @@ public class OperationRouting extends AbstractComponent {
         this.awarenessAttributes = awarenessAttributes;
     }
 
+    /**
+     * 写入文档时的路由函数
+     * @param clusterState
+     * @param index
+     * @param id
+     * @param routing
+     * @return
+     */
     public ShardIterator indexShards(ClusterState clusterState, String index, String id, @Nullable String routing) {
         return shards(clusterState, index, id, routing).shardsIt();
     }
 
+    /**
+     * 用get 获取文档时的路由函数，指定了id 和 routing值
+     * @param clusterState
+     * @param index
+     * @param id
+     * @param routing
+     * @param preference
+     * @return
+     */
     public ShardIterator getShards(ClusterState clusterState, String index, String id, @Nullable String routing, @Nullable String preference) {
         return preferenceActiveShardIterator(shards(clusterState, index, id, routing), clusterState.nodes().getLocalNodeId(), clusterState.nodes(), preference);
     }
 
+    /**
+     * 用get 获取文档时的路由函数， 指定了shardId
+     * @param clusterState
+     * @param index
+     * @param shardId
+     * @param preference
+     * @return
+     */
     public ShardIterator getShards(ClusterState clusterState, String index, int shardId, @Nullable String preference) {
         final IndexShardRoutingTable indexShard = clusterState.getRoutingTable().shardRoutingTable(index, shardId);
         return preferenceActiveShardIterator(indexShard, clusterState.nodes().getLocalNodeId(), clusterState.nodes(), preference);
     }
 
+    /**
+     * search查询时的路由函数
+     * @param clusterState
+     * @param concreteIndices
+     * @param routing
+     * @param preference
+     * @return
+     */
     public GroupShardsIterator<ShardIterator> searchShards(ClusterState clusterState, String[] concreteIndices, @Nullable Map<String, Set<String>> routing, @Nullable String preference) {
         final Set<IndexShardRoutingTable> shards = computeTargetedShards(clusterState, concreteIndices, routing);
         final Set<ShardIterator> set = new HashSet<>(shards.size());
@@ -177,6 +213,10 @@ public class OperationRouting extends AbstractComponent {
             }
         }
         // if not, then use it as the index
+        /**
+         * 使用自定义的字符串作为preference. 先hash，再shuffle。
+         * 相同的preference得到的ShardIterator顺序始终是一致的。
+         */
         if (awarenessAttributes.length == 0) {
             return indexShard.activeInitializingShardsIt(Murmur3HashFunction.hash(preference));
         } else {
@@ -200,6 +240,12 @@ public class OperationRouting extends AbstractComponent {
         return indexRouting;
     }
 
+    /**
+     * 返回给定名称的索引的IndexMetaData
+     * @param clusterState
+     * @param index 索引名称
+     * @return
+     */
     protected IndexMetaData indexMetaData(ClusterState clusterState, String index) {
         IndexMetaData indexMetaData = clusterState.metaData().index(index);
         if (indexMetaData == null) {
@@ -218,6 +264,15 @@ public class OperationRouting extends AbstractComponent {
         return new ShardId(indexMetaData.getIndex(), generateShardId(indexMetaData, id, routing));
     }
 
+    /**
+     * 计算Shard id。优先使用routing值，routing值为null时用id。
+     * 先hash，再mod。
+     * 通常情况下，partitionOffset=0, indexMetaData.getRoutingFactor()=1
+     * @param indexMetaData
+     * @param id
+     * @param routing
+     * @return
+     */
     static int generateShardId(IndexMetaData indexMetaData, @Nullable String id, @Nullable String routing) {
         final String effectiveRouting;
         final int partitionOffset;

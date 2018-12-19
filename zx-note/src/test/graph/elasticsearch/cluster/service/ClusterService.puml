@@ -1,6 +1,5 @@
 @startuml
 
-
 class ClusterService{
     ---
     // 三种优先级的集群状态更改
@@ -8,6 +7,8 @@ class ClusterService{
     -Collection<ClusterStateApplier> normalPriorityStateAppliers
     -Collection<ClusterStateApplier> lowPriorityStateAppliers
     -AtomicReference<ClusterState> state
+    -NodeConnectionsService nodeConnectionsService
+    -OperationRouting operationRouting
 }
 
 class ClusterSettings{
@@ -51,11 +52,41 @@ class ClusterBlocks{
     // 表示集群级别的阻塞，用来阻止对集群的脏操作
     // 见elasticsearch.cluster.block包
 }
+
+class NodeConnectionsService{
+    // 负责连接到其他节点（当节点加入集群时）
+    // 或者断开到其他节点的连接（当节点从集群被移除时）
+    // 内部依赖org.elasticsearch.transport.TransportService来实现功能
+    ---
+    +void connectToNodes(DiscoveryNodes discoveryNodes)
+    +void disconnectFromNodesExcept(DiscoveryNodes nodesToKeep)
+}
+
+class OperationRouting{
+    // 路由操作
+    ---
+    // 用get 获取文档时的路由函数，指定了id 和 routing值
+    +ShardIterator getShards(ClusterState clusterState, String index, String id, @Nullable String routing, @Nullable String preference)
+    // 用get 获取文档时的路由函数， 指定了shardId
+    +ShardIterator getShards(ClusterState clusterState, String index, int shardId, @Nullable String preference)
+    // 写入文档时的路由函数
+    +ShardIterator indexShards(ClusterState clusterState, String index, String id, @Nullable String routing)
+    // search查询时的路由函数
+    +GroupShardsIterator<ShardIterator> searchShards(ClusterState clusterState, String[] concreteIndices, @Nullable Map<String, Set<String>> routing, @Nullable String preference)
+    +ShardId shardId(ClusterState clusterState, String index, String id, @Nullable String routing)
+}
+
 ClusterService *-- ClusterSettings
+
+ClusterService *- DiscoverySettings
+
+ClusterService *---- OperationRouting
 
 ClusterService "1" *-- "n" ClusterStateApplier
 
 ClusterService *-- ClusterState
+
+ClusterService *-- NodeConnectionsService
 
 ClusterState *-- RoutingTable
 
