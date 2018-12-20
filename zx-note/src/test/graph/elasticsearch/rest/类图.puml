@@ -1,0 +1,79 @@
+@startuml
+
+set namespaceSeparator ::
+
+note as N1
+通过RESTful HTTP 来暴露ES的功能
+end note
+
+package org.elasticsearch.common.xcontent{
+    interface ToXContent.Params{
+        +String param(String key);
+        +String param(String key, String defaultValue);
+        +boolean paramAsBoolean(String key, boolean defaultValue);
+        +Boolean paramAsBoolean(String key, Boolean defaultValue);
+    }
+}
+
+package org.elasticsearch.rest{
+    class RestController{
+        // 负责注册Handler 、分配请求
+        ---
+        +void registerHandler(RestRequest.Method method, String path, RestHandler handler)
+        +void dispatchRequest(RestRequest request, RestChannel channel, ThreadContext threadContext)
+        +void dispatchBadRequest(...)
+    }
+
+    abstract class RestRequest implements org.elasticsearch.common.xcontent::ToXContent.Params{
+        // Rest请求
+        ---
+        +{abstract} Method method()
+        +{abstract} String uri()
+        +String rawPath()
+        +String path()
+        +String header(String name)
+        ---
+        +String param(String key)
+        +int paramAsInt(String key, int defaultValue)
+        +TimeValue paramAsTime(String key, TimeValue defaultValue)
+        其他获取param的方法...
+    }
+
+    abstract class RestResponse{
+        // Rest 响应
+        ---
+        +{abstract} String contentType()
+        +{abstract} BytesReference content()
+        +{abstract} RestStatus status()
+    }
+
+    interface RestChannel{
+        // 用来构造响应内容，并发送响应
+        ---
+        +XContentBuilder newBuilder()
+        +XContentBuilder newErrorBuilder()
+        +BytesStreamOutput bytesOutput()
+        +RestRequest request()
+        +void sendResponse(RestResponse response)
+        +boolean detailedErrorsEnabled()
+    }
+
+    interface RestHandler{
+        // Rest请求处理器
+        ---
+        // request : 待处理的请求
+        // channel : 写响应的通道
+        // client : 用于创建代表原始请求的internal requests
+        +void handleRequest(RestRequest request, RestChannel channel, NodeClient client)
+    }
+
+    enum RestStatus{
+        ---
+        OK(200)
+        NOT_MODIFIED(304)
+        BAD_REQUEST(400)
+        INTERNAL_SERVER_ERROR(500)
+        其他各种HTTP状态...
+    }
+}
+@enduml

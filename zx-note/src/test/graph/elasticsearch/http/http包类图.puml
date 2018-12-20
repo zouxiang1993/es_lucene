@@ -1,0 +1,32 @@
+@startuml
+interface HttpServerTransport{
+    +BoundTransportAddress boundAddress()
+    +HttpInfo info()
+    +HttpStats stats()
+}
+
+interface HttpServerTransport.Dispatcher{
+    // 分发http请求
+    ---
+    // 将RestRequest分配到对应的RestHandler，
+    // 如果没有合适的RestHandler，则直接将结果响应到RestChannel中
+    +void dispatchRequest(RestRequest request, RestChannel channel, ThreadContext threadContext)
+    ---
+    //
+    +void dispatchBadRequest(RestRequest request, RestChannel channel, ThreadContext threadContext, Throwable cause)
+}
+
+class HttpStats{
+    -long serverOpen
+    -long totalOpen;
+}
+
+class HttpInfo{
+    -BoundTransportAddress address
+    -long maxContentLength
+}
+
+HttpServerTransport *--- HttpServerTransport.Dispatcher
+HttpServerTransport *-- HttpStats
+HttpServerTransport *-- HttpInfo
+@enduml

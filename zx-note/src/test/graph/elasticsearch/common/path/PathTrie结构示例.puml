@@ -1,0 +1,28 @@
+@startuml
+note as N1
+PathTrie是一颗字典树，每一个节点代表一类请求的URL，
+每一条边代表"/"分隔的一段URL，支持通配符{index}, {type}等
+可以将一个URL绑定到一个RestHandler上
+这个是ES GET请求的PathTrie示例
+end note
+node "/" as node1
+node "/{index}\nRestGetIndicesAction" as node11
+node "/_search\nRestSearchAction" as node12
+node "/其他" as node13
+node "/{index}/_count\nRestCountAction" as node111
+node "/{index}/_mapping\n" as node112
+node "/{index}/_mapping/{type}\nRestGetMappingAction" as node1121
+node "/_search/scroll\nRestSearchScrollAction" as node121
+node "/_search/template\nRestSearchTemplateAction" as node122
+
+node1 --> node11 : "{index}"
+node1 --* node12: "_search"
+node1 --* node13: "......."
+
+node11 --> node111 : "_count"
+node11 --> node112 : "_mapping"
+node112 --> node1121 : "{type}"
+
+node12 --> node121 : "scroll"
+node12 --> node122 : "template"
+@enduml

@@ -1,0 +1,8 @@
+@startuml
+participant ActionModule
+participant RestController
+autonumber
+ActionModule -> ActionModule : setupActions()\n注册各种Action
+create RestController
+ActionModule -> RestController : new
+@enduml

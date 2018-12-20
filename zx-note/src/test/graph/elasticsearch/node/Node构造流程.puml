@@ -23,20 +23,26 @@ Node -> NodeClient: new
     各种Action
     end note
 create ResourceWatcherService
-Node -> ResourceWatcherService
+Node -> ResourceWatcherService : new
     note right
     资源监控
     end note
 create NetworkService
-Node -> NetworkService
+Node -> NetworkService : new
     note right
     TODO: 网络
     end note
 create ClusterService
-Node -> ClusterService
+Node -> ClusterService : new
     note right
-    TODO: 集群服务 !!!
+    集群服务
     end note
+create ActionModule
+Node -> ActionModule : new
+    note right
+
+    end note
+
 @enduml
 
 
