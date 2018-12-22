@@ -1,0 +1,35 @@
+@startuml
+participant "<b>RestController</b>" as RestController
+participant "<b>RestGetAction</b> \n extends \nBaseRestHandler" as RestGetAction
+participant "<b>GetRequest</b>\n extends \n ActionRequest" as GetRequest
+participant "<b>RestChannelConsumer</b>" as RestChannelConsumer
+participant "<b>NodeClient</b> \n implements \n Client" as NodeClient
+participant "<b>TransportGetAction</b> \n extends \n TransportAction " as TransportAction
+participant "<b>AsyncSingleAction</b>" as AsyncSingleAction
+
+note over of NodeClient
+用于在本地节点执行Action的Client
+end note
+autonumber
+--> RestController : dispatchRequest( RestRequest, \n RestChannel, ThreadContext)
+RestController --> RestController : getHandler(RestRequest)\n根据请求的Method和URL来获取Handler
+RestController -> RestGetAction : handleRequest(RestRequest, \n RestChannel, NodeClient)
+RestGetAction -> RestGetAction : prepareRequest(RestRequest, NodeClient)\n消费掉RestRequest中所有的params，生成ActionRequest对象\n 最终以Consumer的形式返回一个可执行的action
+activate RestGetAction
+create GetRequest
+RestGetAction -> GetRequest : create
+create RestChannelConsumer
+RestGetAction -> RestChannelConsumer : create
+deactivate RestGetAction
+RestGetAction -> RestChannelConsumer : apply(RestChannel)
+RestChannelConsumer -> NodeClient : get(GetRequest,\n ActionListener<GetResponse>)
+NodeClient -> NodeClient :executeLocally(GenericAction, \n Request, ActionListener)
+activate NodeClient
+NodeClient -> TransportAction : 根据Action找到对应的TransportAction
+NodeClient -> TransportAction : execute(Request, ActionListener)
+TransportAction -> TransportAction : doExecute(Request, \n ActionListener<Response>)
+create AsyncSingleAction
+TransportAction -> AsyncSingleAction : new
+TransportAction -> AsyncSingleAction : start()
+deactivate NodeClient
+@enduml

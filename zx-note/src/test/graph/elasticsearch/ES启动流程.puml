@@ -1,5 +1,4 @@
 @startuml
-
 participant InternalSettingsPreparer
 participant Elasticsearch
 participant Bootstrap
@@ -15,5 +14,8 @@ create Node
 Bootstrap -> Node : new() 创建节点
 deactivate Bootstrap
 Bootstrap -> Bootstrap : start()
-
+activate Bootstrap
+Bootstrap -> Node : start() 启动节点
+Bootstrap -> Bootstrap : keepAliveThread.start()
+deactivate Bootstrap
 @enduml

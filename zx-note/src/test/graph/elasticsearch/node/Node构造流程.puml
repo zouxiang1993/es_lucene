@@ -42,7 +42,26 @@ Node -> ActionModule : new
     note right
 
     end note
-
+create MetaStateService
+Node -> MetaStateService : new
+    note right
+    TODO：
+    end note
+create IndicesService
+Node -> IndicesService : new
+    note right
+    TODO：
+    end note
+create NetworkModule
+Node -> NetworkModule : new
+    note right
+    TODO:
+    end note
+create TransportService
+Node -> TransportService : new
+    note right
+    TODO:
+    end note
 @enduml
 
 
