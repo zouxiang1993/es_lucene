@@ -1,0 +1,49 @@
+@startuml
+
+class LiveIndexWriterConfig{
+    ---
+    // 索引时用的默认分词器
+    -Analyzer analyzer
+    //
+    -int maxBufferedDocs
+    -double ramBufferSizeMB
+    -int maxBufferedDeleteTerms
+    // 控制何时删除Commit Point
+    #IndexDeletionPolicy delPolicy
+    #IndexCommit commit
+    #OpenMode openMode
+    #Similarity similarity
+    // 选择应该执行哪些merge
+    #MergePolicy mergePolicy
+    // 控制merge何时执行、如何执行
+    #MergeScheduler mergeScheduler
+    #
+    IndexingChain indexingChain
+    // 定义了内部所有类型索引的Encoder和Decoder
+    Codec codec
+    //
+    #DocumentsWriterPerThreadPool indexerThreadPool
+    // 定义In-memery buffer 何时被flush
+    #FlushPolicy flushPolicy
+    // 限制In-memery buffer的大小，超过后强制flush
+    #int perThreadHardLimitMB
+}
+
+class IndexWriterConfig extends LiveIndexWriterConfig{
+
+}
+
+enum OpenMode{
+---
+// 创建一个新的索引，或者覆盖掉一个已经存在的索引
+CREATE
+// 打开一个已经存在的索引
+APPEND
+// 如果索引不存在，则CREATE；如果存在，则APPEND
+CREATE_OR_APPEND
+}
+
+
+
+LiveIndexWriterConfig *--right-- OpenMode
+@enduml

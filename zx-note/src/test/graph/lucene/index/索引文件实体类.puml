@@ -1,0 +1,124 @@
+@startuml
+class StandardDirectoryReader{
+    ~SegmentInfos segmentInfos
+    -SegmentReader[] subReaders
+}
+
+class SegmentReader{
+    ~SegmentCoreReaders core
+}
+
+class SegmentCoreReader{
+    ~FieldsProducer fields
+    ~NormsProducer normsProducer
+    ~StoredFieldsReader fieldsReaderOrig
+    ~TermVectorsReader termVectorsReaderOrig
+    ~FieldInfos coreFieldInfos
+}
+
+class SegmentInfos{
+    # <b><font color=red>segment_N文件</font></b>
+    -List<SegmentCommitInfo> segments
+}
+
+class SegmentCommitInfo{
+    包装一个只读的SegmentInfo，
+    并提供一些 per-commit fields
+    每次commit这些字段都可能变化
+    ---
+    +SegmentInfo info
+    // 已删除的文档数
+    -int delCount
+    // .liv文件的生成序号
+    -long delGen
+    // FieldInfos的生成序号
+    -long fieldInfosGen
+    ...
+}
+
+class SegmentInfo{
+    <b><font color=red>xxx.si文件</font></b>,表示一个segment
+    <b><font color=red>不可变对象
+    ---
+    +String name
+    -int maxDoc // 段中文档总数
+    +Directory dir // 段存在的位置/目录
+    -boolean isCompoundFile // 是否使用复合文件
+    -Codec codec //段文件的编码解码器
+    -Set<String> setFiles //相关文件
+}
+
+class FieldInfos{
+    # .fnm文件
+    -boolean hasFreq
+    -boolean hasProx
+    -boolean hasPayloads
+    -boolean hasOffsets
+    -boolean hasVectors
+    -boolean hasNorms
+    -boolean hasDocValues
+    -boolean hasPointValues
+    --
+    -FieldInfo[] byNumberTable
+    -SortedMap<Integer,FieldInfo> byNumberMap
+    -HashMap<String,FieldInfo> byName
+    -Collection<FieldInfo> values
+}
+
+class FieldInfo{
+    +String name
+    +int number
+    -DocValuesType docValuesType
+    -boolean storeTermVector
+    -boolean omitNorms
+    -IndexOptions indexOptions
+    -boolean storePayloads
+}
+
+class FieldsReader extends FieldsProducer{
+    -Map<String,FieldsProducer> fields
+    -Map<String,FieldsProducer> formats
+}
+
+class BlockTreeTermsReader extends FieldsProducer{
+}
+
+class CompressingStoredFieldsReader extends StoredFieldsReader{
+    // 读取.fdx的reader 和 读取.fdt的inputstream
+    -CompressingStoredFieldsIndexReader indexReader
+    -IndexInput fieldsStream
+}
+
+abstract class TermVectorsReader{
+    +Fields get(int doc)
+}
+
+class CompressingTermVectorsReader extends TermVectorsReader{
+    // 读取.tvx的reader和读取.tvd的inputstream
+    // 这里是重用的.fdx的reader类，二者结构是一致的。
+    ~CompressingStoredFieldsIndexReader indexReader
+    ~IndexInput vectorsStream
+}
+
+class FieldsProducer extends Fields{
+
+}
+
+class Fields{
+    +Terms terms(String field)
+}
+
+FieldInfos "1" -left---*  "n" FieldInfo : contains
+
+SegmentCoreReader --* FieldInfos : contains
+SegmentCoreReader --* FieldsProducer : contains
+SegmentCoreReader --* StoredFieldsReader : contains
+SegmentCoreReader --* TermVectorsReader : contains
+
+SegmentReader -up--* SegmentCoreReader : contains
+StandardDirectoryReader "1" -left--* "n" SegmentReader : contains
+StandardDirectoryReader -up--* SegmentInfos : contains
+SegmentInfos "1" -up--*  "n" SegmentCommitInfo : contains
+SegmentCommitInfo -up--*  SegmentInfo : wrap
+
+@enduml
