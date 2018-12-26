@@ -9,13 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>example</artifactId>
+    <artifactId>extend_mapping_char_filter</artifactId>
 
     <properties>
         <elasticsearch.assembly.descriptor>${project.basedir}/src/main/assemblies/plugin.xml</elasticsearch.assembly.descriptor>
     </properties>
 
     <build>
+        <finalName>extend-mapping</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

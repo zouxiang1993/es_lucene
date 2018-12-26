@@ -60,7 +60,6 @@
     </modules>
 
     <build>
-        <finalName>esearch-server</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
