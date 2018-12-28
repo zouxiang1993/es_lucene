@@ -4,6 +4,9 @@ participant DocumentsWriter
 participant DocumentsWriterFlushControl
 participant DocumentsWriterPerThreadPool
 
+note over DocumentsWriterDeleteQueue
+    TODO: DWDQ的实现！！！
+end note
 autonumber
 --> IndexWriter : updateDocument(\nTerm, Document)
 IndexWriter --> DocumentsWriter : updateDocument(\nDocument, Analyzer, Term)

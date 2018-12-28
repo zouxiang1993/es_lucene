@@ -10,6 +10,11 @@ class DocumentsWriterDeleteQueue{
 
     long generation
     AtomicLong nextSeqNo
+    ---
+    // 由DW调用，直接deleteDocument时
+    long addDelete(Term... terms)
+    // 由DWPT调用， updateDocument时
+    long add(Term term, DeleteSlice slice)
 }
 
 class Node<T> {
