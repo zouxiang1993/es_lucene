@@ -1,0 +1,99 @@
+@startuml
+class IndexWriter{
+    // 负责创建并维护一个index
+    ---
+    // original user directory
+    -Directory directoryOrig
+    // wrapped with additional checks
+    -Directory directory
+    // how to analyze text
+    -Analyzer analyzer
+    // 每次修改完成后都 +1
+    -AtomicLong changeCount
+    // 最后一次提交的changeCount
+    -long lastCommitChangeCount
+    // 所有 segment 的信息
+    -SegmentInfos segmentInfos
+    //
+    -DocumentsWriter docWriter
+    -Queue<Event> eventQueue
+    -IndexFileDeleter deleter
+    // 当前文档总数，用来判断是否超过最大限制
+    AtomicLong pendingNumDocs
+    ---
+    +long addDocument(doc)
+    +long updateDocument(Term term, doc)
+    +long deleteDocuments(Term... terms)
+    // 触发一次MergePolicy的判定
+    +void maybeMerge()
+    // 强制触发一次merge
+    +void forceMerge(int maxNumSegments)
+}
+
+class SegmentInfos{
+    已经落地的segment
+}
+
+class DocumentsWriter{
+    In-memery Buffer
+}
+
+class IndexWriter{
+    ---
+    // 当前文档总数，用来判断是否超过最大限制
+    AtomicLong pendingNumDocs
+}
+
+class DocumentsWriter{
+
+}
+
+class DocumentsWriterPerThread{
+    ---
+    Codec codec
+    TrackingDirectoryWrapper directory
+    Directory directoryOrig
+    DocState docState
+    DocConsumer consumer
+    SegmentWriteState flushState
+    BufferedUpdates pendingUpdates
+    // 当前segment的信息
+    SegmentInfo segmentInfo
+    FieldInfos.Builder fieldInfos
+    int numDocsInRAM
+    DocumentsWriterDeleteQueue deleteQueue
+    DeleteSlice deleteSlice
+
+}
+
+class ThreadState extends ReentrantLock{
+    DocumentsWriterPerThread dwpt
+    boolean flushPending
+    long lastSeqNo
+}
+
+class DocumentsWriterPerThreadPool{
+    -List<ThreadState> threadStates
+    -List<ThreadState> freeList
+    -boolean aborted
+    ---
+    // 将aborted设置为true
+    void setAbort()
+    // 将aborted设置为false，并notifyAll 调用newThreadState的线程
+    void clearAbort()
+    // 清空ThreadState中的TWPT
+    DocumentsWriterPerThread reset(ThreadState threadState)
+    ThreadState getAndLock(Thread requestingThread, DocumentsWriter documentsWriter)
+    void release(ThreadState state)
+    // 释放一个ThreadState，并加入freeList中。
+    ThreadState getThreadState(int ord)
+    //
+    int getMaxThreadStates()
+}
+
+IndexWriter *-- SegmentInfos
+IndexWriter *-- DocumentsWriter
+DocumentsWriter *-- ThreadState : 每个线程使用一个ThreadState
+DocumentsWriterPerThreadPool *--right-- "n" ThreadState : "contains     "
+ThreadState *-- "1" DocumentsWriterPerThread
+@enduml

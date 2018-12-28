@@ -213,7 +213,7 @@ class DocumentsWriterPerThread {
   public long updateDocument(Iterable<? extends IndexableField> doc, Analyzer analyzer, Term delTerm) throws IOException, AbortingException {
     testPoint("DocumentsWriterPerThread addDocument start");
     assert deleteQueue != null;
-    reserveOneDoc();
+    reserveOneDoc(); // 先占一个doc的位置，避免超过最大文档数目的限制。
     docState.doc = doc;
     docState.analyzer = analyzer;
     docState.docID = numDocsInRAM;
@@ -229,7 +229,7 @@ class DocumentsWriterPerThread {
     boolean success = false;
     try {
       try {
-        consumer.processDocument();
+        consumer.processDocument();  // TODO: 如何消费一个文档?
       } finally {
         docState.clear();
       }
@@ -238,7 +238,7 @@ class DocumentsWriterPerThread {
       if (!success) {
         // mark document as deleted
         deleteDocID(docState.docID);
-        numDocsInRAM++;
+        numDocsInRAM++; // 这里是出现异常的情况，正常情况下会在finishDocument()中增加
       }
     }
 

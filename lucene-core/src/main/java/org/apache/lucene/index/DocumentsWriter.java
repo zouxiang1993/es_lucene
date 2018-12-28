@@ -371,6 +371,7 @@ final class DocumentsWriter implements Closeable, Accountable {
     flushControl.setClosed();
   }
 
+  // 1. 执行排队的flush操作。 2. 如果写的速度太快，则阻塞。
   private boolean preUpdate() throws IOException, AbortingException {
     ensureOpen();
     boolean hasEvents = false;

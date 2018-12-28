@@ -1,0 +1,38 @@
+@startuml
+participant IndexWriter
+participant DocumentsWriter
+participant DocumentsWriterFlushControl
+participant DocumentsWriterPerThreadPool
+
+autonumber
+--> IndexWriter : updateDocument(\nTerm, Document)
+IndexWriter --> DocumentsWriter : updateDocument(\nDocument, Analyzer, Term)
+
+== 第一阶段，有锁==
+DocumentsWriter --> DocumentsWriter : preUpdate()\n(1)执行排队的flush\n(2)如果写速度太快,\n则阻塞
+DocumentsWriter --> DocumentsWriterFlushControl : obtainAndLock() \n 获取一个ThreadState
+
+== 第二阶段，无锁。每个线程都在自己独立的DWPT内处理数据==
+DocumentsWriter --> DocumentsWriter : ensureInitialized(ThreadState state)\n 初始化ThreadState，重用或新建DWPT
+activate DocumentsWriter
+create DocumentsWriterPerThread
+DocumentsWriter --> DocumentsWriterPerThread : new... DWPT在一个时刻只会被一个线程使用
+DocumentsWriter --> DocumentsWriterPerThread : updateDocument
+DocumentsWriterPerThread --> DocConsumer : processDocument 消费文档 \n 写入内存buffer
+DocumentsWriterPerThread --> DocumentsWriterPerThread : finishDocument()
+activate DocumentsWriterPerThread
+DocumentsWriterPerThread --> DocumentsWriterDeleteQueue : add() 加入删除队列
+DocumentsWriterPerThread --> DeleteSlice : apply() 或者 reset()
+deactivate DocumentsWriterPerThread
+deactivate DocumentsWriter
+DocumentsWriter --> DocumentsWriterFlushControl : doAfterDocument()\n 判定是否需要flush
+DocumentsWriter --> DocumentsWriterPerThreadPool : release()释放ThreadState
+DocumentsWriter --> DocumentsWriter : postUpdate
+activate DocumentsWriter
+DocumentsWriter --> DocumentsWriter : applyAllDeletes
+DocumentsWriter --> DocumentsWriter : doFlush
+deactivate DocumentsWriter
+
+
+IndexWriter --> IndexWriter : processEvents
+@enduml
