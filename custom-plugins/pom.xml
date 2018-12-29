@@ -36,5 +36,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.zx.es_lucene</groupId>
+            <artifactId>transport-netty4</artifactId>
+            <version>${es.lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
