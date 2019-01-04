@@ -1,0 +1,49 @@
+@startuml
+skinparam class{
+    BackgroundColor<<Important>> PaleGreen
+    BorderColor<<Important>> SpringGreen
+}
+
+abstract class Lock{
+    // 进程间互斥的锁
+    ---
+    // 释放锁
+    +{abstract}void close()
+    // 尽力验证锁当前是否还有效
+    // 比如说，有人手动将锁文件删除了。
+    +{abstract} void ensureValid()
+}
+
+abstract class LockFactory{
+    // 获取一个锁
+    +{abstract} Lock obtainLock(Directory dir, String lockName)
+}
+
+class SingleInstanceLockFactory extends LockFactory{
+
+}
+
+class VerifyingLockFactory extends LockFactory{
+
+}
+
+class NoLockFactory extends LockFactory{
+
+}
+
+abstract class FSLockFactory extends LockFactory{
+    // 基于文件系统来实现的锁
+    ---
+    +{abstract} Lock obtainFSLock(FSDirectory dir, String lockName)
+}
+
+class NativeFSLockFactory<<Important>> extends FSLockFactory{
+    // 默认的实现方式!!!
+    // 使用操作系统的文件锁来实现
+    // 当JVM非正常退出时，锁会被自动释放(锁文件并不会被删除)
+}
+
+class SimpleFSLockFactory extends FSLockFactory{
+
+}
+@enduml

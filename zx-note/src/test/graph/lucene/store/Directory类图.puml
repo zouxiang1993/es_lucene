@@ -1,0 +1,78 @@
+@startuml
+abstract class Directory{
+    // Directory表示一些扁平文件的集合
+    ---
+    // 返回目录下所有文件
+    +{abstract} String[] listAll()
+    +{abstract} void deleteFile(String name)
+    +{abstract} long fileLength(String name)
+    // 创建一个新文件
+    +{abstract} IndexOutput createOutput(String name, IOContext context)
+    // 创建一个临时文件
+    +{abstract} IndexOutput createTempOutput(String prefix, String suffix, IOContext context)
+    // 确保对这些文件所有的写入都被转移到稳定的存储介质上去。
+    +{abstract} void sync(Collection<String> names)
+    // 重命名文件
+    +{abstract} void rename(String source, String dest)
+    // 持久化Directory的元数据
+    +{abstract} void syncMetaData()
+    // 打开一个文件
+    +{abstract} IndexInput openInput(String name, IOContext context)
+    // 获取锁
+    +{abstract} Lock obtainLock(String name)
+}
+
+class FileSwitchDirectory extends Directory {
+    // ??????
+}
+
+abstract class BaseDirectory extends Directory{
+    // Directory具体实现的基类，使用LockFactory来获取锁
+    # LockFactory lockFactory
+}
+
+class RAMDirectory extends BaseDirectory{
+    // 在内存中的实现
+}
+
+abstract class FSDirectory extends BaseDirectory{
+    // 在文件系统上的实现
+    ---
+    // 根据当前的环境来选择使用哪一种实现。
+    + {static}FSDirectory open(Path path, LockFactory lockFactory)
+    ---
+    #Path directory
+}
+
+class SimpleFSDirectory extends FSDirectory{
+    //
+}
+
+class MMapDirectory extends FSDirectory{
+}
+
+class NIOFSDirectory extends FSDirectory{
+}
+
+abstract class FilterDirectory extends Directory{
+    // 装饰
+}
+
+class NRTCachingDirectory extends FilterDirectory{
+
+}
+
+class LockValidatingDirectoryWrapper extends FilterDirectory{
+    // 在一些写操作进行之前，提供锁的校验
+}
+
+class TrackingDirectoryWrapper extends FilterDirectory {
+    // 可以记录创建了哪些文件
+    +Set<String> getCreatedFiles()
+}
+
+class SleepingLockWrapper extends FilterDirectory{
+    // 如果获取锁失败，则休眠一段时间后重试。
+}
+
+@enduml

@@ -71,7 +71,7 @@ import org.apache.lucene.util.IOUtils;
  *
  * @see LockFactory
  */
-
+// Lucene默认的文件锁
 public final class NativeFSLockFactory extends FSLockFactory {
   
   /**

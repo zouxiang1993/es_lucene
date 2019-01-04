@@ -1,0 +1,76 @@
+@startuml
+
+interface RandomAccessInput{
+    // 随机访问的API，不会记录当前读到文件的什么位置
+    // 所有的读操作都是根据绝对位置来读
+    ---
+    +byte readByte(long pos)
+    +short readShort(long pos)
+    +int readInt(long pos)
+    +long readLong(long pos)
+}
+
+abstract class DataInput{
+    +{abstract} byte readByte()
+    +{abstract} void readBytes(byte[] b, int offset, int len)
+    +short readShort()
+    +int readInt()
+    +int readVInt()
+    +int readZInt()
+    +long readLong()
+    +long readVLong()
+    +long readZLong()
+    +String readString()
+    +Map<String,String> readMapOfStrings()
+    +Set<String> readSetOfStrings()
+    +void skipBytes(final long numBytes)
+}
+
+abstract class IndexInput extends DataInput{
+    // 表示Directory中一个文件的输入
+    ---
+    // 返回文件当前读入的position
+    +{abstract} long getFilePointer()
+    // 设置文件当前读入的position
+    +{abstract} void seek(long pos)
+    // 文件字节数
+    +{abstract} long length()
+
+}
+
+class InputStreamDataInput extends DataInput{
+    // 一个DataInput
+    // 包装一个普通的InputStream
+}
+
+abstract class ByteBufferIndexInput extends IndexInput implements RandomAccessInput{
+    // 用ByteBuffer的数组来表示一个文件
+}
+
+abstract class BufferedIndexInput extends IndexInput implements RandomAccessInput{
+    // 带缓冲功能的IndexInput
+    ---
+    #{abstract} void readInternal(byte[] b, int offset, int length)
+    #{abstract} void seekInternal(long pos)
+}
+
+class RAMInputStream extends IndexInput{
+    // 一种在内存中的IndexInput实现
+}
+
+abstract class ChecksumIndexInput extends IndexInput{
+    // 一边读入数据，一边计算checksum
+    ---
+    // 返回当前的checksum
+    + {abstract} long getChecksum()
+
+}
+
+class ByteArrayIndexInput extends IndexInput{
+    // 未使用？
+}
+
+class BufferedChecksumIndexInput extends ChecksumIndexInput{
+
+}
+@enduml

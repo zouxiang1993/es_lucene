@@ -1,0 +1,31 @@
+@startuml
+class IOContext{
+    +Context context
+    +MergeInfo mergeInfo
+    +FlushInfo flushInfo
+    +boolean readOnce
+}
+
+enum Context {
+    MERGE
+    READ
+    FLUSH
+    DEFAULT
+}
+
+class FlushInfo{
+    +int numDocs
+    +long estimatedSegmentSize
+}
+
+class MergeInfo{
+    +int totalMaxDoc
+    +long estimatedMergeBytes
+    +boolean isExternal
+    +int mergeMaxNumSegments
+}
+
+IOContext "1" *-- "1" Context
+IOContext "1" *-- "0..1" FlushInfo
+IOContext "1" *-- "0..1" MergeInfo
+@enduml
