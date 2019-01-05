@@ -1,0 +1,98 @@
+@startuml
+class Field{
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .........................................................
+}
+
+StoredField -down-|> Field
+class StoredField{
+    // 值会被存储的Field
+}
+
+StringField -down-|> Field
+class StringField{
+    // Indexed,
+    // not tokenized,
+    // omits norms,
+    // indexes DOCS_ONLY
+    // stored 或 not stored
+}
+
+TextField -down-|> Field
+class TextField{
+    // Indexed DOCS_AND_FREQS_AND_POSITIONS
+    // tokenized
+    // stored 或 not stored
+}
+
+namespace DocValues{
+    BinaryDocValuesField -up-|> .Field
+
+    DoubleDocValuesField -up--|> NumericDocValuesField
+
+    FloatDocValuesField -up--|> NumericDocValuesField
+
+    NumericDocValuesField -up-|> .Field
+
+    SortedDocValuesField -up-|> .Field
+
+    SortedNumericDocValuesField -up-|> .Field
+
+    SortedSetDocValuesField -up-|> .Field
+}
+
+namespace point{
+    BinaryPoint --|> .Field
+
+    DoublePoint --|> .Field
+
+    FloatPoint --|> .Field
+
+    LongPoint --|> .Field
+
+    IntPoint --|> .Field
+    class IntPoint{
+        // 一个被索引的int字段，用来快速执行范围过滤
+        // 如果需要存储这个int值，还需要另外一个StoredField字段
+        // 一个文档的同一个字段支持多值
+        ---
+        +{static} Query newExactQuery(String, int)
+        +{static} Query newRangeQuery(String, int, int)
+        +{static} Query newSetQuery(String, int...)
+        +{static} Query newRangeQuery(String, int[], int[]) ???
+    }
+}
+
+namespace range{
+    LongRange -right-|> .Field
+
+    DoubleRange --|> .Field
+
+    FloatRange ---|> .Field
+
+    IntRange ----|> .Field
+    class IntRange{
+        // 最多支持4组 min/max 对
+        // 区间操作
+        ---
+        +{static} Query newIntersectsQuery(String, int[], int[])
+        +{static} Query newContainsQuery(String, int[], int[])
+        +{static} Query newWithinQuery(String, int[], int[])
+    }
+}
+@enduml

@@ -1,0 +1,98 @@
+@startuml
+package index{
+    interface IndexableField{
+        // 表示一个字段
+        ---
+        +String name()
+        +IndexableFieldType fieldType()
+        ---
+        // 这个方法可以看作是 textValue()，对应string和text两种文本类型
+        +TokenStream tokenStream(Analyzer analyzer, TokenStream reuse)
+        +BytesRef binaryValue()
+        +String stringValue()
+        +Reader readerValue()
+        +Number numericValue()
+    }
+    interface IndexableFieldType{
+        // 用来描述一个字段的属性
+        ---
+        +boolean stored() // 是否存储
+        +boolean tokenized() // 是否分词
+        // term vector 相关
+        +boolean storeTermVectors()
+        +boolean storeTermVectorOffsets()
+        +boolean storeTermVectorPositions()
+        +boolean storeTermVectorPayloads()
+        // 是否省略normalization值
+        +boolean omitNorms()
+        +IndexOptions indexOptions()
+        +DocValuesType docValuesType()
+        +int pointDimensionCount()
+        +int pointNumBytes()
+    }
+    enum IndexOptions{
+        // 控制倒排表中存储哪些信息
+        ---
+        // 不索引
+        NONE
+        // 只存储文档(Term本身)
+        DOCS
+        // 存储文档和词频
+        DOCS_AND_FREQS
+        // 存储文档、词频、位置(一般作为全文搜索的默认值)
+        DOCS_AND_FREQS_AND_POSITIONS
+        // 存储文档、词频、位置、偏移量
+        DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS
+    }
+    enum DocValuesType{
+        // DocValues类型。 DocValues是强类型的，
+        // 一个字段上所有文档的类型都必须相同。
+        ---
+        // 无DocValues
+        NONE
+        // 一个 per-document 数字
+        NUMERIC
+        // A per-document byte[]
+        BINARY,
+        // ???
+        SORTED,
+        // ???
+        SORTED_NUMERIC,
+        // ???
+        SORTED_SET,
+    }
+    abstract class StoredFieldVisitor{
+    }
+}
+
+package document{
+    class FieldType implements IndexableFieldType{
+    }
+
+    class Document{
+        // 表示一个文档，是索引和查询的最小单位
+        // 文档是一系列Field的集合
+        ---
+        -List<IndexableField> fields
+        ---
+        +Iterator<IndexableField> iterator()
+        +void add(IndexableField field)
+        +void removeField(String name)
+        +BytesRef[] getBinaryValues(String name)
+        +IndexableField getField(String name)
+        +List<IndexableField> getFields()
+        +String get(String name)
+    }
+
+    class Field implements IndexableField{
+    }
+
+    class DocumentStoredFieldVisitor extends StoredFieldVisitor{
+    }
+}
+
+Document "1 " *-- " n" IndexableField
+IndexableFieldType "1" -right-* "1" IndexableField
+IndexOptions -up-* IndexableFieldType
+DocValuesType -up-* IndexableFieldType
+@enduml
