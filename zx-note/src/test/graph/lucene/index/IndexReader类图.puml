@@ -1,0 +1,84 @@
+@startuml
+abstract class IndexReader{
+    // 访问索引在某一个时间点的视图
+    ---
+    // 返回给定文档的term vector
+    +{abstract} Fields getTermVectors(int docID)
+    +Terms getTermVector(int docID, String field)
+    // 文档总数
+    +{abstract} int numDocs()
+    // 文档的最大编号
+    +{abstract} int maxDoc()
+    // 已删除文档数：maxDoc-numDocs
+    +int numDeletedDocs()
+    +boolean hasDeletions()
+    // 获取文档
+    +{abstract} void document(int docID, StoredFieldVisitor visitor)
+    +Document document(int docID)
+    +Document document(int docID, Set<String> fieldsToLoad)
+    +{abstract} IndexReaderContext getContext()
+    ---
+    // TODO: 5个统计量的含义
+    +{abstract} int docFreq(Term term)
+    +{abstract} long totalTermFreq(Term term)
+    +{abstract} long getSumDocFreq(String field)
+    +{abstract} int getDocCount(String field)
+    +{abstract} long getSumTotalTermFreq(String field)
+}
+
+abstract class CompositeReader extends IndexReader{
+    // 组合形式的Reader
+    ---
+    // 获取子Reader
+    +{abstract} List<? extends IndexReader> getSequentialSubReaders()
+}
+
+abstract class BaseCompositeReader<R extends IndexReader> extends CompositeReader{
+
+}
+
+abstract class DirectoryReader extends BaseCompositeReader{
+    // 读取一个Directory中的索引
+}
+
+class StandardDirectoryReader extends DirectoryReader{
+}
+
+abstract class LeafReader extends IndexReader{
+    +{abstract} Fields fields()
+    +Terms terms(String field)
+    +PostingsEnum postings(Term term, int flags)
+    +PostingsEnum postings(Term term)
+    ---
+    +{abstract} NumericDocValues getNumericDocValues(String field)
+    +{abstract} BinaryDocValues getBinaryDocValues(String field)
+    +{abstract} SortedDocValues getSortedDocValues(String field)
+    +{abstract} SortedNumericDocValues getSortedNumericDocValues(String field)
+    +{abstract} SortedSetDocValues getSortedSetDocValues(String field)
+    +{abstract} Bits getDocsWithField(String field)
+    +{abstract} NumericDocValues getNormValues(String field)
+    +{abstract} FieldInfos getFieldInfos()
+    +{abstract} Bits getLiveDocs()
+    +{abstract} PointValues getPointValues()
+    +{abstract} Sort getIndexSort()
+}
+
+abstract class FilterLeafReader extends LeafReader{
+    // 装饰
+}
+
+abstract class CodecReader extends LeafReader{
+    // 用codec APIs 实现的LeafReader
+    ---
+    +{abstract} StoredFieldsReader getFieldsReader()
+    +{abstract} TermVectorsReader getTermVectorsReader()
+    +{abstract} NormsProducer getNormsReader()
+    +{abstract} DocValuesProducer getDocValuesReader()
+    +{abstract} FieldsProducer getPostingsReader()
+    +{abstract} PointsReader getPointsReader()
+}
+
+class SegmentReader extends CodecReader{
+    // 单个segment的Reader
+}
+@enduml
