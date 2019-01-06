@@ -1,0 +1,29 @@
+@startuml
+
+abstract class DocIdSetIterator {
+    // 用来遍历一个非下降的doc id 集合
+    ---
+    // 返回当前所在的doc id
+    +{abstract} int docID()
+    // 返回当前doc的id，并走到下一个doc
+    +{abstract} int nextDoc()
+    // 走到下一个id >= target 的doc
+    +{abstract}int advance(int target)
+}
+
+abstract class PostingsEnum extends DocIdSetIterator{
+    // 用来遍历倒排表
+    ---
+    // 当前doc的词频
+    +{abstract} int freq()
+    // 下一个position. 比如 freq()=3时
+    // 可以调用3次nextPosition(),得到3个Term的信息
+    +{abstract} int nextPosition()
+    // 当前position的startOffset
+    +{abstract} int startOffset()
+    // 当前position的endOffset
+    +{abstract} int endOffset()
+    // 当前position的payload
+    +{abstract} BytesRef getPayload()
+}
+@enduml

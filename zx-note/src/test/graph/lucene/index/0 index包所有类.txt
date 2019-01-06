@@ -1,23 +1,19 @@
-Term相关：
+Term & 倒排表
 	Term
-	TermContext
-	TermState
-	TermVectorsConsumer
-	TermVectorsConsumerPerField
-	Terms
-	TermsHash
-	TermsHashPerField
-	MultiTerms
-	TermsEnum
-	SingleTermsEnum
-	MultiTermsEnum
-	FilteredTermsEnum
-	AutomatonTermsEnum
+	Terms -- MultiTerms
+    TermsEnum -- FilteredTermsEnum, SingleTermsEnum, MultiTermsEnum, AutomatonTermsEnum
+	PostingsEnum -- MultiPostingsEnum, MappingMultiPostingsEnum
 
-倒排表:
-	PostingsEnum
-	MultiPostingsEnum
-	MappingMultiPostingsEnum
+Reader:
+	IndexReader
+	CompositeReader
+	DirectoryReader
+	LeafReader
+	SegmentReader
+	---
+	IndexReaderContext
+	CompositeReaderContext
+	LeafReaderContext
 
 Field相关:
 	FieldInfo
@@ -74,56 +70,17 @@ Merge相关:
 	MergeState
 	MergeTrigger
 MergePolicy:
-	LogByteSizeMergePolicy
-	LogDocMergePolicy
-	LogMergePolicy
-	MergePolicy
-	MergePolicyWrapper
-	NoMergePolicy
-	OneMergeWrappingMergePolicy
-	TieredMergePolicy
-	UpgradeIndexMergePolicy
+    MergePolicy -- LogMergePolicy, LogByteSizeMergePolicy, LogDocMergePolicy, NoMergePolicy, MergePolicyWrapper, OneMergeWrappingMergePolicy, TieredMergePolicy, UpgradeIndexMergePolicy
 
 MergeScheduler:
-	MergeScheduler
-	ConcurrentMergeScheduler
-	NoMergeScheduler
-	SerialMergeScheduler
+	MergeScheduler -- NoMergeScheduler, SerialMergeScheduler, ConcurrentMergeScheduler
 
 DeletionPolicy:
-	PersistentSnapshotDeletionPolicy
-	SnapshotDeletionPolicy
-	IndexDeletionPolicy
-	KeepOnlyLastCommitDeletionPolicy
-	NoDeletionPolicy
+	IndexDeletionPolicy -- PersistentSnapshotDeletionPolicy, SnapshotDeletionPolicy, KeepOnlyLastCommitDeletionPolicy, NoDeletionPolicy
 
-Reader:
-	IndexReader
-	BaseCompositeReader
-	CodecReader
-	CompositeReader
-	DirectoryReader ！！！
-	ExitableDirectoryReader
-	FilterCodecReader
-	FilterDirectoryReader
-	FilterLeafReader
-	LeafReader
-	MergeReaderWrapper
-	MultiReader
-	ParallelCompositeReader
-	ParallelLeafReader
-	ReaderManager ！！！
-	ReaderSlice
-	ReaderUtil
-	SortingLeafReader
-	StandardDirectoryReader
-	SegmentReader
-	SegmentCoreReaders
-	SlowCodecReaderWrapper
-	---
-	IndexReaderContext
-	CompositeReaderContext
-	LeafReaderContext
+Term Vector:
+    TermVectorsConsumer
+   	TermVectorsConsumerPerField
 
 DocValues：
 	MultiDocValues
@@ -188,6 +145,8 @@ TODO:
 	MultiBits
 
 	NormValuesWriter
+	TermContext
+    TermState
 	OrdTermState
 	ParallelPostingsArray
 	PointValues
@@ -201,3 +160,6 @@ TODO:
 	SortingTermVectorsConsumer
 	StoredFieldVisitor
 	StoredFieldsConsumer
+
+    TermsHash
+    TermsHashPerField

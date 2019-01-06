@@ -35,11 +35,24 @@ abstract class Terms{
 }
 
 abstract class TermsEnum{
-    //
+    // 用来seek或者遍历每一个Term，获取Term的一些相关信息
     ---
     // 精准查询term
     +boolean seekExact(BytesRef text)
     // 查找一个term,
     +{abstract} SeekStatus seekCeil(BytesRef text)
+    // 下一个Term
+    +BytesRef next()
+    ---
+    // 当前Term的文本值
+    +{abstract} BytesRef term()
+    // 当前Term的序号
+    +{abstract} long ord()
+    // 当前Term的文档频率
+    +{abstract} int docFreq()
+    // 当前Term在所有文档中出现的词频
+    +{abstract} long totalTermFreq()
+    // 当前Term的倒排表
+    +{abstract} PostingsEnum postings(PostingsEnum reuse, int flags)
 }
 @enduml
