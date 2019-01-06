@@ -15,9 +15,14 @@ Reader:
 	CompositeReaderContext
 	LeafReaderContext
 
+索引文件相关：
+    SegmentInfos        segment_N文件
+    SegmentInfo:        xxx.si文件 (segment的不可变部分。一旦flush形成segment，大部分内容就不可再变化)
+    SegmentCommitInfo   包装一个SegmentInfo实例，再提供了一些"每次commit都可能发生变化的属性",例如: 已删除的doc ids
+    FieldInfos          .fnm文件
+    FieldInfo
+
 Field相关:
-	FieldInfo
-	FieldInfos
 	FieldInvertState
 	FieldTermIterator
 	Fields
@@ -25,11 +30,8 @@ Field相关:
 	MappedMultiFields
 
 Segment相关:
-	SegmentCommitInfo
 	SegmentDocValues
 	SegmentDocValuesProducer
-	SegmentInfo
-	SegmentInfos
 	SegmentMerger
 	SegmentReadState
 	SegmentWriteState

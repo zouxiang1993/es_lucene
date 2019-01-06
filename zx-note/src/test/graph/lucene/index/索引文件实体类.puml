@@ -1,11 +1,30 @@
 @startuml
+note as N1
+SegmentReader 与 SegmentCoreReader
+SegmentCommitInfo 与 SegmentInfo
+... 之间的关系:
+一个Segment大部分信息是不可变的，但有少部分信息是可变的,每次commit都可能改变。
+(比如：segment中被删除的doc ids)
+不可变的信息用SegmentInfo封装，可变的少量信息用SegmentCommitInfo封装，
+然后SegmentCommitInfo再持有一个SegmentInfo来表示一个完整的Segment信息。
+这样一来，一个SegmentInfo可以被多个SegmentCommitInfo共享使用。
+同理，一个SegmentCoreReader可能被多个SegmentReader共享使用。
+在IndexReader reopen 的时候，这个特性是非常有用的。
+end note
+
 class StandardDirectoryReader{
     ~SegmentInfos segmentInfos
     -SegmentReader[] subReaders
 }
 
 class SegmentReader{
+    -SegmentCommitInfo si
+    -Bits liveDocs
+    -int numDocs
     ~SegmentCoreReaders core
+    ~SegmentDocValues segDocValues
+    ~boolean isNRT
+    ~DocValuesProducer docValuesProducer
 }
 
 class SegmentCoreReader{
@@ -49,7 +68,7 @@ class SegmentInfo{
 }
 
 class FieldInfos{
-    # .fnm文件
+    # <b><font color=red>.fnm文件
     -boolean hasFreq
     -boolean hasProx
     -boolean hasPayloads
@@ -84,7 +103,7 @@ class BlockTreeTermsReader extends FieldsProducer{
 }
 
 class CompressingStoredFieldsReader extends StoredFieldsReader{
-    // 读取.fdx的reader 和 读取.fdt的inputstream
+    // <b><font color=red>读取.fdx和.fdt文件</font></b>
     -CompressingStoredFieldsIndexReader indexReader
     -IndexInput fieldsStream
 }
@@ -94,7 +113,7 @@ abstract class TermVectorsReader{
 }
 
 class CompressingTermVectorsReader extends TermVectorsReader{
-    // 读取.tvx的reader和读取.tvd的inputstream
+    // <b><font color=red>读取.tvx和.tvd文件</font></b>
     // 这里是重用的.fdx的reader类，二者结构是一致的。
     ~CompressingStoredFieldsIndexReader indexReader
     ~IndexInput vectorsStream
@@ -108,6 +127,11 @@ class Fields{
     +Terms terms(String field)
 }
 
+abstract class DocValuesProducer{
+    // DocValues
+    // <b><font color=red>读取.dvd, .dvm文件</font></b>
+}
+
 FieldInfos "1" -left---*  "n" FieldInfo : contains
 
 SegmentCoreReader --* FieldInfos : contains
@@ -116,6 +140,7 @@ SegmentCoreReader --* StoredFieldsReader : contains
 SegmentCoreReader --* TermVectorsReader : contains
 
 SegmentReader -up--* SegmentCoreReader : contains
+SegmentReader -up--* DocValuesProducer : contains
 StandardDirectoryReader "1" -left--* "n" SegmentReader : contains
 StandardDirectoryReader -up--* SegmentInfos : contains
 SegmentInfos "1" -up--*  "n" SegmentCommitInfo : contains
