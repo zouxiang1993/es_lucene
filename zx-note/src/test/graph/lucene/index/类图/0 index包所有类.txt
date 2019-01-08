@@ -4,16 +4,21 @@ Term & 倒排表
     TermsEnum -- FilteredTermsEnum, SingleTermsEnum, MultiTermsEnum, AutomatonTermsEnum
 	PostingsEnum -- MultiPostingsEnum, MappingMultiPostingsEnum
 
-Reader:
-	IndexReader
-	CompositeReader
-	DirectoryReader
-	LeafReader
-	SegmentReader
-	---
-	IndexReaderContext
-	CompositeReaderContext
-	LeafReaderContext
+IndexReader相关:
+	IndexReader -- CompositeReader, DirectoryReader, LeafReader, SegmentReader .....
+	IndexReaderContext, CompositeReaderContext, LeafReaderContext
+
+IndexWriter相关：
+    IndexWriter
+    IndexWriterConfig
+    LiveIndexWriterConfig
+    DocumentsWriterFlushControl
+    DocumentsWriter
+    DocumentsWriterPerThread
+	DocumentsWriterDeleteQueue
+	DocumentsWriterFlushQueue
+	DocumentsWriterPerThreadPool DWPT池
+	DocumentsWriterStallControl  写速度控制
 
 索引文件相关：
     SegmentInfos        segment_N文件
@@ -41,11 +46,6 @@ Index相关:
 	IndexFileDeleter
 	IndexFileNames
 	IndexUpgrader
-	IndexWriter
-	IndexWriterConfig
-	LiveIndexWriterConfig
-	IndexableField
-	IndexableFieldType
 
 异常：
 	AbortingException
@@ -54,18 +54,8 @@ Index相关:
 	IndexFormatTooOldException
 	IndexNotFoundException
 
-DocumentsWriter:
-	DocumentsWriter
-	DocumentsWriterDeleteQueue
-	DocumentsWriterFlushControl
-	DocumentsWriterFlushQueue
-	DocumentsWriterPerThread
-	DocumentsWriterPerThreadPool
-	DocumentsWriterStallControl
-
 FlushPolicy：
-	FlushByRamOrCountsPolicy
-	FlushPolicy
+	FlushPolicy -- FlushByRamOrCountsPolicy
 
 Merge相关:
 	MergeRateLimiter
@@ -85,11 +75,11 @@ Term Vector:
    	TermVectorsConsumerPerField
 
 DocValues：
+	DocValues : 工具方法
 	MultiDocValues
 	BinaryDocValues
 	BinaryDocValuesFieldUpdates
 	BinaryDocValuesWriter
-	DocValues
 	DocValuesFieldUpdates
 	DocValuesType
 	DocValuesUpdate
@@ -132,10 +122,13 @@ IO:
 TODO:
 	BitsSlice
 
+    BufferedUpdates
 	FrozenBufferedUpdates
-	CoalescedUpdates
-	BufferedUpdates
 	BufferedUpdatesStream
+    PrefixCodedTerms
+	MergedPrefixCodedTermsIterator
+
+	CoalescedUpdates
 
 	DocIDMerger
 
@@ -143,7 +136,7 @@ TODO:
 	FreqProxTermsWriter
 	FreqProxTermsWriterPerField
 
-	MergedPrefixCodedTermsIterator
+
 	MultiBits
 
 	NormValuesWriter
@@ -153,7 +146,6 @@ TODO:
 	ParallelPostingsArray
 	PointValues
 	PointValuesWriter
-	PrefixCodedTerms
 	RandomAccessOrds
 	ReadersAndUpdates
 	SimpleMergedSegmentWarmer

@@ -9,11 +9,12 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -35,12 +36,13 @@ import java.nio.file.Paths;
 public class IndexWriterTest {
     private IndexWriter writer;
     private IndexReader reader;
+    private final String pathStr = "E:\\lucene-test\\testWrite";
+    private final Path path = Paths.get(pathStr);
 
-//    @Before
+    //    @Before
     public void setup() throws IOException {
-        String path = "E:\\lucene-test\\testWrite";
         // Directory 是数据持久层的抽象接口
-        Directory directory = new NIOFSDirectory(Paths.get(path));
+        Directory directory = new NIOFSDirectory(path);
         IndexWriterConfig config = new IndexWriterConfig();
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         config.setUseCompoundFile(false);
@@ -61,6 +63,12 @@ public class IndexWriterTest {
     // 添加文档 数据路径
     @Test
     public void testAdd() throws IOException {
+        Directory directory = FSDirectory.open(path);
+        IndexWriterConfig config =
+                new IndexWriterConfig()
+                        .setOpenMode(IndexWriterConfig.OpenMode.CREATE)
+                        .setUseCompoundFile(false);
+        writer = new IndexWriter(directory, config);
         Document doc = new Document();
         doc.add(new StringField("goodsId", "1", Field.Store.YES));
         doc.add(new StringField("price", "10", Field.Store.YES));
@@ -99,6 +107,7 @@ public class IndexWriterTest {
      * flush完成后，这个segment还是不可被搜索的，只有在commit之后才能被搜索。
      * commit时会触发一次强制flush，commit会生成一个commit point(一个新的segnets_N文件)。
      * Commit point会由IndexDeletionPolicy管理，lucene默认的策略是只会保留最后一个commit point.
+     *
      * @throws IOException
      * @throws InterruptedException
      */

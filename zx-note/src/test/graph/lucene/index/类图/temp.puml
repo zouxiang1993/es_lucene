@@ -1,4 +1,60 @@
 @startuml
+class DocumentsWriterFlushControl{
+    // flush 排队队列
+    -Queue<DocumentsWriterPerThread> flushQueue
+    DocumentsWriterStallControl stallControl
+    -DocumentsWriterPerThreadPool perThreadPool
+    -FlushPolicy flushPolicy
+    ---
+    ThreadState obtainAndLock()
+}
+
+class DocumentsWriterStallControl{
+    // 用来控制index的速度。
+    // 如果flush的速度比index的速度慢很多，则阻塞所有的index操作
+    // 如果flush的速度追赶了上来，则唤醒等待的index操作。
+    ---
+    -volatile boolean stalled
+    ---
+    // 修改stalled的状态，并通知所有等待的线程
+    void updateStalled(boolean stalled)
+    // 如果写操作已经超速，则阻塞当前线程1秒
+    void waitIfStalled()
+    // 返回stalled的值，表示当前是否有超速线程
+    boolean anyStalledThreads()
+}
+
+abstract class FlushPolicy{
+    ---
+    +{abstract} void onDelete(DocumentsWriterFlushControl, ThreadState)
+    +void onUpdate(DocumentsWriterFlushControl, ThreadState)
+    +{abstract} void onInsert(DocumentsWriterFlushControl, ThreadState)
+    // 找出内存占用最大的ThreadState
+    #ThreadState findLargestNonPendingWriter(DocumentsWriterFlushControl, ThreadState)
+}
+
+abstract class IndexCommit{
+    // 表示一次Commit(一个 commit point)。每一次Commit都会产生一个segment_N文件
+    ---
+    // 获取关联的segment_N文件的名称
+    +{abstract} String getSegmentsFileName()
+    // 获取所有索引文件的名称
+    +{abstract} Collection<String> getFileNames()
+    +{abstract} Directory getDirectory()
+    // 删除这个Commit Point
+    +{abstract} void delete()
+    // 获取 segment数目
+    +{abstract} int getSegmentCount()
+}
+
+abstract class IndexDeletionPolicy{
+    // 决定删除掉哪些commit point
+    ---
+    +{abstract} void onInit(List<? extends IndexCommit> commits)
+    // 每次commit时的callback
+    +{abstract} void onCommit(List<? extends IndexCommit> commits)
+}
+
 class IndexWriter{
     // 负责创建并维护一个index
     ---
@@ -83,9 +139,10 @@ class DocumentsWriterPerThreadPool{
     void clearAbort()
     // 清空ThreadState中的TWPT
     DocumentsWriterPerThread reset(ThreadState threadState)
+    // 获取一个ThreadState，并将其lock
     ThreadState getAndLock(Thread requestingThread, DocumentsWriter documentsWriter)
-    void release(ThreadState state)
     // 释放一个ThreadState，并加入freeList中。
+    void release(ThreadState state)
     ThreadState getThreadState(int ord)
     //
     int getMaxThreadStates()
