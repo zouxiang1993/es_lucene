@@ -157,16 +157,16 @@ public final class CompressingStoredFieldsWriter extends StoredFieldsWriter {
 
   @Override
   public void finishDocument() throws IOException {
-    if (numBufferedDocs == this.numStoredFields.length) {
+    if (numBufferedDocs == this.numStoredFields.length) { // 数组扩容
       final int newLength = ArrayUtil.oversize(numBufferedDocs + 1, 4);
       this.numStoredFields = Arrays.copyOf(this.numStoredFields, newLength);
       endOffsets = Arrays.copyOf(endOffsets, newLength);
     }
-    this.numStoredFields[numBufferedDocs] = numStoredFieldsInDoc;
+    this.numStoredFields[numBufferedDocs] = numStoredFieldsInDoc;  // 记录当前doc的字段数
     numStoredFieldsInDoc = 0;
     endOffsets[numBufferedDocs] = bufferedDocs.getPosition();
     ++numBufferedDocs;
-    if (triggerFlush()) {
+    if (triggerFlush()) { // 如果达到flush的条件，则进行flush (chuckSize 或者 文档数 达到上限)
       flush();
     }
   }
@@ -240,7 +240,7 @@ public final class CompressingStoredFieldsWriter extends StoredFieldsWriter {
         compressor.compress(bufferedDocs.getBytes(), compressed, Math.min(chunkSize, bufferedDocs.getPosition() - compressed), fieldsStream);
       }
     } else {
-      compressor.compress(bufferedDocs.getBytes(), 0, bufferedDocs.getPosition(), fieldsStream);
+      compressor.compress(bufferedDocs.getBytes(), 0, bufferedDocs.getPosition(), fieldsStream); // 将一个chuck压缩后，写入fieldsStream
     }
 
     // reset

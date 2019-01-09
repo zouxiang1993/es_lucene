@@ -43,8 +43,8 @@ import static org.apache.lucene.util.RamUsageEstimator.NUM_BYTES_OBJECT_REF;
  **/
 public final class ByteBlockPool {
   public final static int BYTE_BLOCK_SHIFT = 15;
-  public final static int BYTE_BLOCK_SIZE = 1 << BYTE_BLOCK_SHIFT;
-  public final static int BYTE_BLOCK_MASK = BYTE_BLOCK_SIZE - 1;
+  public final static int BYTE_BLOCK_SIZE = 1 << BYTE_BLOCK_SHIFT;  // 0x8000  1个1，15个0
+  public final static int BYTE_BLOCK_MASK = BYTE_BLOCK_SIZE - 1;    // 0x7999  15个1
 
   /** Abstract class for allocating and freeing byte
    *  blocks. */

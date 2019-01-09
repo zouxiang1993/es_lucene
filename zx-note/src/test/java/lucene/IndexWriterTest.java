@@ -80,6 +80,25 @@ public class IndexWriterTest {
         System.out.println("Over...");
     }
 
+    // 测试DocConsumer的processDocument方法
+    @Test
+    public void testDocConsumer() throws IOException{
+        Directory directory = FSDirectory.open(path);
+        IndexWriterConfig config =
+                new IndexWriterConfig()
+                        .setOpenMode(IndexWriterConfig.OpenMode.CREATE)
+                        .setUseCompoundFile(false);
+        writer = new IndexWriter(directory, config);
+        Document doc = new Document();
+        doc.add(new StringField("goodsId", "1", Field.Store.YES));
+
+        // debug...
+        writer.addDocument(doc);
+
+        writer.commit();
+        System.out.println("Over...");
+    }
+
     // 更新文档 数据路径
     @Test
     public void testUpdate() throws IOException {

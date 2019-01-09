@@ -1,0 +1,37 @@
+@startuml
+abstract class StoredFieldsFormat{
+    ---
+    +{abstract} StoredFieldsReader fieldsReader()
+    +{abstract} StoredFieldsWriter fieldsWriter
+}
+
+class Lucene50StoredFieldsFormat extends StoredFieldsFormat{
+    // BEST_SPEED or BEST_COMPRESSION
+    -Mode mode
+}
+
+class CompressingStoredFieldsFormat extends StoredFieldsFormat{
+
+}
+
+class CompressingStoredFieldsReader extends StoredFieldsReader {
+
+}
+
+abstract class StoredFieldsWriter{
+    +{abstract} void startDocument()
+    +{abstract} void writeField(FieldInfo info, IndexableField field)
+    +void finishDocument()
+    +{abstract} void finish(FieldInfos fis, int numDocs)
+    +int merge(MergeState mergeState)
+}
+
+class CompressingStoredFieldsWriter extends StoredFieldsWriter{
+
+}
+
+Lucene50StoredFieldsFormat  -right--> CompressingStoredFieldsFormat : "根据不同的Mode调用不同的构造函数"
+
+CompressingStoredFieldsFormat -down-- CompressingStoredFieldsReader
+CompressingStoredFieldsFormat -down-- CompressingStoredFieldsWriter
+@enduml
