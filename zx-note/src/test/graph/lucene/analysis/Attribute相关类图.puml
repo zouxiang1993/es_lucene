@@ -1,0 +1,51 @@
+@startuml
+
+interface Attribute
+
+abstract class AttributeImpl implements Attribute{
+    // 重置状态
+    +{abstract} void clear()
+    //
+    +void end()
+}
+
+class AttributeSource{
+    一个AttributeSource包含多个AttributeImpl。
+    在单个AttributeSource实例中，每一种Attribute都只能有一个实例。
+    --
+    -Map<Class<? extends Attribute>, AttributeImpl> attributes
+    -Map<Class<? extends AttributeImpl>, AttributeImpl> attributeImpls
+    -State[] currentState
+    -AttributeFactory factory
+    ---
+    // 如果接口T的实例已经存在，则直接返回该实例
+    // 否则，创建一个新的实例并返回
+    +<T extends Attribute> T addAttribute(Class<T> attClass)
+    // 是否包含任意Attribute
+    +boolean hasAttributes()
+    // 是否包含指定Attribute
+    +boolean hasAttribute(Class<? extends Attribute> attClass)
+    // 获取指定的Attribute
+    +<T extends Attribute> T getAttribute(Class<T> attClass)
+    // 初始化所有的AttributeImpl
+    +void clearAttributes()
+    // 获取当前所有AttributeImpl的状态，以链表形式返回
+    +State captureState()
+    // 恢复成给定的状态
+    +void restoreState(State state)
+}
+
+abstract class AttributeFactory{
+    // 用来创建AttributeImpl实例
+    ---
+    +{abstract} AttributeImpl createAttributeInstance(Class<? extends Attribute> attClass)
+}
+
+class DefaultAttributeFactory extends AttributeFactory{
+    根据接口创建实现类的方式：
+    1. 找名为"接口名+Impl"的实现类
+    2. 找该实现类的无参构造函数。
+}
+
+AttributeImpl "n" -up--* "1" AttributeSource
+@enduml

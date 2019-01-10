@@ -56,6 +56,7 @@ public abstract class AttributeFactory {
     private final ClassValue<MethodHandle> constructors = new ClassValue<MethodHandle>() {
       @Override
       protected MethodHandle computeValue(Class<?> attClass) {
+        // 1. 找名为"接口名+Impl"的实现类   2. 找该实现类的无参构造函数。
         return findAttributeImplCtor(findImplClass(attClass.asSubclass(Attribute.class)));
       }
     };

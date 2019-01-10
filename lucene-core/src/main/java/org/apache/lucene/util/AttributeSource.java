@@ -42,6 +42,7 @@ public class AttributeSource {
   
   /**
    * This class holds the state of an AttributeSource.
+   * 这个类表示AttributeSource当前的状态（以链表的形式存储了当前所有的AttributeImpl）
    * @see #captureState
    * @see #restoreState
    */
@@ -66,7 +67,7 @@ public class AttributeSource {
   // So they are private, final and read-only from the outside (read-only iterators)
   private final Map<Class<? extends Attribute>, AttributeImpl> attributes;
   private final Map<Class<? extends AttributeImpl>, AttributeImpl> attributeImpls;
-  private final State[] currentState;
+  private final State[] currentState; // 为什么用数组，不是单个State？
 
   private final AttributeFactory factory;
   
@@ -145,7 +146,8 @@ public class AttributeSource {
       return Collections.<AttributeImpl>emptySet().iterator();
     }
   }
-  
+
+  /** 缓存映射关系：每个类 --> 该类实现的所有Attribute的子接口*/
   /** a cache that stores all interfaces for known implementation classes for performance (slow reflection) */
   private static final ClassValue<Class<? extends Attribute>[]> implInterfaces = new ClassValue<Class<? extends Attribute>[]>() {
     @Override

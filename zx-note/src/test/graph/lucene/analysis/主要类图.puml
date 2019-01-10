@@ -1,0 +1,55 @@
+@startuml
+abstract class Analyzer{
+    ---
+    // 在这里配置Tokenizer和TokenFilter链
+    #{abstract} TokenStreamComponents createComponents(String fieldName)
+    // 在这里配置CharFilter链
+    #Reader initReader(String fieldName, Reader reader)
+    // 分词, 生成TokenStream
+    +TokenStream tokenStream(String fieldName, Reader reader)
+    // 多个section之间的间距(单字段多值的情况)
+    +int getPositionIncrementGap(String fieldName)
+}
+
+
+abstract class CharFilter extends java.io.Reader{
+    可以链式的装饰一个Reader
+    --
+    // 纠正位置
+    +int correctOffset(int currentOff)
+}
+
+abstract class TokenStream extends AttributeSource{
+    // 表示一些token的序列
+    ---
+    +{abstract} boolean incrementToken()
+    +void end()
+    +void reset()
+}
+
+abstract class Tokenizer extends TokenStream {
+
+}
+
+abstract class TokenFilter extends TokenStream {
+
+}
+
+CharFilter "0..n" -up--* Analyzer
+Tokenizer "1" -up--* Analyzer
+TokenFilter "0..n" -up--* Analyzer
+
+note right of TokenStream
+TokenStream的两个子类:
+    Tokenizer: a TokenStream whose input is a Reader
+    TokenFilter: a TokenStream whose input is another TokenStream
+TokenStream工作流程：
+1. 实例化TokenStream/TokenFilters
+2. 用户调用reset()
+3. 用户通过addAttribute(...)获取需要的属性，并保存其引用
+4. 用户不断的调用incrementToken()直到返回false，
+   每调用一次，就消费一个token的属性
+5. 用户调用end()方法
+6. 用户调用close()方法
+end note
+@enduml
