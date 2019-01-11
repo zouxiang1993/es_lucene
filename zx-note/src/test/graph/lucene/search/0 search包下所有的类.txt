@@ -1,0 +1,145 @@
+Rescorer
+    Rescorer
+    SortRescorer
+
+Rewrite:
+    DocValuesRewriteMethod
+    ScoringRewrite
+    TermCollectingRewrite
+    TopTermsRewrite
+
+Weight相关
+    BooleanWeight
+    ConstantScoreWeight
+    FilterWeight
+    RandomAccessWeight
+    Weight
+
+Query相关
+    Query
+    AutomatonQuery
+    BlendedTermQuery
+    BooleanQuery
+    BoostQuery
+    ConstantScoreQuery
+    DisjunctionMaxQuery
+    FieldValueQuery
+    FuzzyQuery
+    IndexOrDocValuesQuery
+    LRUQueryCache
+    LegacyNumericRangeQuery
+    MatchAllDocsQuery
+    MatchNoDocsQuery
+    MultiPhraseQuery
+    MultiTermQuery
+    MultiTermQueryConstantScoreWrapper
+    NGramPhraseQuery
+    PhraseQuery
+    PointInSetQuery
+    PointRangeQuery
+    PrefixQuery
+    QueryCache
+    QueryCachingPolicy
+    QueryRescorer
+    RegexpQuery
+    SynonymQuery
+    TermInSetQuery
+    TermQuery
+    TermRangeQuery
+    UsageTrackingQueryCachingPolicy
+    WildcardQuery
+
+Collector相关
+    Collector
+    CollectorManager
+    EarlyTerminatingSortingCollector
+    FilterCollector
+    FilterLeafCollector
+    LeafCollector
+    MultiCollector
+    MultiCollectorManager
+    PositiveScoresOnlyCollector
+    SimpleCollector
+    TimeLimitingCollector
+    TopDocsCollector
+    TopFieldCollector
+    TopScoreDocCollector
+    TotalHitCountCollector
+
+Scorer相关
+    Boolean2ScorerSupplier
+    BooleanScorer
+    BooleanTopLevelScorers
+    BulkScorer
+    ConjunctionScorer
+    ConstantScoreScorer
+    DisjunctionMaxScorer
+    DisjunctionScorer
+    DisjunctionSumScorer
+    ExactPhraseScorer
+    FakeScorer
+    FilterScorer
+    MinShouldMatchSumScorer
+    ReqExclBulkScorer
+    ReqExclScorer
+    ReqOptSumScorer
+    ScoreCachingWrappingScorer
+    Scorer
+    ScorerSupplier
+    SloppyPhraseScorer
+    TermScorer
+
+DocIdSet
+    DocIdSet
+    DocValuesDocIdSet
+    DocIdSetIterator
+    ConjunctionDISI
+    FilteredDocIdSetIterator
+    DisjunctionDISIApproximation
+
+其他：
+    CollectionStatistics
+    TermStatistics
+
+    LongValues
+    LongValuesSource
+    DoubleValues
+    DoubleValuesSource
+
+    FieldComparator
+    FieldComparatorSource
+    LeafFieldComparator
+    MultiLeafFieldComparator
+    SimpleFieldComparator
+
+    SortField
+    SortedNumericSelector
+    SortedNumericSortField
+    SortedSetSelector
+    SortedSetSortField
+
+    TopDocs
+    TopFieldDocs
+
+TODO:
+    BooleanClause
+    ControlledRealTimeReopenThread
+    DisiPriorityQueue
+    DisiWrapper
+    Explanation
+    FieldDoc
+    FieldValueHitQueue
+    FuzzyTermsEnum
+    HitQueue
+    IndexSearcher
+    LiveFieldValues
+    Multiset
+    PhrasePositions
+    PhraseQueue
+    ReferenceManager
+    ScoreDoc
+    SearcherFactory
+    SearcherLifetimeManager
+    SearcherManager
+    Sort
+    TwoPhaseIterator

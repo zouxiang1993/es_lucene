@@ -1,0 +1,27 @@
+@startuml
+abstract class Query{
+    // 用户查询的抽象表示
+    --
+    +Weight createWeight(IndexSearcher searcher, boolean needsScores)
+    +Query rewrite(IndexReader reader)
+}
+
+note right of Weight
+    Weight的主要目的是保证查询过程不会修改Query对象，
+    这样Query实例就可以被重用。
+    依赖IndexSearch的状态应该放在Weight中
+    依赖LeafReader的状态应该放在Scorer中
+
+    Weight一般的使用方式：
+    1. 通过Query.createWeight()创建一个Weight实例
+    2. 调用getValueForNormalization()来计算查询归一化因子。 Similarity.queryNorm(float)
+    3. 通过normalize(float, float)传入归一化因子。这时权重计算完成。
+    4. 通过scorer(..)方法来创建Scorer
+end note
+abstract class Weight{
+    计算查询权重，并构造Scorer
+    --
+
+}
+
+@enduml
