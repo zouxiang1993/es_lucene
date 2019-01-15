@@ -1,0 +1,28 @@
+@startuml
+
+class IndexSearcher {
+    TODO: 多线程并行化处理
+    TODO: QueryCache QueryCachePolicy 查询缓存
+    --
+    // TODO: 其他方法
+    ...
+    // Term的统计量
+    +TermStatistics termStatistics(Term term, TermContext context)
+    // 集合层面的统计量
+    +CollectionStatistics collectionStatistics(String field)
+}
+
+class TermStatistics{
+  -BytesRef term;
+  -long docFreq;
+  -long totalTermFreq;
+}
+
+class CollectionStatistics{
+  -String field;
+  -long maxDoc;
+  -long docCount;
+  -long sumTotalTermFreq;
+  -long sumDocFreq;
+}
+@enduml

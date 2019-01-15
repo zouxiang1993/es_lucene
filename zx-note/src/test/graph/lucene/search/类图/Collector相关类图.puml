@@ -1,0 +1,62 @@
+@startuml
+
+interface Collector{
+    主要用来收集一个查询的原始结果，并进行排序或一些自定义的结果过滤
+    ---
+    // 新建一个LeafCollector, 用来收集指定的context
+    +LeafCollector getLeafCollector(LeafReaderContext context)
+    // 是否需要打分
+    +boolean needsScores()
+}
+
+interface LeafCollector{
+    将打分过程从文档收集的过程中解耦
+    如果不需要打分，可以直接忽略。
+    如果需要打分，则先需要通过setScorer()方法来持有一个Scorer实例，
+    然后在collect(int)方法中通过调用Scorer.score()方法来为当前文档打分
+    ---
+}
+
+interface CollectorManager<C extends Collector, T>{
+    用于管理Collector
+    可用于search请求的并行化处理
+    ---
+    // 新建一个Collector实例
+    +C newCollector()
+    // 合并多个Collectors的结果
+    +T reduce(Collection<C> collectors)
+}
+
+abstract class SimpleCollector implements Collector, LeafCollector{
+
+}
+
+abstract class TopDocsCollector implements Collector{
+    收集完成之后，按照某些条件，取Top N个文档
+}
+
+abstract class TopScoreDocCollector extends TopDocsCollector{
+    按照(score, docID)来排序
+    如果没有显示的指定Sort，通常就使用这个来排序
+    ---
+}
+
+abstract class TopFieldCollector extends TopDocsCollector{
+    按照一个Sort对象来排序(sort by field)
+}
+
+class TimeLimitingCollector implements Collector{
+    用来装饰其他的Collector
+    当消耗时间太长，终止搜索
+}
+
+abstract class FilterCollector implements Collector{
+    装饰
+}
+
+class PositiveScoresOnlyCollector extends FilterCollector{
+    用来装饰一个其他的Collector
+    排除掉 score <= 0.0 的文档
+}
+
+@enduml

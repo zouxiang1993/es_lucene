@@ -1,0 +1,58 @@
+@startuml
+participant IndexSearcher
+participant "TermQuery \n extends Query" as Query
+participant TermContext
+participant "TermWeight \n extends Weight " as Weight
+participant "BM25Similarity \n extends Similarity" as Similarity
+participant "BM25Stats \n extends SimWeight" as SimWeight
+participant "TermScorer \n extends Scorer" as Scorer
+participant "BM25DocScorer \n extends SimScorer" as SimScorer
+
+autonumber
+
+--> IndexSearcher : createNormalizedWeight(Query\n, boolean needsScores)
+activate IndexSearcher
+    IndexSearcher --> IndexSearcher : rewrite(Query)\nTermQuery不需要rewrite
+    IndexSearcher --> IndexSearcher : createWeight(Query,\n boolean needsScores)
+    activate IndexSearcher
+        IndexSearcher --> Query : createWeight(IndexSearcher\n, boolean needsScores)
+        activate Query
+            create TermContext
+            Query --> TermContext : build() 初始化
+            create Weight
+            Query --> Weight : new
+            activate Weight
+                Weight --> IndexSearcher : collectionStatistics(String field)   计算一些基本的统计量
+                Weight --> IndexSearcher : termStatistics(Term term, TermContext context)
+                Weight --> Similarity : computeWeight(CollectionStatistics, TermStatistics...)
+                activate Similarity
+                    Similarity --> Similarity : idfExplain(CollectionStatistics, TermStatistics) \n <b><font color="red">计算IDF: log(1 + (docCount - docFreq + 0.5)/(docFreq + 0.5))
+                    Similarity --> Similarity : avgFieldLength(CollectionStatistics) \n <b><font color="red">计算平均字段长度: sumTotalTermFreq / docCount
+                    Similarity --> Similarity : <b><font color="red">计算 cache[] 数组的值: cache[i] = k1 * ((1 - b) + b * decodeNormValue((byte)i) / avgdl)
+                    create SimWeight
+                    Similarity --> SimWeight : new
+                deactivate Similarity
+            deactivate Weight
+        deactivate Query
+        ==省略一些不重要的步骤...==
+    deactivate IndexSearcher
+deactivate IndexSearcher
+
+--> Weight : scorer()
+activate Weight
+    Weight --> Similarity : simScorer(SimWeight, LeafReaderContext)
+    activate Similarity
+        create SimScorer
+        Similarity --> SimScorer : new(),  计算: <b><font color="red"> weightValue = idf * (k1 + 1)
+    deactivate Similarity
+    create Scorer
+    Weight --> Scorer : new
+deactivate Weight
+==此处省略一万字...==
+
+--> Scorer : score()
+activate Scorer
+    Scorer --> SimScorer : score(int doc, float freq)\n <b><font color="red">score=weightValue * freq / (freq + norm) \n 其中: <b><font color="red">norm = cache[(byte)norms.get(doc)] \n 即<b><font color="red">norm = k1 * (1 - b + b * fieldLength / avgFieldLength) \n最终结果: \n <b><font color="red">score = idf * (freq * (k1 + 1)) / (freq + k1 * (1 - b + b * fieldLength / avgFieldLength))
+deactivate Scorer
+
+@enduml

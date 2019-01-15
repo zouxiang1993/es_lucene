@@ -1,0 +1,106 @@
+@startuml
+abstract class Query{
+    // 用户查询的抽象表示
+    --
+    +Weight createWeight(IndexSearcher searcher, boolean needsScores)
+    // 重写为简单的Query
+    +Query rewrite(IndexReader reader)
+}
+
+note right of Weight
+    Weight的主要目的是保证查询过程不会修改Query对象，
+    这样Query实例就可以被重用。
+    <b><font color=red>依赖IndexSearch的状态应该放在Weight中
+    <b><font color=red>依赖LeafReader的状态应该放在Scorer中
+
+    Weight一般的使用方式：
+    1. 通过Query.createWeight()创建一个Weight实例
+    2. 调用getValueForNormalization()来计算查询归一化因子。 Similarity.queryNorm(float)
+    3. 通过normalize(float, float)传入归一化因子。这时权重计算完成。
+    4. 通过scorer(..)方法来创建Scorer
+end note
+
+abstract class Weight{
+    计算查询权重，并构造Scorer
+    --
+    // 解析出Query中所有出现的Term，放入set中
+    +{abstract} void extractTerms(Set<Term> terms)
+    // 解释指定的文档是如何计算得分的
+    +{abstract} Explanation explain(LeafReaderContext context, int doc)
+    // 返回关联的Query
+    +Query getQuery()
+    // 查询归一因子 queryNorm
+    +{abstract} float getValueForNormalization()
+    // 设置 字段长度归一值 & 索引时boost
+    +{abstract} void normalize(float norm, float boost)
+    // 创建一个Scorer
+    +{abstract} Scorer scorer(LeafReaderContext context)
+    // 创建一个BulkScorer
+    +BulkScorer bulkScorer(LeafReaderContext context)
+}
+
+abstract class Scorer{
+    // 不同Query之间通用的打分函数。
+    ---
+    // 返回一个docID迭代器，用来迭代所有匹配的文档
+    +{abstract} DocIdSetIterator iterator()
+    // 当前文档的docID
+    +{abstract} int docID()
+    // 当前文档的分数
+    +{abstract} float score()
+    // 当前文档的词频
+    +{abstract} int freq()
+    // 父Weight
+    +Weight getWeight()
+}
+
+note top of Similarity
+查询时，Query与Similarity的交互步骤如下: (<b>详见IndexSearcher.createNormalizedWeight()方法</b>)
+1. 调用一次computeWeight(CollectionStatistics, TermStatistics...),计算一些文档集合层面的统计量。
+   计算的结果量存储在SimWeight中(例如：IDF，平均文档长度...)。传入的参数中，CollectionsStatistics和TermStatistics
+   已经包含了所有的基础统计量，这样就不会再需要额外的I/O。Lucene对返回的SimWeight中存储的字段不做任何假设。
+2. 进行一次查询标准化(query normalization)：
+   (1) 对每个叶子Query调用： SimWeight.getValueForNormalization()
+   (2) 在顶级Query调用： float queryNorm(float)
+   (3) 调用SimWeight.normalize(float queryNorm, float boost) 传入 归一值 和 顶层Query的boost
+3. 对索引的每个Segment, Query调用SimScorer simScorer(SimWeight, LeafReaderContext)创建一个SimScorer，
+   对于每一个匹配的文档，都会调用SimScorer.score()方法
+end note
+abstract class Similarity{
+    // Similarity定义了Lucene评分的各个部分
+    // Similarity决定了Lucene如何给Term赋予权重
+    ---
+    // 查询协调因子。
+    +float coord(int overlap, int maxOverlap)
+    // 查询归一因子
+    +float queryNorm(float valueForNormalization)
+    +{abstract} long computeNorm(FieldInvertState state)
+    // 计算所有集合层面的权重因子
+    +{abstract} SimWeight computeWeight(CollectionStatistics collectionStats, TermStatistics... termStats)
+    +{abstract} SimScorer simScorer(SimWeight weight, LeafReaderContext context)
+}
+
+abstract class SimWeight{
+    // 存储一个Query在文档集合层面的权重因子。
+    // 这个抽象类是空的，子类可以自己定义需要的统计量
+    // 例如: IDF, 平均字段长度...
+    ---
+    +{abstract} float getValueForNormalization()
+    +{abstract} void normalize(float queryNorm, float boost)
+}
+
+abstract class SimScorer{
+    ---
+    // 为单个文档打分
+    +{abstract} float score(int doc, float freq)
+    +{abstract} float computeSlopFactor(int distance)
+    +{abstract} float computePayloadFactor(int doc, int start, int end, BytesRef payload)
+    +Explanation explain(int doc, Explanation freq)
+}
+
+Query -right-- Weight
+Weight -down-- Scorer
+Scorer -left-- Similarity
+Similarity -down-- SimWeight
+Similarity -down-- SimScorer
+@enduml

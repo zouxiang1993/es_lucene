@@ -1,6 +1,10 @@
+Collector相关
+    Collector -- FilterCollector, PositiveScoresOnlyCollector, SimpleCollector, TopDocsCollector, TopFieldCollector, TopScoreDocCollector, TotalHitCountCollector, TimeLimitingCollector, MultiCollector, EarlyTerminatingSortingCollector
+    LeafCollector -- FilterLeafCollector
+    CollectorManager - MultiCollectorManager
+
 Rescorer
-    Rescorer
-    SortRescorer
+    Rescorer, SortRescorer
 
 Rewrite:
     DocValuesRewriteMethod
@@ -9,11 +13,7 @@ Rewrite:
     TopTermsRewrite
 
 Weight相关
-    BooleanWeight
-    ConstantScoreWeight
-    FilterWeight
-    RandomAccessWeight
-    Weight
+    Weight - FilterWeight, RandomAccessWeight, BooleanWeight, ConstantScoreWeight
 
 Query相关
     Query
@@ -48,23 +48,6 @@ Query相关
     TermRangeQuery
     UsageTrackingQueryCachingPolicy
     WildcardQuery
-
-Collector相关
-    Collector
-    CollectorManager
-    EarlyTerminatingSortingCollector
-    FilterCollector
-    FilterLeafCollector
-    LeafCollector
-    MultiCollector
-    MultiCollectorManager
-    PositiveScoresOnlyCollector
-    SimpleCollector
-    TimeLimitingCollector
-    TopDocsCollector
-    TopFieldCollector
-    TopScoreDocCollector
-    TotalHitCountCollector
 
 Scorer相关
     Boolean2ScorerSupplier
