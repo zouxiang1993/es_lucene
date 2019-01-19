@@ -43,14 +43,45 @@ public class SearchTest {
     // 单个Term Query
     // debug IndexSearcher.createNormalizedWeight
     @Test
-    public void testTermQuery() throws IOException {
+    public void testTermQueryScoring() throws IOException {
         Query query = new TermQuery(new Term("title", "lucene"));
         searchByQuery(query);
     }
 
     // 多个Term Query
+    /*  打分详细解释
+1.6569202 = sum of:
+
+
+  0.66665417 = weight(title:lucene in 1) [BM25Similarity], result of:
+    0.66665417 = score(doc=1,freq=1.0 = termFreq=1.0
+), product of:
+      0.6931472 = idf, computed as log(1 + (docCount - docFreq + 0.5) / (docFreq + 0.5)) from:
+        3.0 = docFreq
+        6.0 = docCount
+      0.96177864 = tfNorm, computed as (freq * (k1 + 1)) / (freq + k1 * (1 - b + b * fieldLength / avgFieldLength)) from:
+        1.0 = termFreq=1.0
+        1.2 = parameter k1
+        0.75 = parameter b
+        2.3333333 = avgFieldLength
+        2.56 = fieldLength
+
+
+  0.990266 = weight(title:elasticsearch in 1) [BM25Similarity], result of:
+    0.990266 = score(doc=1,freq=1.0 = termFreq=1.0
+), product of:
+      1.0296195 = idf, computed as log(1 + (docCount - docFreq + 0.5) / (docFreq + 0.5)) from:
+        2.0 = docFreq
+        6.0 = docCount
+      0.96177864 = tfNorm, computed as (freq * (k1 + 1)) / (freq + k1 * (1 - b + b * fieldLength / avgFieldLength)) from:
+        1.0 = termFreq=1.0
+        1.2 = parameter k1
+        0.75 = parameter b
+        2.3333333 = avgFieldLength
+        2.56 = fieldLength
+     */
     @Test
-    public void testBM25Similarity() throws IOException {
+    public void testBooleanQueryScorering() throws IOException {
         BooleanQuery.Builder builder = new BooleanQuery.Builder();
         BooleanQuery query = builder.setDisableCoord(false)
                 .add(new BooleanClause(new TermQuery(new Term("title", "lucene")), BooleanClause.Occur.SHOULD))

@@ -1,0 +1,45 @@
+@startuml
+participant IndexSearcher
+participant "BooleanQuery \n extends Query" as Query
+participant "BooleanWeight \n extends Weight" as Weight
+participant "Similarity"
+participant "BooleanScorer \n extends Scorer" as Scorer
+
+autonumber
+
+--> IndexSearcher : createNormalizedWeight()
+activate IndexSearcher
+    IndexSearcher --> IndexSearcher : rewrite(Query)
+    activate IndexSearcher
+        IndexSearcher --> Query : rewrite()
+    deactivate IndexSearcher
+    IndexSearcher --> IndexSearcher : createWeight(Query,\n boolean needsScores)
+    activate IndexSearcher
+        IndexSearcher --> Query : createWeight()
+        activate Query
+            create Weight
+            Query --> Weight : new
+            activate Weight
+                Weight --> IndexSearcher : createWeight : 为每一个子句创建weight
+                Weight --> Weight : coord(int overlap, int maxOverlap) \n计算coords数组,用来缓存coord因子 \n 但BM25实现并没有采用这个协调因子。
+            deactivate Weight
+        deactivate Query
+        IndexSearcher --> Weight : getValueForNormalization()
+        activate Weight
+            Weight --> Weight : 父Query的normalizationValue=\n<b><font color="red">所有子句的normalizationValue之和
+        deactivate Weight
+        IndexSearcher --> Similarity : queryNorm(), BM25未实现查询归一因子，始终返回1f
+        IndexSearcher --> Weight : normalize(float norm, float boost)
+        activate Weight
+            Weight --> Weight : 调用所有子句的\nnormalize(float norm, float boost)
+        deactivate Weight
+    deactivate IndexSearcher
+    ==此处省略一万字==
+    --> Scorer : score()
+    activate Scorer
+        Scorer --> Scorer : <b><font color="red">"每个子句的得分 * 每个子句的查询时boost()，再求和。"
+    deactivate Scorer
+deactivate IndexSearcher
+
+
+@enduml
