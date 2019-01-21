@@ -73,14 +73,14 @@ import org.apache.lucene.util.packed.PackedInts;
 public final class CompressingStoredFieldsIndexWriter implements Closeable {
   
   final IndexOutput fieldsIndexOut;
-  final int blockSize;
-  int totalDocs;
-  int blockDocs;
-  int blockChunks;
-  long firstStartPointer;
-  long maxStartPointer;
-  final int[] docBaseDeltas;
-  final long[] startPointerDeltas;
+  final int blockSize;  // 一个Block中最多包含多少个chunk? 默认是1024个。 Lucene50StoredFieldsFormat中传入
+  int totalDocs; // 已经写入的所有block中的文档总数？
+  int blockDocs; // 当前block中的文档总数
+  int blockChunks; // 当前block中已经写入的chunk总数
+  long firstStartPointer; // 当前block中， 第一个chuck的开始位置？ -1表示还没有写入任何chunk
+  long maxStartPointer; // 上一个chuck的startPointer
+  final int[] docBaseDeltas; // 每个chunk....
+  final long[] startPointerDeltas; // 每个chunk与上一个chunk的起始位置差值。
 
   CompressingStoredFieldsIndexWriter(IndexOutput indexOutput, int blockSize) throws IOException {
     if (blockSize <= 0) {
@@ -95,12 +95,14 @@ public final class CompressingStoredFieldsIndexWriter implements Closeable {
     fieldsIndexOut.writeVInt(PackedInts.VERSION_CURRENT);
   }
 
+  // 重置一些block相关的字段，为下一个block的写入做准备
   private void reset() {
     blockChunks = 0;
     blockDocs = 0;
     firstStartPointer = -1; // means unset
   }
 
+  // 写一个block, 写到磁盘中
   private void writeBlock() throws IOException {
     assert blockChunks > 0;
     fieldsIndexOut.writeVInt(blockChunks);
@@ -119,7 +121,7 @@ public final class CompressingStoredFieldsIndexWriter implements Closeable {
     } else {
       avgChunkDocs = Math.round((float) (blockDocs - docBaseDeltas[blockChunks - 1]) / (blockChunks - 1));
     }
-    fieldsIndexOut.writeVInt(totalDocs - blockDocs); // docBase
+    fieldsIndexOut.writeVInt(totalDocs - blockDocs); // docBase  block中第一个文档的docID
     fieldsIndexOut.writeVInt(avgChunkDocs);
     int docBase = 0;
     long maxDelta = 0;
@@ -173,9 +175,10 @@ public final class CompressingStoredFieldsIndexWriter implements Closeable {
     writer.finish();
   }
 
+  // 写一个chuck， 写到内存中
   void writeIndex(int numDocs, long startPointer) throws IOException {
-    if (blockChunks == blockSize) {
-      writeBlock();
+    if (blockChunks == blockSize) {  // 如果chuck数目达到1024
+      writeBlock();  // 写出一个block
       reset();
     }
 
@@ -184,8 +187,8 @@ public final class CompressingStoredFieldsIndexWriter implements Closeable {
     }
     assert firstStartPointer > 0 && startPointer >= firstStartPointer;
 
-    docBaseDeltas[blockChunks] = numDocs;
-    startPointerDeltas[blockChunks] = startPointer - maxStartPointer;
+    docBaseDeltas[blockChunks] = numDocs; // 记录当前chuck的文档总数
+    startPointerDeltas[blockChunks] = startPointer - maxStartPointer; // 记录当前chuck的起始位置与上一个chuck的起始位置的差值。
 
     ++blockChunks;
     blockDocs += numDocs;

@@ -87,8 +87,8 @@ public final class CompressingStoredFieldsWriter extends StoredFieldsWriter {
   private final int maxDocsPerChunk;
 
   private final GrowableByteArrayDataOutput bufferedDocs;
-  private int[] numStoredFields; // number of stored fields
-  private int[] endOffsets; // end offsets in bufferedDocs
+  private int[] numStoredFields; // number of stored fields   记录每个文档的store fields数
+  private int[] endOffsets; // end offsets in bufferedDocs    记录每个文档在bufferedDocs中的结束偏移量
   private int docBase; // doc ID at the beginning of the chunk
   private int numBufferedDocs; // docBase + numBufferedDocs == current doc ID
   
@@ -114,6 +114,7 @@ public final class CompressingStoredFieldsWriter extends StoredFieldsWriter {
     IndexOutput indexStream = directory.createOutput(IndexFileNames.segmentFileName(segment, segmentSuffix, FIELDS_INDEX_EXTENSION), 
                                                                      context);
     try {
+      // fieldsStream 用来写 .fdt 数据文件
       fieldsStream = directory.createOutput(IndexFileNames.segmentFileName(segment, segmentSuffix, FIELDS_EXTENSION),
                                                     context);
 
@@ -123,7 +124,7 @@ public final class CompressingStoredFieldsWriter extends StoredFieldsWriter {
       CodecUtil.writeIndexHeader(fieldsStream, codecNameDat, VERSION_CURRENT, si.getId(), segmentSuffix);
       assert CodecUtil.indexHeaderLength(codecNameDat, segmentSuffix) == fieldsStream.getFilePointer();
       assert CodecUtil.indexHeaderLength(codecNameIdx, segmentSuffix) == indexStream.getFilePointer();
-
+      // indexWriter 用来写 .fdx 索引文件
       indexWriter = new CompressingStoredFieldsIndexWriter(indexStream, blockSize);
       indexStream = null;
 
@@ -163,8 +164,8 @@ public final class CompressingStoredFieldsWriter extends StoredFieldsWriter {
       endOffsets = Arrays.copyOf(endOffsets, newLength);
     }
     this.numStoredFields[numBufferedDocs] = numStoredFieldsInDoc;  // 记录当前doc的字段数
-    numStoredFieldsInDoc = 0;
-    endOffsets[numBufferedDocs] = bufferedDocs.getPosition();
+    numStoredFieldsInDoc = 0; // 重置变量值，供下一个Document使用
+    endOffsets[numBufferedDocs] = bufferedDocs.getPosition(); // 记录当前doc的结束偏移量
     ++numBufferedDocs;
     if (triggerFlush()) { // 如果达到flush的条件，则进行flush (chuckSize 或者 文档数 达到上限)
       flush();
@@ -220,7 +221,7 @@ public final class CompressingStoredFieldsWriter extends StoredFieldsWriter {
     return bufferedDocs.getPosition() >= chunkSize || // chunks of at least chunkSize bytes
         numBufferedDocs >= maxDocsPerChunk;
   }
-
+  // 写一个Chunk
   private void flush() throws IOException {
     indexWriter.writeIndex(numBufferedDocs, fieldsStream.getFilePointer());
 
@@ -235,7 +236,7 @@ public final class CompressingStoredFieldsWriter extends StoredFieldsWriter {
 
     // compress stored fields to fieldsStream
     if (sliced) {
-      // big chunk, slice it
+      // big chunk, slice it  chuck太大，切分成多片压缩
       for (int compressed = 0; compressed < bufferedDocs.getPosition(); compressed += chunkSize) {
         compressor.compress(bufferedDocs.getBytes(), compressed, Math.min(chunkSize, bufferedDocs.getPosition() - compressed), fieldsStream);
       }
@@ -290,8 +291,8 @@ public final class CompressingStoredFieldsWriter extends StoredFieldsWriter {
     }
 
     final long infoAndBits = (((long) info.number) << TYPE_BITS) | bits;
-    bufferedDocs.writeVLong(infoAndBits);
-
+    bufferedDocs.writeVLong(infoAndBits);  // 写入FieldNumAndType
+    // 写入Field的值
     if (bytes != null) {
       bufferedDocs.writeVInt(bytes.length);
       bufferedDocs.writeBytes(bytes.bytes, bytes.offset, bytes.length);

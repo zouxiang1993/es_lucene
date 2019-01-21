@@ -416,7 +416,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
             + ", numDocs=" + numDocs, fieldsStream);
       }
 
-      sliced = (token & 1) != 0;
+      sliced = (token & 1) != 0; // 压缩时是否分成了多个片
 
       offsets = ArrayUtil.grow(offsets, chunkDocs + 1);
       numStoredFields = ArrayUtil.grow(numStoredFields, chunkDocs);
@@ -528,7 +528,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
               throw new EOFException();
             }
             final int toDecompress = Math.min(length - decompressed, chunkSize);
-            decompressor.decompress(fieldsStream, toDecompress, 0, toDecompress, bytes);
+            decompressor.decompress(fieldsStream, toDecompress, 0, toDecompress, bytes); // 如果所需的字段都在前面的分片, 后面的分片可能不需要解压
             decompressed += toDecompress;
           }
 
@@ -569,7 +569,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
 
   SerializedDocument document(int docID) throws IOException {
     if (state.contains(docID) == false) {
-      fieldsStream.seek(indexReader.getStartPointer(docID));
+      fieldsStream.seek(indexReader.getStartPointer(docID)); // 快速定位到docID所在的chuck
       state.reset(docID);
     }
     assert state.contains(docID);
@@ -601,7 +601,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
           skipField(doc.in, bits);
           break;
         case STOP:
-          return;
+          return; // 停止，可能可以避免解压后面的分片
       }
     }
   }

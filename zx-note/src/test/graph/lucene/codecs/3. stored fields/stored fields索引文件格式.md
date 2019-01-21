@@ -17,7 +17,7 @@ stored fields 总共分两个文件存储。
 - ChunkDocs : chuck中的doc总数 
 - DocFieldCounts : 每一个doc的field数目
 - DocLengths : 解压后每一个doc的byte[]长度，用于快速定位到一个doc
-- CompressedDocs --> 多个文档Docs压缩后的形式
+- CompressedDocs --> 多个文档Docs**压缩**后的形式
 - Docs --> Doc^ChunkDocs
 - Doc --> <FieldNumAndType, Value>^DocFieldCount
 - FieldNumAndType : 后3位代表字段类型，其他的代表字段编号
@@ -30,15 +30,24 @@ stored fields 总共分两个文件存储。
 5: Value is Double  
 6, 7: unused
 - 如果文档超过16KB，那么chuck可能只包含一个文档。一个文档不可能分布在多个chuck中，一个文档的所有字段都在同一个chunk中
-- 一个chuck中，如果至少有1个文档过大，导致chuck超过了32KB,这个chuck可能会被压缩成多个16KB的LZ4 blocks。这可以使StoredFieldVisitors解压最少的数据（如果它只需要靠前的field）。
-- 每个文档的原始长度被写入到chunk的元数据中。一旦解压出了足够的信息，解压工具可以利用这些信息及时的停止解压
+- 一个chuck中，如果至少有1个文档过大，导致chuck超过了32KB,这个chuck可能会被压缩成多个16KB的LZ4 blocks。**这可以使StoredFieldVisitors解压最少的数据（如果它只需要靠前的field）**。
+- 每个文档的原始长度被写入到chunk的元数据中。**一旦解压出了足够的信息，解压工具可以利用这些信息及时的停止解压**
 
-2.  索引文件: xxx.fdx 
+2   索引文件: xxx.fdx 
 - FieldsIndex (.fdx) --> Header, ChunkIndex, Footer  
 读数据时， .fdx文件被完全加载到内存。  
 其中主要记录了每个chuck中第一个文档的doc ID和 每个chuck的开始位置。用于快速定位文档所在的chuck  
 详见: http://lucene.apache.org/core/6_6_1/core/org/apache/lucene/codecs/compressing/CompressingStoredFieldsIndexWriter.html  
 
+- FieldsIndex (.fdx) --> Block^BlockCount
+- BlockCount是Block总数，并没有显式的存储
+
+- Block --> BlockChunks, DocBases, StartPointers
+- BlockChunks --> block中的chunk数目，0表示.fdx文件的结束
+- DocBases --> DocBase, AvgChunkDocs, BitsPerDocBaseDelta, DocBaseDeltas
+- DocBase --> block中第一个文档的docID
+- AvgChunkDocs --> 每个chunk中的平均文档数目
+- BitsPerDocBaseDelta -->  ... 
 
 
 
