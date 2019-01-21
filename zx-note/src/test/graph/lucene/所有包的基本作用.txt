@@ -1,2 +1,11 @@
-analysis: 将文本转化为 可索引/可搜索的 token 的API
+store : 基本的I/O API
+codecs : 定义索引文件的结构，编码/解码方式
+document : 文档的逻辑表示
+
+analysis: 文本分析。将文本转化为 可索引/可搜索的 token 的API
+
+index : 维护和访问索引
+
 search : 查询和打分
+
+util : 工具类

@@ -52,6 +52,7 @@
 	IOContext
 	FlushInfo
 	MergeInfo
+
 	RAMFile : 表示一个内存中的文件, 一个 byte[] buffer
 	RateLimiter
 	ByteBufferGuard

@@ -1,6 +1,7 @@
 @startuml
 abstract class Directory{
-    // Directory表示一些扁平文件的集合
+    Directory表示一些扁平文件的集合, 这些文件都只能在创建时写入一次。
+    写入之后，就只能读或者删除，不可再修改。
     ---
     // 返回目录下所有文件
     +{abstract} String[] listAll()

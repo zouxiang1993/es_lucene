@@ -1,5 +1,7 @@
 @startuml
 abstract class DataOutput{
+    为Lucene最底层的各种数据类型执行写操作
+    --
     +{abstract} void writeByte(byte b)
     +{abstract} void writeBytes(byte[] b, int offset, int length)
     +void writeInt(int i)
@@ -38,15 +40,15 @@ class RateLimitedIndexOutput extends IndexOutput{
 }
 
 class OutputStreamDataOutput extends DataOutput{
-    // 包装一个OutputStream的IndexOutput
+    // 直接写到一个OutputStream中
 }
 
 class ByteArrayDataOutput extends DataOutput{
-    // 将数据写到一个字节数组中
+    // 将数据写到一个定长的byte[]中
 }
 
 class GrowableByteArrayDataOutput extends DataOutput{
-
+    // 将数据写到一个可增长的byte[]中
 }
 
 @enduml

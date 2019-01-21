@@ -73,4 +73,5 @@ class ByteArrayIndexInput extends IndexInput{
 class BufferedChecksumIndexInput extends ChecksumIndexInput{
 
 }
+
 @enduml
