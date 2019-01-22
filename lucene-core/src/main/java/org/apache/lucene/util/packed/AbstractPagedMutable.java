@@ -34,18 +34,18 @@ abstract class AbstractPagedMutable<T extends AbstractPagedMutable<T>> extends L
   static final int MIN_BLOCK_SIZE = 1 << 6;
   static final int MAX_BLOCK_SIZE = 1 << 30;
 
-  final long size;
+  final long size; // 数值总个数
   final int pageShift;
   final int pageMask;
-  final PackedInts.Mutable[] subMutables;
-  final int bitsPerValue;
+  final PackedInts.Mutable[] subMutables; // 每一项相当于一页，也是一个block
+  final int bitsPerValue; // 每个数需要的位数
 
-  AbstractPagedMutable(int bitsPerValue, long size, int pageSize) {
+  AbstractPagedMutable(int bitsPerValue, long size, int pageSize) { // 这里的pageSize为每一个block的大小，应该要是2的指数
     this.bitsPerValue = bitsPerValue;
     this.size = size;
-    pageShift = checkBlockSize(pageSize, MIN_BLOCK_SIZE, MAX_BLOCK_SIZE);
-    pageMask = pageSize - 1;
-    final int numPages = numBlocks(size, pageSize);
+    pageShift = checkBlockSize(pageSize, MIN_BLOCK_SIZE, MAX_BLOCK_SIZE); // pageShift是pageSize二进制表示尾部0的个数, 也可以看做是pageSize以2为底的对数
+    pageMask = pageSize - 1; // 掩码
+    final int numPages = numBlocks(size, pageSize); // 页数
     subMutables = new PackedInts.Mutable[numPages];
   }
 

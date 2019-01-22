@@ -1,0 +1,66 @@
+@startuml
+
+set namespaceSeparator ::
+
+abstract class NumericDocValues{
+    一个per doc 的数值
+    --
+    // 根据文档ID获取数值
+    +{abstract} long get(int docID)
+}
+
+abstract class PackedInts.Reader extends NumericDocValues{
+     只读的、可随机访问的正整数数组
+     --
+
+     // 整数值的个数
+     +{abstract} int size()
+     // 从index位置开始读取数据，最少1个最多len个，
+     // 填充到arr数组中的off~off+len位置处，返回实际读取的个数
+     +int get(int index, long[] arr, int off, int len)
+}
+
+abstract class PackedInts.Mutable extends PackedInts.Reader{
+    // 一个可修改的 packed整数数组
+    ---
+    // 存储每一个值需要的bit数
+    +{abstract} int getBitsPerValue()
+    // 指定数组下标，设置值
+    +{abstract} void set(int index, long value)
+    // 批量设置
+    +int set(int index, long[] arr, int off, int len)
+    // 段填充
+    +void fill(int fromIndex, int toIndex, long val)
+    // 将所有值设置为0
+    +void clear()
+}
+
+class GrowableWriter extends PackedInts.Mutable{
+    可支持负数
+    每个数值所需的bit数是可以不断增长的。
+}
+
+abstract class LongValues extends NumericDocValues{
+    +{abstract} long get(long index)
+}
+
+abstract class AbstractPagedMutable<T extends AbstractPagedMutable<T>> extends LongValues{
+    将数据分成多页存储，每一页都是一个PackedInts.Mutable[]
+    --
+    -long size; // final. 数值总数
+    -int bitsPerValue // final. 每个数值需要的bit数
+    -int pageShift;
+    -int pageMask;
+    // 数据实际存储的地方
+    -PackedInts.Mutable[] subMutables;
+    --
+}
+
+class PagedMutable extends AbstractPagedMutable{
+    不同block的bitsPerValue可以不同
+}
+
+class PagedGrowableWriter extends AbstractPagedMutable{
+    每个block的bitsPerValue都是相同的
+}
+@enduml
