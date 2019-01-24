@@ -14,6 +14,7 @@
     <modules>
         <module>example</module>
         <module>extend_mapping_char_filter</module>
+        <module>stanford_stemmer</module>
     </modules>
 
     <dependencies>
