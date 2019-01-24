@@ -1,0 +1,15 @@
+FST
+Builder
+NodeHash
+Util
+
+// FST的输出
+Outputs -- PairOutputs, PositiveIntOutputs, NoOutputs, IntSequenceOutputs， ByteSequenceOutputs, CharSequenceOutputs
+
+// 可以通过next() and advance()来遍历一个FST中的所有Term
+FSTEnum -- IntsRefFSTEnum，BytesRefFSTEnum
+
+BytesStore
+ForwardBytesReader， ReverseBytesReader
+
+

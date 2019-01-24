@@ -91,7 +91,7 @@ final class SegmentTermsEnum extends TermsEnum {
     currentFrame = staticFrame;
     final FST.Arc<BytesRef> arc;
     if (fr.index != null) {
-      arc = fr.index.getFirstArc(arcs[0]);
+      arc = fr.index.getFirstArc(arcs[0]); // FST的虚拟入边, 初始化
       // Empty string prefix must have an output in the index!
       assert arc.isFinal();
     } else {

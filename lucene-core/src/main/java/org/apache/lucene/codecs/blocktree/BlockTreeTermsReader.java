@@ -150,7 +150,7 @@ public final class BlockTreeTermsReader extends FieldsProducer {
     
     String termsName = IndexFileNames.segmentFileName(segment, state.segmentSuffix, TERMS_EXTENSION);
     try {
-      termsIn = state.directory.openInput(termsName, state.context);
+      termsIn = state.directory.openInput(termsName, state.context); // 词典文件输入流
       version = CodecUtil.checkIndexHeader(termsIn, TERMS_CODEC_NAME, VERSION_START, VERSION_CURRENT, state.segmentInfo.getId(), state.segmentSuffix);
 
       if (version < VERSION_AUTO_PREFIX_TERMS || version >= VERSION_AUTO_PREFIX_TERMS_REMOVED) {
@@ -173,7 +173,7 @@ public final class BlockTreeTermsReader extends FieldsProducer {
       }
 
       String indexName = IndexFileNames.segmentFileName(segment, state.segmentSuffix, TERMS_INDEX_EXTENSION);
-      indexIn = state.directory.openInput(indexName, state.context);
+      indexIn = state.directory.openInput(indexName, state.context);  // 词典index文件输入流
       CodecUtil.checkIndexHeader(indexIn, TERMS_INDEX_CODEC_NAME, version, version, state.segmentInfo.getId(), state.segmentSuffix);
       CodecUtil.checksumEntireFile(indexIn);
 
@@ -187,17 +187,17 @@ public final class BlockTreeTermsReader extends FieldsProducer {
       CodecUtil.retrieveChecksum(termsIn);
 
       // Read per-field details
-      seekDir(termsIn, dirOffset);
+      seekDir(termsIn, dirOffset);  // 结合索引文件格式 和 seekDir方法内容
       seekDir(indexIn, indexDirOffset);
 
-      final int numFields = termsIn.readVInt();
+      final int numFields = termsIn.readVInt(); // 字段总数
       if (numFields < 0) {
         throw new CorruptIndexException("invalid numFields: " + numFields, termsIn);
       }
 
       for (int i = 0; i < numFields; ++i) {
-        final int field = termsIn.readVInt();
-        final long numTerms = termsIn.readVLong();
+        final int field = termsIn.readVInt(); // 字段编号
+        final long numTerms = termsIn.readVLong(); // 字段中去重后的Term总数
         if (numTerms <= 0) {
           throw new CorruptIndexException("Illegal numTerms for field number: " + field, termsIn);
         }
@@ -205,7 +205,7 @@ public final class BlockTreeTermsReader extends FieldsProducer {
         if (numBytes < 0) {
           throw new CorruptIndexException("invalid rootCode for field number: " + field + ", numBytes=" + numBytes, termsIn);
         }
-        final BytesRef rootCode = new BytesRef(new byte[numBytes]);
+        final BytesRef rootCode = new BytesRef(new byte[numBytes]); // rootCode 指向这个字段的 root block
         termsIn.readBytes(rootCode.bytes, 0, numBytes);
         rootCode.length = numBytes;
         final FieldInfo fieldInfo = state.fieldInfos.fieldInfo(field);
@@ -230,7 +230,7 @@ public final class BlockTreeTermsReader extends FieldsProducer {
         if (sumTotalTermFreq != -1 && sumTotalTermFreq < sumDocFreq) { // #positions must be >= #postings
           throw new CorruptIndexException("invalid sumTotalTermFreq: " + sumTotalTermFreq + " sumDocFreq: " + sumDocFreq, termsIn);
         }
-        final long indexStartFP = indexIn.readVLong();
+        final long indexStartFP = indexIn.readVLong();  // 指向该字段的FST起始位置
         FieldReader previous = fields.put(fieldInfo.name,       
                                           new FieldReader(this, fieldInfo, numTerms, rootCode, sumTotalTermFreq, sumDocFreq, docCount,
                                                           indexStartFP, longsSize, indexIn, minTerm, maxTerm));
@@ -239,7 +239,7 @@ public final class BlockTreeTermsReader extends FieldsProducer {
         }
       }
       
-      indexIn.close();
+      indexIn.close(); // 至此，索引文件(.tip)已经全部加载到内存； 而词典文件(.tim)的主要部分还在磁盘，后面要持续的读取。
       success = true;
     } finally {
       if (!success) {
@@ -260,7 +260,7 @@ public final class BlockTreeTermsReader extends FieldsProducer {
   /** Seek {@code input} to the directory offset. */
   private void seekDir(IndexInput input, long dirOffset)
       throws IOException {
-    input.seek(input.length() - CodecUtil.footerLength() - 8);
+    input.seek(input.length() - CodecUtil.footerLength() - 8);  // .tim .tip 两个文件的偏移量offset 都写在了文件的尾部
     dirOffset = input.readLong();
     input.seek(dirOffset);
   }

@@ -85,10 +85,10 @@ public final class FieldReader extends Terms implements Accountable {
     rootBlockFP = (new ByteArrayDataInput(rootCode.bytes, rootCode.offset, rootCode.length)).readVLong() >>> BlockTreeTermsReader.OUTPUT_FLAGS_NUM_BITS;
 
     if (indexIn != null) {
-      final IndexInput clone = indexIn.clone();
+      final IndexInput clone = indexIn.clone(); // 多个field共用1个indexInput, 需要clone, 持有不同的offset
       //System.out.println("start=" + indexStartFP + " field=" + fieldInfo.name);
       clone.seek(indexStartFP);
-      index = new FST<>(clone, ByteSequenceOutputs.getSingleton());
+      index = new FST<>(clone, ByteSequenceOutputs.getSingleton()); // 索引FST
         
       /*
         if (false) {
@@ -153,7 +153,7 @@ public final class FieldReader extends Terms implements Accountable {
 
   @Override
   public TermsEnum iterator() throws IOException {
-    return new SegmentTermsEnum(this);
+    return new SegmentTermsEnum(this);  // TermsEnum : 用来准确查找(seek)一个Term，或者遍历所有Term
   }
 
   @Override
