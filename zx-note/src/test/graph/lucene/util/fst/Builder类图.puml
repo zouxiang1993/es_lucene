@@ -1,0 +1,56 @@
+@startuml
+
+class Builder<T>{
+}
+
+class Arc<T>{
+    表示一条待定的弧(可见但是还没有序列化)
+    ----
+    // 输入字符label
+    +int label;
+    // 弧的目标Node
+    +Node target;
+    +boolean isFinal;
+    +T output;
+    +T nextFinalOutput;
+}
+
+interface Node{
+    +boolean isCompiled();
+}
+
+class CompiledNode implements Node{
+    #long node
+}
+
+class UnCompiledNode<T> implements Node{
+    表示一个待定的Node(可见但是还没有序列化的Node)
+    --
+    #Builder<T> owner
+    // 弧的数目
+    +int numArcs
+    // 所有弧
+    +Arc<T>[] arcs
+    +T output
+    +boolean isFinal
+    +long inputCount
+    +int depth
+    ----
+    // 构造方法
+    +UnCompiledNode(Builder<T> owner, int depth)
+    +void clear()
+    // 返回最后一条弧的输出
+    +T getLastOutput(int labelToMatch)
+    // 新增一条弧
+    +void addArc(int label, Node target)
+    // 更新最后一条弧
+    +void replaceLast(int labelToMatch, Node target, T nextFinalOutput, boolean isFinal)
+    // 删除最后一条弧
+    +void deleteLast(int label, Node target)
+    // 设置最后一条弧的Output
+    +void setLastOutput(int labelToMatch, T newOutput)
+    // ???
+    +void prependOutput(T outputPrefix)
+}
+
+@enduml
