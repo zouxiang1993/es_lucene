@@ -1,56 +1,140 @@
 @startuml
+set namespaceSeparator ::
 
-class Builder<T>{
+package FST{
+    class FST<T>{
+        ---
+        // 构建FST时用到；构建完毕后，
+        // 如果FST>1GB，则存储在BytesStore中供后面的读取
+        // 否则，存储在byte[]中供后面的读取
+        -BytesStore bytes
+        -byte[] bytesArray
+        ---
+        // 构造函数
+        FST(INPUT_TYPE inputType, Outputs<T> outputs, boolean willPackFST, float acceptableOverheadRatio, int bytesPageBits)
+        --
+        // 构造结束后调用
+        void finish(long newStartNode)
+        -void cacheRootArcs()
+        // 将一个Node序列化到byte[]当中去
+        long addNode(Builder<T> builder, Builder.UnCompiledNode<T> nodeIn)
+
+        --
+        // 获取FST的虚拟入边
+        +Arc<T> getFirstArc(Arc<T> arc)
+        // 获取follow边的目的节点的第一条边，填充到arc参数中。
+        +Arc<T> readFirstTargetArc(Arc<T> follow, Arc<T> arc, BytesReader in)
+        // 获取follow边的目的节点的最后一条边，填充到arc参数中。
+        +Arc<T> readLastTargetArc(Arc<T> follow, Arc<T> arc, BytesReader in)
+        //
+        +boolean isExpandedTarget(Arc<T> follow, BytesReader in)
+        // 读取下一条边。如果后面没有了，则读取第一条边
+        +Arc<T> readNextArc(Arc<T> arc, BytesReader in)
+        //
+        +int readNextArcLabel(Arc<T> arc, BytesReader in)
+        // 读下一条边。
+        +Arc<T> readNextRealArc(Arc<T> arc, final BytesReader in)
+        // 寻找follow边的输入字符为"labelToMatch"的后续边
+        +Arc<T> findTargetArc(int labelToMatch, Arc<T> follow, Arc<T> arc, BytesReader in)
+    }
+
+    class FST.Arc<T>{
+        ---
+        // 输入符号
+        +int label
+        // 输出
+        +T output
+        // 起始Node(序号或地址)
+        long node
+        // 目标Node
+        +long target
+        // 各种标志位
+        byte flags
+        // ???
+        +T nextFinalOutput
+        // address (into the byte[]), or ord/address if label == END_LABEL
+        long nextArc;
+
+        // 从一个Node出发的每条边固定占多少位？
+        // 这种方式会浪费一点内存，但是可以加速查找
+        int bytesPerArc
+        // 第一条边从数组的哪里开始？
+        long posArcsStart
+        // 当前我们正在第几条边？
+        int arcIdx
+        // 总共几条边?
+        int numArcs
+        ---
+        // 是否是当前Node的最后一条边
+        +boolean isLast()
+        // 是否是终止状态(可接受状态)
+        +boolean isFinal()
+    }
 }
 
-class Arc<T>{
-    表示一条待定的弧(可见但是还没有序列化)
-    ----
-    // 输入字符label
-    +int label;
-    // 弧的目标Node
-    +Node target;
-    +boolean isFinal;
-    +T output;
-    +T nextFinalOutput;
-}
+package Builder {
+    class Builder<T>{
+        ---
+        // 存放已经编译的Node？？？
+        -NodeHash<T> dedupHash
+        FST<T> fst
+       -IntsRefBuilder lastInput
+       -UnCompiledNode<T>[] frontier
+       -long lastFrozenNode
+       -BytesStore bytes
+        ---
+        // 加入下一组输入/输出对（必须按顺序添加）
+        +void add(IntsRef input, T output)
+    }
 
-interface Node{
-    +boolean isCompiled();
-}
+    class Builder.Arc<T>{
+        表示一条待定的弧(可见但是还没有序列化)
+        ----
+        // 输入字符label
+        +int label;
+        // 弧的目标Node
+        +Node target;
+        +boolean isFinal;
+        +T output;
+        +T nextFinalOutput;
+    }
 
-class CompiledNode implements Node{
-    #long node
-}
+    interface Builder.Node{
+        +boolean isCompiled();
+    }
 
-class UnCompiledNode<T> implements Node{
-    表示一个待定的Node(可见但是还没有序列化的Node)
-    --
-    #Builder<T> owner
-    // 弧的数目
-    +int numArcs
-    // 所有弧
-    +Arc<T>[] arcs
-    +T output
-    +boolean isFinal
-    +long inputCount
-    +int depth
-    ----
-    // 构造方法
-    +UnCompiledNode(Builder<T> owner, int depth)
-    +void clear()
-    // 返回最后一条弧的输出
-    +T getLastOutput(int labelToMatch)
-    // 新增一条弧
-    +void addArc(int label, Node target)
-    // 更新最后一条弧
-    +void replaceLast(int labelToMatch, Node target, T nextFinalOutput, boolean isFinal)
-    // 删除最后一条弧
-    +void deleteLast(int label, Node target)
-    // 设置最后一条弧的Output
-    +void setLastOutput(int labelToMatch, T newOutput)
-    // ???
-    +void prependOutput(T outputPrefix)
-}
+    class Builder.CompiledNode implements Builder.Node{
+        #long node
+    }
 
+    class Builder.UnCompiledNode<T> implements Builder.Node{
+        表示一个待定的Node(可见但是还没有序列化的Node)
+        --
+        #Builder<T> owner
+        // 弧的数目
+        +int numArcs
+        // 所有弧
+        +Arc<T>[] arcs
+        +T output
+        +boolean isFinal
+        +long inputCount
+        +int depth
+        ----
+        // 构造方法
+        +UnCompiledNode(Builder<T> owner, int depth)
+        +void clear()
+        // 返回最后一条弧的输出
+        +T getLastOutput(int labelToMatch)
+        // 新增一条弧
+        +void addArc(int label, Node target)
+        // 更新最后一条弧
+        +void replaceLast(int labelToMatch, Node target, T nextFinalOutput, boolean isFinal)
+        // 删除最后一条弧
+        +void deleteLast(int label, Node target)
+        // 设置最后一条弧的Output
+        +void setLastOutput(int labelToMatch, T newOutput)
+        // ???
+        +void prependOutput(T outputPrefix)
+    }
+}
 @enduml

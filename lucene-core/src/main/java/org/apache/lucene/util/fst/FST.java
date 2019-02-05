@@ -99,7 +99,7 @@ public final class FST<T> implements Accountable {
   private static final int BIT_TARGET_DELTA = 1 << 6;
 
   // We use this as a marker (because this one flag is
-  // illegal by itself ...):
+  // illegal by itself ...):  每条边都以固定长度写入
   private static final byte ARCS_AS_FIXED_ARRAY = BIT_ARC_HAS_FINAL_OUTPUT;
 
   /**
@@ -474,7 +474,7 @@ public final class FST<T> implements Accountable {
     }
   }
   
-  // Optionally caches first 128 labels
+  // Optionally caches first 128 labels   缓存根节点的一些出边(也可能不会缓存)
   @SuppressWarnings({"rawtypes","unchecked"})
   private void cacheRootArcs() throws IOException {
     // We should only be called once per FST:
@@ -671,11 +671,11 @@ public final class FST<T> implements Accountable {
 
     builder.arcCount += nodeIn.numArcs;
     
-    final int lastArc = nodeIn.numArcs-1;
+    final int lastArc = nodeIn.numArcs-1; // 此Node最后一条Arc的编号
 
     long lastArcStart = builder.bytes.getPosition();
     int maxBytesPerArc = 0;
-    for(int arcIdx=0;arcIdx<nodeIn.numArcs;arcIdx++) {
+    for(int arcIdx=0;arcIdx<nodeIn.numArcs;arcIdx++) {  // 顺序写入所有的Arc
       final Builder.Arc<T> arc = nodeIn.arcs[arcIdx];
       final Builder.CompiledNode target = (Builder.CompiledNode) arc.target;
       int flags = 0;

@@ -71,7 +71,7 @@ public class Builder<T> {
   private final IntsRefBuilder lastInput = new IntsRefBuilder();
   
   // for packing
-  private final boolean doPackFST;
+  private final boolean doPackFST;  // 是否简化FST, 见DFA的简化(最小化)
   private final float acceptableOverheadRatio;
 
   // NOTE: cutting this over to ArrayList instead loses ~6%
@@ -84,7 +84,7 @@ public class Builder<T> {
   // instead of storing the address of the target node for
   // a given arc, we mark a single bit noting that the next
   // node in the byte[] is the target node):
-  long lastFrozenNode;
+  long lastFrozenNode; // 用于TARGET_NEXT优化（即不存储目标node的地址，改用一个位来标志bytes中的下一个node是目标node)
 
   // Reused temporarily while building the FST:
   int[] reusedBytesPerArc = new int[4];
@@ -169,7 +169,7 @@ public class Builder<T> {
     this.acceptableOverheadRatio = acceptableOverheadRatio;
     this.allowArrayArcs = allowArrayArcs;
     fst = new FST<>(inputType, outputs, doPackFST, acceptableOverheadRatio, bytesPageBits);
-    bytes = fst.bytes;
+    bytes = fst.bytes; // 共享FST的ByteStore
     assert bytes != null;
     if (doShareSuffix) {
       dedupHash = new NodeHash<>(fst, bytes.getReverseReader(false));
@@ -386,7 +386,7 @@ public class Builder<T> {
       return;
     }
 
-    // compare shared prefix length
+    // compare shared prefix length   第一步: 找公共前缀的长度
     int pos1 = 0;
     int pos2 = input.offset;
     final int pos1Stop = Math.min(lastInput.length(), input.length);
@@ -399,9 +399,9 @@ public class Builder<T> {
       pos1++;
       pos2++;
     }
-    final int prefixLenPlus1 = pos1+1;
+    final int prefixLenPlus1 = pos1+1; // 公共前缀长度+1
       
-    if (frontier.length < input.length+1) {
+    if (frontier.length < input.length+1) {   // frontier 数组扩容
       final UnCompiledNode<T>[] next = ArrayUtil.grow(frontier, input.length+1);
       for(int idx=frontier.length;idx<next.length;idx++) {
         next[idx] = new UnCompiledNode<>(this, idx);
@@ -411,9 +411,9 @@ public class Builder<T> {
 
     // minimize/compile states from previous input's
     // orphan'd suffix
-    freezeTail(prefixLenPlus1);
+    freezeTail(prefixLenPlus1);    // 第二步: 将已经确定的状态节点冻结(lastInput中非公共前缀的部分)
 
-    // init tail states for current input
+    // init tail states for current input  // 第三步：将当前字符串形成状态节点，插入frontier中。
     for(int idx=prefixLenPlus1;idx<=input.length;idx++) {
       frontier[idx-1].addArc(input.ints[input.offset + idx - 1],
                              frontier[idx]);
@@ -421,13 +421,14 @@ public class Builder<T> {
     }
 
     final UnCompiledNode<T> lastNode = frontier[input.length];
+    // 这里的判断等价于 if (! lastInput.equals(input)) , 两次整数比较速度远高于字符串的比较。
     if (lastInput.length() != input.length || prefixLenPlus1 != input.length + 1) {
       lastNode.isFinal = true;
       lastNode.output = NO_OUTPUT;
     }
 
     // push conflicting outputs forward, only as far as
-    // needed
+    // needed     第四步： 调整输出
     for(int idx=1;idx<prefixLenPlus1;idx++) {
       final UnCompiledNode<T> node = frontier[idx];
       final UnCompiledNode<T> parentNode = frontier[idx-1];
@@ -452,7 +453,7 @@ public class Builder<T> {
       output = fst.outputs.subtract(output, commonOutputPrefix);
       assert validOutput(output);
     }
-
+    // 如果input 和 lastInput完全相同
     if (lastInput.length() == input.length && prefixLenPlus1 == 1+input.length) {
       // same input more than 1 time in a row, mapping to
       // multiple outputs
@@ -463,7 +464,7 @@ public class Builder<T> {
       frontier[prefixLenPlus1-1].setLastOutput(input.ints[input.offset + prefixLenPlus1-1], output);
     }
 
-    // save last input
+    // save last input  本次的input已经处理完毕，input变成了lastInput
     lastInput.copyInts(input);
 
     //System.out.println("  count[0]=" + frontier[0].inputCount);
@@ -540,7 +541,7 @@ public class Builder<T> {
   }
 
   static final class CompiledNode implements Node {
-    long node;
+    long node; // 存储的是Node在bytes中的位置
     @Override
     public boolean isCompiled() {
       return true;
@@ -558,7 +559,7 @@ public class Builder<T> {
     // code here...
     public T output;
     public boolean isFinal;
-    public long inputCount;
+    public long inputCount;  // 入边总数
 
     /** This node's depth, starting from the automaton root. */
     public final int depth;

@@ -1,0 +1,46 @@
+@startuml
+
+abstract class Outputs<T>{
+    T为FST输出的具体类型
+    Outputs<T>是T的一些运算抽象
+    ---
+    // 二者的公共部分
+    +abstract T common(T output1, T output2)
+    // 二者之差
+    +abstract T subtract(T output, T inc)
+    // 二者之和
+    +abstract T add(T prefix, T output)
+    // 写出
+    +abstract void write(T output, DataOutput out)
+    // 读入
+    +abstract T read(DataInput in)
+    // 返回一个单例的对象，表示空结果
+    +abstract T getNoOutput()
+    // 将输出转换成字符串
+    +abstract String outputToString(T output)
+    // 合并两个输出
+    +T merge(T first, T second)
+}
+
+class PositiveIntOutputs extends Outputs{
+    表示非负Long型整数的输出
+    ---
+}
+
+class NoOutputs extends Outputs{
+    表示FST无输出，此时的FST退化成FSA(有限状态机)
+}
+
+class CharSequenceOutputs extends Outputs{
+    表示"字符序列"的输出
+    应用场景： MappingCharFilter
+}
+
+note bottom of  ByteSequenceOutputs
+ByteSequenceOutputs 与 CharSequenceOutputs 的区别？？？
+end note
+class ByteSequenceOutputs extends Outputs{
+    表示"字节序列"的输出
+    应用场景： SynonymMap
+}
+@enduml

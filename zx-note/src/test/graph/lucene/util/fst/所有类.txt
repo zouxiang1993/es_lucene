@@ -1,7 +1,7 @@
-FST
-Builder
-NodeHash
-Util
+FST         // FST本身
+Builder     // 用于构造一个FST
+NodeHash    // 用于Node的Hash
+Util        // FST工具类
 
 // FST的输出
 Outputs -- PairOutputs, PositiveIntOutputs, NoOutputs, IntSequenceOutputs， ByteSequenceOutputs, CharSequenceOutputs
@@ -9,6 +9,7 @@ Outputs -- PairOutputs, PositiveIntOutputs, NoOutputs, IntSequenceOutputs， Byt
 // 可以通过next() and advance()来遍历一个FST中的所有Term
 FSTEnum -- IntsRefFSTEnum，BytesRefFSTEnum
 
+// FST的二进制存储
 BytesStore
 ForwardBytesReader， ReverseBytesReader
 
