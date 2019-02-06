@@ -1,0 +1,37 @@
+@startuml
+
+class HashMap<K,V>{
+    ---
+    // 默认初始容量: 16
+    {static} final int DEFAULT_INITIAL_CAPACITY
+    // 最大容量: 1<<30，约10亿
+    {static} final int MAXIMUM_CAPACITY
+    // 默认负载因子: 0.75f
+    {static} final float DEFAULT_LOAD_FACTOR
+    // 树化阈值： 8。 处理哈希冲突时，何时用list存储，何时用tree存储？???????
+    {static} final int TREEIFY_THRESHOLD
+    //
+    {static} final int UNTREEIFY_THRESHOLD
+    //
+    {static} final int MIN_TREEIFY_CAPACITY
+    ---
+    // hash表，第一次使用时被初始化。必要时会进行resize
+    // 长度始终是2的幂
+    Node<K,V>[] table
+    Set<Map.Entry<K,V>> entrySet
+    // 元素总数
+    int size
+    // 用来判断是否应该resize的阈值， 容量*负载因子。
+    int threshold
+    // 负载因子
+    final float loadFactor
+}
+
+class HashMap.Node<K,V>{
+    final int hash;
+    final K key;
+    V value;
+    Node<K,V> next;
+}
+
+@enduml
