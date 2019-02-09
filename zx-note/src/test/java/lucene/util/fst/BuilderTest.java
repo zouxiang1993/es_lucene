@@ -8,6 +8,7 @@ import org.apache.lucene.util.fst.*;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class BuilderTest {
     /**
@@ -37,6 +38,7 @@ public class BuilderTest {
 
     /**
      * 遍历FST
+     *
      * @throws IOException
      */
     @Test
@@ -48,8 +50,20 @@ public class BuilderTest {
         while ((inputOutput = fstEnum.next()) != null) {
             String input = Util.toBytesRef(inputOutput.input, scratch).utf8ToString();
             Long output = inputOutput.output;
-            System.out.println(input +"\t" + output);
+            System.out.println(input + "\t" + output);
         }
+    }
+
+    /**
+     * 将FST绘制成图<br/>
+     * 将输出的文本复制到 Graphviz2.38\bin\gvedit.exe 可以绘图。
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testDrawFST() throws IOException {
+        FST<Long> fst = buildFST();
+        Util.toDot(fst, new PrintWriter(System.out), false, true);
     }
 
     private FST<Long> buildFST() throws IOException {

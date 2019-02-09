@@ -78,17 +78,17 @@ public final class FST<T> implements Accountable {
    *  this FST. */
   public static enum INPUT_TYPE {BYTE1, BYTE2, BYTE4};
 
-  static final int BIT_FINAL_ARC = 1 << 0;
-  static final int BIT_LAST_ARC = 1 << 1;
-  static final int BIT_TARGET_NEXT = 1 << 2;
+  static final int BIT_FINAL_ARC = 1 << 0;  // 表示此条Arc的target节点是Final节点(可接受状态)
+  static final int BIT_LAST_ARC = 1 << 1;   // 一个节点的所有arc按顺序写入，最后一条Arc被标记为LAST_ARC，标志这个节点的所有Arc都写入完毕。
+  static final int BIT_TARGET_NEXT = 1 << 2; // target_next优化，表明下一个节点就是此Arc的target节点，这样可以节省下存储target node的空间。
 
   // TODO: we can free up a bit if we can nuke this:
-  static final int BIT_STOP_NODE = 1 << 3;
+  static final int BIT_STOP_NODE = 1 << 3;   // 表示此Arc的target节点是-1(结束状态)
 
   /** This flag is set if the arc has an output. */
-  public static final int BIT_ARC_HAS_OUTPUT = 1 << 4;
+  public static final int BIT_ARC_HAS_OUTPUT = 1 << 4; // 表示此Arc有输出
 
-  static final int BIT_ARC_HAS_FINAL_OUTPUT = 1 << 5;
+  static final int BIT_ARC_HAS_FINAL_OUTPUT = 1 << 5; // 表示此Arc的target node 有 final output
 
   // Arcs are stored as fixed-size (per entry) array, so
   // that we can find an arc using binary search.  We do
@@ -96,7 +96,7 @@ public final class FST<T> implements Accountable {
 
   // If set, the target node is delta coded vs current
   // position:
-  private static final int BIT_TARGET_DELTA = 1 << 6;
+  private static final int BIT_TARGET_DELTA = 1 << 6;  // target节点以差值存储
 
   // We use this as a marker (because this one flag is
   // illegal by itself ...):  每条边都以固定长度写入
