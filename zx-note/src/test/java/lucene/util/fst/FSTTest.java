@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class BuilderTest {
+public class FSTTest {
     /**
      * FST的构造过程
      *
