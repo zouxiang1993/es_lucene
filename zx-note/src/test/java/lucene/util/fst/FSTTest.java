@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Comparator;
 
 public class FSTTest {
     /**
@@ -64,6 +65,40 @@ public class FSTTest {
     public void testDrawFST() throws IOException {
         FST<Long> fst = buildFST();
         Util.toDot(fst, new PrintWriter(System.out), false, true);
+    }
+
+    @Test
+    public void testShortestPath() throws IOException {
+        final String userInput = "do"; // 假如用户输入了"do"
+        BytesRef bytesRef = new BytesRef(userInput);
+        IntsRef input = Util.toIntsRef(bytesRef, new IntsRefBuilder());
+
+        FST<Long> fst = buildFST();
+
+        // 从开始位置走到"do"位置
+        FST.Arc<Long> arc = fst.getFirstArc(new FST.Arc<>());
+        FST.BytesReader fstReader = fst.getBytesReader();
+        for (int i = 0; i < input.length; i++) {
+            if (fst.findTargetArc(input.ints[input.offset + i], arc, arc, fstReader) == null) {
+                System.out.println("没找到。。。");
+                return;
+            }
+        }
+
+        // 从"do"位置开始找走到终止状态最近的2条路径
+        Util.TopResults<Long> results = Util.shortestPaths(fst, arc, PositiveIntOutputs.getSingleton().getNoOutput(), new Comparator<Long>() {
+            @Override
+            public int compare(Long o1, Long o2) {
+                return o1.compareTo(o2);
+            }
+        }, 2, false);
+
+        // 打印结果： dog  dogs。 即用户输入"do"，给用户建议"dog"和"dogs"
+        BytesRefBuilder bytesRefBuilder = new BytesRefBuilder();
+        for (Util.Result<Long> result : results) {
+            IntsRef intsRef = result.input;
+            System.out.println(userInput + Util.toBytesRef(intsRef, bytesRefBuilder).utf8ToString());
+        }
     }
 
     private FST<Long> buildFST() throws IOException {
