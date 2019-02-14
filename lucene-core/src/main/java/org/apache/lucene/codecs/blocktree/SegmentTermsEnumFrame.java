@@ -155,7 +155,7 @@ final class SegmentTermsEnumFrame {
 
     ste.in.seek(fp);
     int code = ste.in.readVInt();
-    entCount = code >>> 1;
+    entCount = code >>> 1; // entry总数
     assert entCount > 0;
     isLastInFloor = (code & 1) != 0;
 
@@ -173,7 +173,7 @@ final class SegmentTermsEnumFrame {
     if (suffixBytes.length < numBytes) {
       suffixBytes = new byte[ArrayUtil.oversize(numBytes, 1)];
     }
-    ste.in.readBytes(suffixBytes, 0, numBytes);
+    ste.in.readBytes(suffixBytes, 0, numBytes); // 读入块中所有的后缀
     suffixesReader.reset(suffixBytes, 0, numBytes);
 
     /*if (DEBUG) {
@@ -582,7 +582,7 @@ final class SegmentTermsEnumFrame {
     nextTerm: while (true) {
       nextEnt++;
 
-      suffix = suffixesReader.readVInt();
+      suffix = suffixesReader.readVInt(); // 表示当前后缀的长度
 
       // if (DEBUG) {
       //   BytesRef suffixBytesRef = new BytesRef();
@@ -593,8 +593,8 @@ final class SegmentTermsEnumFrame {
       // }
 
       final int termLen = prefix + suffix;
-      startBytePos = suffixesReader.getPosition();
-      suffixesReader.skipBytes(suffix);
+      startBytePos = suffixesReader.getPosition(); // 记录下当前后缀的起始位置。
+      suffixesReader.skipBytes(suffix); // 跳过当前后缀，下一次循环时读取下一个后缀的长度。
 
       final int targetLimit = target.offset + (target.length < termLen ? target.length : termLen);
       int targetPos = target.offset + prefix;
@@ -602,7 +602,7 @@ final class SegmentTermsEnumFrame {
       // Loop over bytes in the suffix, comparing to
       // the target
       int bytePos = startBytePos;
-      while(true) {
+      while(true) { // 逐个字节的比较suffix和target
         final int cmp;
         final boolean stop;
         if (targetPos < targetLimit) {

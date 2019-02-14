@@ -1,0 +1,63 @@
+@startuml
+
+class SegmentTermsEnum {
+    // .tim文件的输入流
+    IndexInput in
+    -SegmentTermsEnumFrame[] stack
+    -SegmentTermsEnumFrame staticFrame
+    SegmentTermsEnumFrame currentFrame
+    boolean termExists
+    -int targetBeforeCurrentLength
+    -ByteArrayDataInput scratchReader
+    -int validIndexPrefix
+    BytesRefBuilder term
+    // 从.tip文件中读取的，该field的FST
+    -FST.BytesReader fstReader
+    -FST.Arc<BytesRef>[] arcs
+}
+
+class SegmentTermsEnumFrame{
+    // 在stack[]中的序号
+    int ord
+    boolean hasTerms
+    boolean hasTermsOrig
+    boolean isFloor
+    FST.Arc<BytesRef> arc
+    boolean versionAutoPrefix
+    // 文件指针，这个block是从哪里加载的
+    long fp;
+    long fpOrig;
+    long fpEnd;
+
+    byte[] suffixBytes
+    ByteArrayDataInput suffixesReader
+
+    byte[] statBytes
+    ByteArrayDataInput statsReader
+
+    byte[] floorData
+    ByteArrayDataInput floorDataReader
+
+    int prefix // block中所有的term共享的前缀长度。
+    int entCount // block中的entry数目。一个entry可能是一个Term，也可能是一个子block
+    int nextEnt // 下一个要读的entry序号
+    // True if this block is either not a floor block, or, it's the last sub-block of a floor block ??????
+    boolean isLastInFloor
+
+    boolean isLeafBlock // 叶子block，即所有的entry都是term
+
+    long lastSubFP
+
+    int nextFloorLabel
+    int numFollowFloorBlocks
+
+    int metaDataUpto
+    BlockTermState state
+    long[] longs  // metadata buffer, holding monotonic values
+    byte[] bytes // metadata buffer, holding general values
+    ByteArrayDataInput bytesReader
+
+
+}
+
+@enduml

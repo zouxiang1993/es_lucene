@@ -88,7 +88,7 @@ public final class BlockTreeTermsReader extends FieldsProducer {
   
   static final BytesRef NO_OUTPUT = FST_OUTPUTS.getNoOutput();
 
-  static final int OUTPUT_FLAGS_NUM_BITS = 2;
+  static final int OUTPUT_FLAGS_NUM_BITS = 2; // FST的输出为ByteSequenceOutputs。表示一个字节序列。最开始是一个VLong：磁盘地址 + 2位标识位。
   static final int OUTPUT_FLAGS_MASK = 0x3;
   static final int OUTPUT_FLAG_IS_FLOOR = 0x1;
   static final int OUTPUT_FLAG_HAS_TERMS = 0x2;

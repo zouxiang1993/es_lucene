@@ -208,7 +208,7 @@ final class SegmentTermsEnum extends TermsEnum {
   }
 
   private SegmentTermsEnumFrame getFrame(int ord) throws IOException {
-    if (ord >= stack.length) {
+    if (ord >= stack.length) { // 数组扩容
       final SegmentTermsEnumFrame[] next = new SegmentTermsEnumFrame[ArrayUtil.oversize(1+ord, RamUsageEstimator.NUM_BYTES_OBJECT_REF)];
       System.arraycopy(stack, 0, next, 0, stack.length);
       for(int stackOrd=stack.length;stackOrd<next.length;stackOrd++) {
@@ -237,11 +237,11 @@ final class SegmentTermsEnum extends TermsEnum {
   SegmentTermsEnumFrame pushFrame(FST.Arc<BytesRef> arc, BytesRef frameData, int length) throws IOException {
     scratchReader.reset(frameData.bytes, frameData.offset, frameData.length);
     final long code = scratchReader.readVLong();
-    final long fpSeek = code >>> BlockTreeTermsReader.OUTPUT_FLAGS_NUM_BITS;
+    final long fpSeek = code >>> BlockTreeTermsReader.OUTPUT_FLAGS_NUM_BITS; // 除去最后2位标识位。
     final SegmentTermsEnumFrame f = getFrame(1+currentFrame.ord);
     f.hasTerms = (code & BlockTreeTermsReader.OUTPUT_FLAG_HAS_TERMS) != 0;
     f.hasTermsOrig = f.hasTerms;
-    f.isFloor = (code & BlockTreeTermsReader.OUTPUT_FLAG_IS_FLOOR) != 0;
+    f.isFloor = (code & BlockTreeTermsReader.OUTPUT_FLAG_IS_FLOOR) != 0;   // TODO: hasTerms, isFloor含义？
     if (f.isFloor) {
       f.setFloorData(scratchReader, frameData);
     }
@@ -449,7 +449,7 @@ final class SegmentTermsEnum extends TermsEnum {
         //return termExists;
       }
 
-    } else {
+    } else {  // 从FST的头开始找
 
       targetBeforeCurrentLength = -1;
       arc = fr.index.getFirstArc(arcs[0]);
@@ -476,13 +476,13 @@ final class SegmentTermsEnum extends TermsEnum {
     // }
 
     // We are done sharing the common prefix with the incoming target and where we are currently seek'd; now continue walking the index:
-    while (targetUpto < target.length) {
+    while (targetUpto < target.length) {  // 从0到targetUpto是当前查询的Term与上一次查询的Term的公共前缀部分。接下来匹配剩余的部分
 
       final int targetLabel = target.bytes[target.offset + targetUpto] & 0xFF;
 
       final FST.Arc<BytesRef> nextArc = fr.index.findTargetArc(targetLabel, arc, getArc(1+targetUpto), fstReader);
 
-      if (nextArc == null) {
+      if (nextArc == null) {  // FST中已经匹配不到
 
         // Index is exhausted
         // if (DEBUG) {
@@ -494,7 +494,7 @@ final class SegmentTermsEnum extends TermsEnum {
 
         currentFrame.scanToFloorFrame(target);
 
-        if (!currentFrame.hasTerms) {
+        if (!currentFrame.hasTerms) { // 没有查询到Term
           termExists = false;
           term.setByteAt(targetUpto, (byte) targetLabel);
           term.setLength(1+targetUpto);
@@ -504,7 +504,7 @@ final class SegmentTermsEnum extends TermsEnum {
           return false;
         }
 
-        currentFrame.loadBlock();
+        currentFrame.loadBlock(); // 加载一个block
 
         final SeekStatus result = currentFrame.scanToTerm(target, true);            
         if (result == SeekStatus.FOUND) {

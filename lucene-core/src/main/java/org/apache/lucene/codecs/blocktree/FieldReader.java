@@ -85,10 +85,10 @@ public final class FieldReader extends Terms implements Accountable {
     rootBlockFP = (new ByteArrayDataInput(rootCode.bytes, rootCode.offset, rootCode.length)).readVLong() >>> BlockTreeTermsReader.OUTPUT_FLAGS_NUM_BITS;
 
     if (indexIn != null) {
-      final IndexInput clone = indexIn.clone(); // 多个field共用1个indexInput, 需要clone, 持有不同的offset
+      final IndexInput clone = indexIn.clone(); // 原来的indexInput指向下一个Field的FSTStartIndexFP，后面还要用到，这里clone一个新的indexInput，用来读取当前Field的FST数据。
       //System.out.println("start=" + indexStartFP + " field=" + fieldInfo.name);
       clone.seek(indexStartFP);
-      index = new FST<>(clone, ByteSequenceOutputs.getSingleton()); // 索引FST
+      index = new FST<>(clone, ByteSequenceOutputs.getSingleton()); // 从磁盘读取数据，在内存构建索引FST
         
       /*
         if (false) {
