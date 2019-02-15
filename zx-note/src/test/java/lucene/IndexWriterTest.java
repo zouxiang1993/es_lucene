@@ -102,6 +102,7 @@ public class IndexWriterTest {
     // 更新文档 数据路径
     @Test
     public void testUpdate() throws IOException {
+        setup();
         Document doc = new Document();
         doc.add(new StringField("goodsId", "1", Field.Store.YES));
         doc.add(new StringField("price", "1000", Field.Store.YES));
