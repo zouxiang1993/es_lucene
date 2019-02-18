@@ -288,7 +288,7 @@ final class BootstrapChecks {
 
     }
 
-    static class MlockallCheck implements BootstrapCheck {
+    static class MlockallCheck implements BootstrapCheck { // 锁定内存，不会交换到硬盘上。 通过配置 bootstrap.memory_lock来开启。
 
         private final boolean mlockallSet;
 

@@ -1,0 +1,24 @@
+@startuml
+
+abstract class Command{
+    // 表示一条可以执行的命令
+    ---
+    // 执行命令
+    #{abstract} void execute(Terminal terminal, OptionSet options)
+    // 退出时的回调函数
+    void close()
+}
+
+abstract class EnvironmentAwareCommand extends Command {
+    ---
+    // 执行时能感知到Enviroment
+    #{abstract} void execute(Terminal terminal, OptionSet options, Environment env)
+}
+
+class Elasticsearch extends EnvironmentAwareCommand{
+    ---
+    // 内部调用Bootstrap.init()方法进行初始化
+    void init(final boolean daemonize, final Path pidFile, final boolean quiet, Environment initialEnv)
+}
+
+@enduml
