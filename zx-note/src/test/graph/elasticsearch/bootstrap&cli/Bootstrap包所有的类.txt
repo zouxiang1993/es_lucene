@@ -1,0 +1,34 @@
+Elasticsearch : 外部启动的入口类
+Bootstrap : 内部实际的启动流程
+
+BootstrapCheck ： 启动时的一些检查。例如：最大线程数检查、最大文件描述符检查...
+BootstrapChecks
+
+BootstrapInfo
+BootstrapSettings
+
+
+
+异常:
+    StartupException
+    BootstrapException
+
+    ElasticsearchUncaughtExceptionHandler
+
+
+其他：大部分是用来辅助启动时的一些检查项。
+    ConsoleCtrlHandler
+    JarHell : jar 冲突
+
+    JNACLibrary
+    JNAKernel32Library
+    JNANatives
+    Natives
+
+    Security
+    ESPolicy :
+
+    JavaVersion
+
+    SystemCallFilter
+    Spawner

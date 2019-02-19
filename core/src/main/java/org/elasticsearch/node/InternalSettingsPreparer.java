@@ -97,7 +97,7 @@ public class InternalSettingsPreparer {
             if (Files.exists(path)) {
                 if (!settingsFileFound) {
                     try {
-                        output.loadFromPath(path);
+                        output.loadFromPath(path); // 加载配置文件,例如：elasticsearch.yml
                     } catch (IOException e) {
                         throw new SettingsException("Failed to load settings from " + path.toString(), e);
                     }

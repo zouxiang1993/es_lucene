@@ -1,0 +1,15 @@
+@startuml
+
+interface Discovery{
+
+}
+
+interface PingContextProvider{
+
+}
+
+class ZenDiscovery implements Discovery, PingContextProvider{
+
+}
+
+@enduml
