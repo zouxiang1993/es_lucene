@@ -223,7 +223,7 @@ public final class NodeEnvironment  implements Closeable {
                     try (Directory luceneDir = FSDirectory.open(dir, NativeFSLockFactory.INSTANCE)) {
                         startupTraceLogger.trace("obtaining node lock on {} ...", dir.toAbsolutePath());
                         try {
-                            locks[dirIndex] = luceneDir.obtainLock(NODE_LOCK_FILENAME);
+                            locks[dirIndex] = luceneDir.obtainLock(NODE_LOCK_FILENAME); // 获取文件锁node.lock
                             nodePaths[dirIndex] = new NodePath(dir);
                             nodeLockId = possibleLockId;
                         } catch (LockObtainFailedException ex) {
@@ -411,8 +411,8 @@ public final class NodeEnvironment  implements Closeable {
     private static NodeMetaData loadOrCreateNodeMetaData(Settings settings, Logger logger,
                                                          NodePath... nodePaths) throws IOException {
         final Path[] paths = Arrays.stream(nodePaths).map(np -> np.path).toArray(Path[]::new);
-        NodeMetaData metaData = NodeMetaData.FORMAT.loadLatestState(logger, NamedXContentRegistry.EMPTY, paths);
-        if (metaData == null) {
+        NodeMetaData metaData = NodeMetaData.FORMAT.loadLatestState(logger, NamedXContentRegistry.EMPTY, paths); // 从目录加载metadata
+        if (metaData == null) { // 如果metadata不存在，则新建。
             metaData = new NodeMetaData(generateNodeId(settings));
         }
         // we write again to make sure all paths have the latest state file

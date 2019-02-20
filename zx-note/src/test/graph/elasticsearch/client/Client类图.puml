@@ -19,30 +19,73 @@ interface ElasticsearchClient{
 }
 
 interface Client extends ElasticsearchClient{
+    // 对ES集群操作的一站式接口:
+    // 集群层面的操作，索引层面的操作，文档层面的操作。
     ---
     +AdminClient admin()
     +Settings settings()
-    // 每种操作都有两种形式
+    // 所有操作都是异步的，有两种形式
     // 1. 返回ActionFuture  2. 回调 Listener
-    +ActionFuture<IndexResponse> index(IndexRequest request)
-    +IndexRequestBuilder prepareIndex(String index, String type)
-    +ActionFuture<GetResponse> get(GetRequest request)
-    +GetRequestBuilder prepareGet()
-    +ActionFuture<SearchResponse> search(SearchRequest request)
-    +SearchRequestBuilder prepareSearch(String... indices)
-    // 其他操作...
+    index
+    update
+    delete
+    bulk
+    get
+    multiGet
+    search
+    searchScroll
+    clearScroll
+    multiSearch
+    termVectors
+    explain
+    fieldCaps
 }
 
 abstract class AbstractClient implements Client{
 }
 
 interface ClusterAdminClient extends ElasticsearchClient{
+    对集群操作
+    ---
+    health
+    state
+    updateSettings
+    reroute
+    nodesInfo
+    clusterStats
+    listTasks
+    getTask
+    cancelTasks
 }
 
 class AbstractClient.ClusterAdmin implements ClusterAdminClient{
 }
 
 interface IndicesAdminClient extends ElasticsearchClient{
+    对索引操作
+    ---
+    exists
+    typesExists
+    stats
+    recoveries
+    segments
+    shardStores
+    create
+    delete
+    close
+    open
+    refresh
+    flush
+    syncedFlush
+    forceMerge
+    upgrade
+    getMappings
+    putMapping
+    aliases
+    getAliases
+    clearCache
+    updateSettings
+    analyze
 }
 
 class AbstractClient.IndicesAdmin implements IndicesAdminClient{
@@ -55,4 +98,11 @@ class NodeClient extends AbstractClient{
     // 在本地Node执行Action
     ---
 }
+
+interface AdminClient{
+    +ClusterAdminClient cluster()
+    +IndicesAdminClient indices()
+}
+
+Client -left-- AdminClient
 @enduml

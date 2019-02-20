@@ -262,7 +262,7 @@ public class Node implements Closeable {
 
             // create the node environment as soon as possible, to recover the node id and enable logging
             try {
-                nodeEnvironment = new NodeEnvironment(tmpSettings, environment);
+                nodeEnvironment = new NodeEnvironment(tmpSettings, environment); // 构造NodeEnvironment，读取或新建集群元数据。
                 resourcesToClose.add(nodeEnvironment);
             } catch (IOException ex) {
                 throw new IllegalStateException("Failed to create node environment", ex);

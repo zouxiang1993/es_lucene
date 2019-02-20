@@ -1,11 +1,14 @@
 @startuml
 participant Node
+participant NodeEnvironment
 participant PluginsService
 participant ThreadPool
 participant NodeClient
 participant ResourceWatcherService
 participant NetworkService
 autonumber
+create NodeEnvironment
+Node --> NodeEnvironment : new
 create PluginsService
 Node --> PluginsService: new
         note right

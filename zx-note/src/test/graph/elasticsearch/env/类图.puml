@@ -1,0 +1,16 @@
+@startuml
+
+class Environment {
+    封装了一些环境信息
+    ---
+    path.home, path.data, path.conf, path.log等配置项
+    ---
+    -Settings settings
+    -String configExtension // 配置文件后缀
+    -Path[] dataFiles // 数据文件目录
+    -Path[] repoFiles // ???
+    -Path configFile // 配置文件目录
+    -Path pluginsFile // 插件目录
+    -Path modulesFile // modules目录
+}
+@enduml
