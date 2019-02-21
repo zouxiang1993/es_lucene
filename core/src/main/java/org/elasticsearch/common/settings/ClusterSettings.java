@@ -109,7 +109,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * Encapsulates all valid cluster level settings.
+ * Encapsulates all valid cluster level settings.   所有集群层面的设置。
  */
 public final class ClusterSettings extends AbstractScopedSettings {
     public ClusterSettings(Settings nodeSettings, Set<Setting<?>> settingsSet) {

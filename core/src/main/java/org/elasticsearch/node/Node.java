@@ -337,11 +337,11 @@ public class Node implements Closeable {
             final ResourceWatcherService resourceWatcherService = new ResourceWatcherService(settings, threadPool);
             final ScriptModule scriptModule = ScriptModule.create(settings, this.environment, resourceWatcherService,
                 pluginsService.filterPlugins(ScriptPlugin.class));
-            AnalysisModule analysisModule = new AnalysisModule(this.environment, pluginsService.filterPlugins(AnalysisPlugin.class));
+            AnalysisModule analysisModule = new AnalysisModule(this.environment, pluginsService.filterPlugins(AnalysisPlugin.class)); // 分词器模块 初始化。
             additionalSettings.addAll(scriptModule.getSettings());
             // this is as early as we can validate settings at this point. we already pass them to ScriptModule as well as ThreadPool
             // so we might be late here already
-            final SettingsModule settingsModule = new SettingsModule(this.settings, additionalSettings, additionalSettingsFilter);
+            final SettingsModule settingsModule = new SettingsModule(this.settings, additionalSettings, additionalSettingsFilter); // 集群层面和索引层面的配置信息。
             scriptModule.registerClusterSettingsListeners(settingsModule.getClusterSettings());
             resourcesToClose.add(resourceWatcherService);
             final NetworkService networkService = new NetworkService(settings,

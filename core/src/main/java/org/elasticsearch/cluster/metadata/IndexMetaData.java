@@ -297,7 +297,7 @@ public class IndexMetaData implements Diffable<IndexMetaData>, ToXContent {
     private final long version;
     private final long[] primaryTerms;
 
-    private final State state;
+    private final State state; // 索引打开还是关闭状态
 
     private final ImmutableOpenMap<String, AliasMetaData> aliases;
 

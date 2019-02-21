@@ -38,6 +38,11 @@ class ClusterState implements Diffable{
     -ClusterBlocks blocks
 }
 
+class MetaData{
+    集群元数据。
+    详见cluster.metadata包
+}
+
 class RoutingTable{
     // 每一个索引中的每一个分片，处在哪一个节点上
     // 见elasticsearch.cluster.routing包

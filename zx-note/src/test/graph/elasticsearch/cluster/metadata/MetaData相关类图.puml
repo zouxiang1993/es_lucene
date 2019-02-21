@@ -1,27 +1,36 @@
 @startuml
 
 class MetaData{
+    集群元数据
+    --
     -Settings settings
+    // 所有的索引
     -ImmutableOpenMap<String, IndexMetaData> indices
     -String[] allIndices
+    // 根据索引名称或者别名查找
     -SortedMap<String, AliasOrIndex> aliasAndIndexLookup
 }
 
 class IndexMetaData{
+    索引元数据
     ---
+    // 用来路由的shards数目，一般情况下等于numberOfShards
+    // 只有在索引收缩(shrunk)后才会改变。
     -int routingNumShards
+    // 默认为1，只有在索引分片数目修改之后才会改变。
     -int routingFactor
+    // 改变路由函数，详见官网_routing： index.routing_partition_size
     -int routingPartitionSize
     ---
-    -int numberOfShards
-    -int numberOfReplicas
+    -int numberOfShards  // 分片数目
+    -int numberOfReplicas  // 副本数目
     ---
     -Index index
     -long version
     // 每一个主分片的编号？ 非负，每次主分配分配时递增
     // (可能是集群重启，也可能是副本分片提升为主分片)
     -long[] primaryTerms
-    -State state // Open / Close
+    -State state // Open 或者 Close
     -ImmutableOpenMap<String, AliasMetaData> aliases
     ---
     -Settings settings
@@ -48,6 +57,9 @@ class Settings{
 
 }
 
+class AliasMetaData{
+}
+
 class MappingMetaData{
 
 }
@@ -55,5 +67,6 @@ class MappingMetaData{
 MetaData "1" *-- "1" Settings
 MetaData "1" *-- "n" IndexMetaData
 MetaData "1" *-- "n" AliasOrIndex
+IndexMetaData "1" *-- "n" AliasMetaData
 IndexMetaData "1" *-- "n" MappingMetaData
 @enduml

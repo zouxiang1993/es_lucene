@@ -151,6 +151,7 @@ import java.util.List;
 
 /**
  * Sets up {@link AnalysisRegistry}.
+ * 注册所有的分词组件：Tokenizer, TokenFilter, CharFilter。 名称到工厂类的映射。
  */
 public final class AnalysisModule {
     static {

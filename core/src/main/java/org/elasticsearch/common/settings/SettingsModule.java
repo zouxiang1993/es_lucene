@@ -70,7 +70,7 @@ public class SettingsModule implements Module {
             registerSetting(setting);
         }
 
-        for (Setting<?> setting : additionalSettings) {
+        for (Setting<?> setting : additionalSettings) { // plugins & modules 中注册的Setting
             registerSetting(setting);
         }
 
