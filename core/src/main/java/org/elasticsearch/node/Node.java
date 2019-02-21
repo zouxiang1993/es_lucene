@@ -354,20 +354,20 @@ public class Node implements Closeable {
                 scriptModule.getScriptService(), analysisModule.getAnalysisRegistry(), pluginsService.filterPlugins(IngestPlugin.class));
             final ClusterInfoService clusterInfoService = newClusterInfoService(settings, clusterService, threadPool, client);
 
-            ModulesBuilder modules = new ModulesBuilder();
+            ModulesBuilder modules = new ModulesBuilder(); // Guice的模块管理。
             // plugin modules must be added here, before others or we can get crazy injection errors...
             for (Module pluginModule : pluginsService.createGuiceModules()) {
                 modules.add(pluginModule);
             }
-            final MonitorService monitorService = new MonitorService(settings, nodeEnvironment, threadPool);
+            final MonitorService monitorService = new MonitorService(settings, nodeEnvironment, threadPool); // 暴露一些进程和系统的指标。
             modules.add(new NodeModule(this, monitorService));
             ClusterModule clusterModule = new ClusterModule(settings, clusterService,
                 pluginsService.filterPlugins(ClusterPlugin.class));
             modules.add(clusterModule);
-            IndicesModule indicesModule = new IndicesModule(pluginsService.filterPlugins(MapperPlugin.class));
+            IndicesModule indicesModule = new IndicesModule(pluginsService.filterPlugins(MapperPlugin.class)); // 写索引模块
             modules.add(indicesModule);
 
-            SearchModule searchModule = new SearchModule(settings, false, pluginsService.filterPlugins(SearchPlugin.class));
+            SearchModule searchModule = new SearchModule(settings, false, pluginsService.filterPlugins(SearchPlugin.class)); // 搜索模块
             CircuitBreakerService circuitBreakerService = createCircuitBreakerService(settingsModule.getSettings(),
                 settingsModule.getClusterSettings());
             resourcesToClose.add(circuitBreakerService);

@@ -56,7 +56,7 @@ public interface CircuitBreaker {
     }
 
     /**
-     * Trip the circuit breaker
+     * Trip the circuit breaker。断开断路器
      * @param fieldName name of the field responsible for tripping the breaker
      * @param bytesNeeded bytes asked for but unable to be allocated
      */

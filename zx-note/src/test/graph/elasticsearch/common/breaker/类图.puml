@@ -1,0 +1,48 @@
+@startuml
+
+interface CircuitBreaker{
+    断路器:表示一类对象，可以一直增长，直到到达某种限制。
+    --
+    // 断开断路器
+    +void circuitBreak(String fieldName, long bytesNeeded)
+    // 增加，可能触发熔断
+    +double addEstimateBytesAndMaybeBreak(long bytes, String label)
+    // 增加，但不触发熔断
+    +long addWithoutBreaking(long bytes)
+    // 已经使用了多少
+    +long getUsed()
+    // 上限是多少
+    +long getLimit()
+    // 见MemoryCircuitBreaker
+    +double getOverhead()
+    // 被熔断的次数
+    +long getTrippedCount()
+    // 断路器名称
+    +String getName()
+}
+
+class ChildMemoryCircuitBreaker implements CircuitBreaker{
+
+}
+
+class MemoryCircuitBreaker implements CircuitBreaker{
+    配置一个内存上限，一旦达到，就熔断。
+    用于fielddata？
+}
+
+class NoopCircuitBreaker implements CircuitBreaker{
+    所有的操作都不会触发熔断
+}
+
+abstract class CircuitBreakerService{
+    熔断服务。为field data的加载提供熔断机制。
+}
+
+class HierarchyCircuitBreakerService extends CircuitBreakerService{
+}
+
+class NoneCircuitBreakerService extends CircuitBreakerService{
+    提供一个永远不会熔断的NoopCircuitBreaker
+}
+
+@enduml
