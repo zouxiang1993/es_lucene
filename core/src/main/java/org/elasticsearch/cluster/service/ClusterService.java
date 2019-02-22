@@ -217,7 +217,7 @@ public class ClusterService extends AbstractLifecycleComponent {
             return ClusterState.builder(state).nodes(nodes).blocks(initialBlocks).build();
         });
         this.threadPoolExecutor = EsExecutors.newSinglePrioritizing(UPDATE_THREAD_NAME,
-            daemonThreadFactory(settings, UPDATE_THREAD_NAME), threadPool.getThreadContext(), threadPool.scheduler());
+            daemonThreadFactory(settings, UPDATE_THREAD_NAME), threadPool.getThreadContext(), threadPool.scheduler());   // 单线程的线程池
         this.taskBatcher = new ClusterServiceTaskBatcher(logger, threadPoolExecutor);
     }
 
@@ -808,7 +808,7 @@ public class ClusterService extends AbstractLifecycleComponent {
     }
 
     private void callClusterStateAppliers(ClusterState newClusterState, ClusterChangedEvent clusterChangedEvent) {
-        for (ClusterStateApplier applier : clusterStateAppliers) {
+        for (ClusterStateApplier applier : clusterStateAppliers) { // 依次调用各个模块对集群状态的处理。
             try {
                 logger.trace("calling [{}] with change to version [{}]", applier, newClusterState.version());
                 applier.applyClusterState(clusterChangedEvent);

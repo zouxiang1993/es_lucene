@@ -1,0 +1,36 @@
+@startuml
+
+interface ClusterStateListener{
+    集群状态监听器
+    --
+    当集群状态发生改变时被调用
+    + void clusterChanged(ClusterChangedEvent event)
+}
+
+class GatewayService implements ClusterStateListener{
+
+}
+
+interface ClusterStateApplier {
+    void applyClusterState(ClusterChangedEvent event);
+}
+
+class GatewayMetaState implements ClusterStateApplier{
+}
+
+class MetaStateService{
+    负责 MetaData 和 IndexMetaData 的 loading 和 writing
+    --
+    //加载完整的State，包括全局的State和索引的State
+    MetaData loadFullState()
+    // 加载索引的meta data
+    IndexMetaData loadIndexState(Index index)
+    // 加载全局的State，不包括索引的State
+    MetaData loadGlobalState()
+    // 写索引的meta data
+    void writeIndex(String reason, IndexMetaData indexMetaData)
+    // 写全局的meta data，不包括索引的
+    void writeGlobalState(String reason, MetaData metaData)
+}
+
+@enduml

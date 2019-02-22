@@ -161,7 +161,7 @@ public class GatewayMetaState extends AbstractComponent implements ClusterStateA
                     success = false;
                 }
             }
-            // check if the global state changed?
+            // check if the global state changed? 检查全局元信息是否发生变化，如果有变化，则将其写入磁盘。
             if (previousMetaData == null || !MetaData.isGlobalStateEquals(previousMetaData, newMetaData)) {
                 try {
                     metaStateService.writeGlobalState("changed", newMetaData);
@@ -173,7 +173,7 @@ public class GatewayMetaState extends AbstractComponent implements ClusterStateA
 
             relevantIndices = getRelevantIndices(event.state(), event.previousState(), previouslyWrittenIndices);
             final Iterable<IndexMetaWriteInfo> writeInfo = resolveStatesToBeWritten(previouslyWrittenIndices, relevantIndices, previousMetaData, event.state().metaData());
-            // check and write changes in indices
+            // check and write changes in indices 。 将发生变化的索引级元数据写入磁盘。
             for (IndexMetaWriteInfo indexMetaWrite : writeInfo) {
                 try {
                     metaStateService.writeIndex(indexMetaWrite.reason, indexMetaWrite.newMetaData);

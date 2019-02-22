@@ -1,14 +1,49 @@
 @startuml
 
+note left of ClusterService
+5.6.4版本中的ClusterService，在后续版本被拆分成<b>MasterService</b>和<b>ClusterApplierService</b>：
+MasterService只有主节点会执行这个类中的方法，即只有主节点会提交集群状态更改的任务。
+主节点和从节点都会应用集群状态，因此都会执行ClusterApplierService中的方法。
+
+Applier和 Listener的区别：
+如果某个模块需要处理集群状态的变化，则调用addStateApplier添加一个<b>处理器</b>
+如果某个模块需要监听集群状态的变化，则调用addStateListener添加一个<b>监听器</b>
+Applier负责将集群状态应用到组件内部，对Applier的调用在集群状态可见之前(ClusterService#state())
+对Listener的通知在新的集群状态可见之后。
+
+线程池类型为PrioritizedEsThreadPoolExecutor, 在单个线程中执行，支持优先级。
+end note
+
 class ClusterService{
     ---
     // 三种优先级的集群状态更改
     -Collection<ClusterStateApplier> highPriorityStateAppliers
     -Collection<ClusterStateApplier> normalPriorityStateAppliers
     -Collection<ClusterStateApplier> lowPriorityStateAppliers
-    -AtomicReference<ClusterState> state
+    -AtomicReference<ClusterState> state // 最新的集群状态
+    -PrioritizedEsThreadPoolExecutor threadPoolExecutor // 执行任务的线程池
     -NodeConnectionsService nodeConnectionsService
     -OperationRouting operationRouting
+    // 发布集群任务的模块
+    - BiConsumer<ClusterChangedEvent, Discovery.AckListener> clusterStatePublisher
+    ---
+    以下方法在后续版本被拆分到MasterService中：
+    // 待执行的任务数量
+    +int numberOfPendingTasks()
+    // 待执行的任务列表
+    +List<PendingClusterTask> pendingTasks()
+    // 提交集群层面的任务
+    void submitStateUpdateTask(...)
+    ---
+    以下方法在后续版本被拆分到ClusterApplierService中：
+    // 添加一个对集群状态的处理器
+    +void addStateApplier(ClusterStateApplier applier)
+    // 添加一个集群状态监听器
+    +void addListener(ClusterStateListener listener)
+    // 返回当前的集群状态
+    +ClusterState state()
+    // 各个模块调用这个方法提交一个集群状态更新的任务
+    + .. submitStateUpdateTask(..)
 }
 
 class ClusterSettings{
