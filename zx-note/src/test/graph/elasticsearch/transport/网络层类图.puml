@@ -1,0 +1,44 @@
+@startuml
+
+class NetworkModule{
+    上层可以通过此类获取传输模块和HTTP传输模块
+    ---
+    +Supplier<Transport> getTransportSupplier()
+    +Supplier<HttpServerTransport> getHttpServerTransportSupplier()
+    +TransportInterceptor getTransportInterceptor()
+}
+
+
+interface Transport{
+    负责内部节点的RPC请求
+    ---
+    // 节点是否已经连接
+    +boolean nodeConnected(DiscoveryNode node)
+    // 连接到给定的节点
+    +void connectToNode(...)
+    // 断开到一个节点的连接
+    +void disconnectFromNode(DiscoveryNode node)
+    // 返回当前建立的连接数目
+    +long serverOpen()
+    // 获取到一个节点的连接
+    +Connection getConnection(DiscoveryNode node)
+}
+
+interface HttpServerTransport{
+    负责对用户的REST接口服务
+}
+
+class Netty4Transport implements Transport{
+    在Netty4插件中实现
+}
+
+class Netty4HttpServerTransport implements HttpServerTransport{
+    在Netty4插件中实现。 创建一个HTTP Server监听端口
+    ---
+    当收到用户请求时，调用dispatchRequest对不同的请求执行相应的处理。
+    void dispatchRequest(final RestRequest request, final RestChannel channel)
+}
+
+NetworkModule -- Transport
+NetworkModule -- HttpServerTransport
+@enduml

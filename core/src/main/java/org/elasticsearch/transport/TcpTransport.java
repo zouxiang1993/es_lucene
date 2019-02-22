@@ -165,7 +165,7 @@ public abstract class TcpTransport<Channel> extends AbstractLifecycleComponent i
     protected final NetworkService networkService;
 
     protected volatile TransportServiceAdapter transportServiceAdapter;
-    // node id to actual channel
+    // node id to actual channel  维护已经连接的节点列表
     protected final ConcurrentMap<DiscoveryNode, NodeChannels> connectedNodes = newConcurrentMap();
 
     protected final Map<String, List<Channel>> serverChannels = newConcurrentMap();
@@ -465,7 +465,7 @@ public abstract class TcpTransport<Channel> extends AbstractLifecycleComponent i
             ensureOpen();
             try (Releasable ignored = connectionLock.acquire(node.getId())) {
                 NodeChannels nodeChannels = connectedNodes.get(node);
-                if (nodeChannels != null) {
+                if (nodeChannels != null) { // 该节点已经连接了
                     return;
                 }
                 boolean success = false;

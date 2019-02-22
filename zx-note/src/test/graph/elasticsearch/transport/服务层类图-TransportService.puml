@@ -1,0 +1,11 @@
+@startuml
+note left of TransportService
+服务层指网络模块的上层应用层，
+基于网络模块提供的Transport来收/发数据
+end note
+
+class TransportService{
+    // 发送请求，handler中定义了对响应的处理
+    +void sendRequest(DiscoveryNode node,String action,TransportRequest request, TransportResponseHandler<T> handler)
+}
+@enduml
