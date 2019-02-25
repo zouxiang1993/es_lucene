@@ -1,0 +1,60 @@
+@startuml
+class Task {
+    -long id;
+    -String type;
+    -String action;
+    -String description;
+    -TaskId parentTask;
+    -long startTime;
+    ---
+    +TaskInfo taskInfo(String localNodeId, boolean detailed)
+    +TaskResult result(DiscoveryNode node, Exception error)
+    +Status getStatus()
+}
+
+class TaskId {
+    -String nodeId;
+    -long id;
+}
+
+class TaskInfo {
+    -TaskId taskId;
+    -String type;
+    -String action;
+    -String description;
+    -long startTime;
+    -long runningTimeNanos;
+    -Task.Status status;
+    -boolean cancellable;
+    -TaskId parentTaskId;
+}
+
+class TaskResult {
+    // 如果没运行完成，则包装的是一个Task
+    // 如果运行已经完成了，则包装的是Task的response或者error
+    --
+    -boolean completed;
+    -TaskInfo task;
+    -BytesReference error;
+    -BytesReference response;
+}
+
+abstract class CancellableTask extends Task {
+    void cancel(String reason)
+    #void onCancelled()
+}
+
+class LoggingTaskListener
+
+class RawTaskStatus
+
+interface TaskAwareRequest
+
+interface TaskListener
+
+class TaskManager
+
+
+
+class TaskResultService
+@enduml

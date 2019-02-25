@@ -1,0 +1,15 @@
+@startuml
+participant Netty4HttpServerTransport
+participant RestController
+participant "<b>RestHandler</b> \n (实现类名为\nRestXxxAction)" as RestHandler
+participant RestChannelConsumer
+participant NodeClient
+
+--> Netty4HttpServerTransport : REST请求
+Netty4HttpServerTransport --> RestController : dispatchRequest
+RestController --> RestController : getHandler\n查找对应的RestHandler
+RestController --> RestHandler : handleRequest
+RestHandler --> RestHandler : prepareRequest \n 消费Request中的所有参数\n 返回RestChannelConsumer
+RestHandler --> RestChannelConsumer : accept
+RestChannelConsumer --> NodeClient : 调用相应的方法，如\n index,search,update...
+@enduml

@@ -190,7 +190,7 @@ public class RestController extends AbstractComponent implements HttpServerTrans
                     RestStatus.NOT_ACCEPTABLE, "Content-Type [" + request.getXContentType() +
                         "] does not support stream parsing. Use JSON or SMILE instead"));
             } else {
-                if (canTripCircuitBreaker(request)) {
+                if (canTripCircuitBreaker(request)) {  // 触发断路器
                     inFlightRequestsBreaker(circuitBreakerService).addEstimateBytesAndMaybeBreak(contentLength, "<http_request>");
                 } else {
                     inFlightRequestsBreaker(circuitBreakerService).addWithoutBreaking(contentLength);
@@ -452,7 +452,7 @@ public class RestController extends AbstractComponent implements HttpServerTrans
             if (closed.compareAndSet(false, true) == false) {
                 throw new IllegalStateException("Channel is already closed");
             }
-            inFlightRequestsBreaker(circuitBreakerService).addWithoutBreaking(-contentLength);
+            inFlightRequestsBreaker(circuitBreakerService).addWithoutBreaking(-contentLength); // 执行完毕后，在断路器中减去占用的资源。
         }
 
     }

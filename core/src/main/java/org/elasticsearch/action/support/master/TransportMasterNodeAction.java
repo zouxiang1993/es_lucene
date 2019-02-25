@@ -129,7 +129,7 @@ public abstract class TransportMasterNodeAction<Request extends MasterNodeReques
         protected void doStart(ClusterState clusterState) {
             final Predicate<ClusterState> masterChangePredicate = MasterNodeChangePredicate.build(clusterState);
             final DiscoveryNodes nodes = clusterState.nodes();
-            if (nodes.isLocalNodeElectedMaster() || localExecute(request)) {
+            if (nodes.isLocalNodeElectedMaster() || localExecute(request)) { // 在本地节点执行
                 // check for block, if blocked, retry, else, execute locally
                 final ClusterBlockException blockException = checkBlock(request, clusterState);
                 if (blockException != null) {
@@ -167,7 +167,7 @@ public abstract class TransportMasterNodeAction<Request extends MasterNodeReques
                         }
                     });
                 }
-            } else {
+            } else { // 通过RPC请求master执行
                 if (nodes.getMasterNode() == null) {
                     logger.debug("no known master node, scheduling a retry");
                     retry(null, masterChangePredicate);

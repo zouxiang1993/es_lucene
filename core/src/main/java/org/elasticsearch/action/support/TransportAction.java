@@ -164,9 +164,9 @@ public abstract class TransportAction<Request extends ActionRequest, Response ex
         public void proceed(Task task, String actionName, Request request, ActionListener<Response> listener) {
             int i = index.getAndIncrement();
             try {
-                if (i < this.action.filters.length) {
+                if (i < this.action.filters.length) { // 应用各个过滤器
                     this.action.filters[i].apply(task, actionName, request, listener, this);
-                } else if (i == this.action.filters.length) {
+                } else if (i == this.action.filters.length) { // 执行Action本身
                     this.action.doExecute(task, request, listener);
                 } else {
                     listener.onFailure(new IllegalStateException("proceed was called too many times"));

@@ -3,17 +3,16 @@
 set namespaceSeparator ::
 
 note as N1
-通过RESTful HTTP 来暴露ES的功能
+rest包： 通过RESTful HTTP 来暴露ES的功能
 end note
 
-package org.elasticsearch.common.xcontent{
-    interface ToXContent.Params{
-        +String param(String key);
-        +String param(String key, String defaultValue);
-        +boolean paramAsBoolean(String key, boolean defaultValue);
-        +Boolean paramAsBoolean(String key, Boolean defaultValue);
-    }
+interface ToXContent.Params{
+    +String param(String key);
+    +String param(String key, String defaultValue);
+    +boolean paramAsBoolean(String key, boolean defaultValue);
+    +Boolean paramAsBoolean(String key, Boolean defaultValue);
 }
+
 
 package org.elasticsearch.rest{
     class RestController{
@@ -24,7 +23,7 @@ package org.elasticsearch.rest{
         +void dispatchBadRequest(...)
     }
 
-    abstract class RestRequest implements org.elasticsearch.common.xcontent::ToXContent.Params{
+    abstract class RestRequest implements ::ToXContent.Params{
         // Rest请求
         ---
         +{abstract} Method method()
@@ -65,6 +64,12 @@ package org.elasticsearch.rest{
         // channel : 写响应的通道
         // client : 用于创建代表原始请求的internal requests
         +void handleRequest(RestRequest request, RestChannel channel, NodeClient client)
+    }
+
+    abstract class BaseRestHandler implements RestHandler{
+        ---
+        // 对请求的预处理，主要是读取请求参数。
+        #{abstract} RestChannelConsumer prepareRequest(RestRequest request, NodeClient client)
     }
 
     enum RestStatus{

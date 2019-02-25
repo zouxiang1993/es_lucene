@@ -1,0 +1,16 @@
+@startuml
+participant "RestCreateIndexAction \n extends \n <b>RestHandler</b>" as RestCreateIndexAction
+participant IndicesAdminClient
+participant NodeClient
+participant "TransportCreateIndexAction \n extends \n <b>TransportAction</b>" as  TransportCreateIndexAction
+
+--> RestCreateIndexAction : prepareRequest中\n返回的lambda表达式
+RestCreateIndexAction --> IndicesAdminClient : create(request, listener)
+IndicesAdminClient --> NodeClient : execute(action, request, listener)
+NodeClient --> NodeClient : doExecute
+NodeClient --> NodeClient : executeLocally
+NodeClient --> NodeClient : transportAction(action)\n返回相应的TransportAction
+NodeClient --> TransportCreateIndexAction : execute(request, listener)
+TransportCreateIndexAction --> TaskManager : register
+TransportCreateIndexAction --> TransportCreateIndexAction : doExecute()
+@enduml
