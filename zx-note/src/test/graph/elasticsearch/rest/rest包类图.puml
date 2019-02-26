@@ -24,7 +24,7 @@ package org.elasticsearch.rest{
     }
 
     abstract class RestRequest implements ::ToXContent.Params{
-        // Rest请求
+        // 原始的Rest请求
         ---
         +{abstract} Method method()
         +{abstract} String uri()

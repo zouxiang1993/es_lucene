@@ -11,5 +11,8 @@ RestController --> RestController : getHandler\n查找对应的RestHandler
 RestController --> RestHandler : handleRequest
 RestHandler --> RestHandler : prepareRequest \n 消费Request中的所有参数\n 返回RestChannelConsumer
 RestHandler --> RestChannelConsumer : accept
-RestChannelConsumer --> NodeClient : 调用相应的方法，如\n index,search,update...
+RestChannelConsumer --> NodeClient : 调用相应的方法，如\n index,search,update... 这里以get为例：\n get(GetRequest,ActionListener<GetResponse>)
+NodeClient --> NodeClient : execute(GetAction.INSTANCE, request, listener) \n <b>在这里完成了从RestXxxAction到XxxAction的过渡。
+NodeClient --> NodeClient : transportAction(GenericAction) \n <b>在这里完成了从XxxAction到TransportXxxAction的过渡。
+NodeClient --> Transport : execute(request, listener) \n <b>这以后就进入了TransportAction的执行流程。
 @enduml
