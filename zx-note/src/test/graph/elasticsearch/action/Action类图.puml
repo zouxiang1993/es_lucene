@@ -1,0 +1,27 @@
+@startuml
+Note as N1
+Action表示Elasticsearch可以执行的命令/动作
+Action的三个泛型参数：
+ActionRequest封装了命令的所有请求参数
+ActionResponse封装了命令的所有响应信息
+ActionRequestBuilder用来构造ActionRequest
+end note
+
+abstract class GenericAction<Request, Response>{
+    // 每类Action都有一个唯一的名称
+    -String name
+    // 构造一个Response实例
+    +{abstract} Response newResponse()
+
+}
+
+abstract class Action<Request, Response, RequestBuilderer> extends GenericAction{
+    // 构造一个RequestBuilder实例
+    +{abstract} RequestBuilder newRequestBuilder(ElasticsearchClient client)
+}
+
+class ExplainAction extends Action{
+    NAME = "indices:data/read/explain"
+}
+
+@enduml

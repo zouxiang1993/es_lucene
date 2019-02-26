@@ -510,7 +510,7 @@ public class Node implements Closeable {
 
             if (NetworkModule.HTTP_ENABLED.get(settings)) {
                 logger.debug("initializing HTTP handlers ...");
-                actionModule.initRestHandlers(() -> clusterService.state().nodes());
+                actionModule.initRestHandlers(() -> clusterService.state().nodes()); // 初始化所有的REST handler
             }
             logger.info("initialized");
 
@@ -705,7 +705,7 @@ public class Node implements Closeable {
         // start after cluster service so the local disco is known
         discovery.start();
         transportService.acceptIncomingRequests();
-        discovery.startInitialJoin();
+        discovery.startInitialJoin();  // 触发第一次的加入集群流程
         // tribe nodes don't have a master so we shouldn't register an observer         s
         final TimeValue initialStateTimeout = DiscoverySettings.INITIAL_STATE_TIMEOUT_SETTING.get(settings);
         if (initialStateTimeout.millis() > 0) {

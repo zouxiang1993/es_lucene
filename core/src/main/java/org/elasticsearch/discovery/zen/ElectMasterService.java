@@ -143,8 +143,8 @@ public class ElectMasterService extends AbstractComponent {
     public MasterCandidate electMaster(Collection<MasterCandidate> candidates) {
         assert hasEnoughCandidates(candidates);
         List<MasterCandidate> sortedCandidates = new ArrayList<>(candidates);
-        sortedCandidates.sort(MasterCandidate::compare);
-        return sortedCandidates.get(0);
+        sortedCandidates.sort(MasterCandidate::compare); // 先比较集群状态版本，版本号大的在前；再比较nodeId
+        return sortedCandidates.get(0); // 取最小的一个
     }
 
     /** selects the best active master to join, where multiple are discovered */

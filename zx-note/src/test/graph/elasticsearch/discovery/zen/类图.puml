@@ -5,11 +5,44 @@ interface Discovery{
 }
 
 interface PingContextProvider{
-
+    --
+    // 返回本节点当前的集群状态
+    +ClusterState clusterState()
 }
 
 class ZenDiscovery implements Discovery, PingContextProvider{
 
+}
+
+interface ZenPing{
+    void start(PingContextProvider contextProvider)
+    // ping一次，resultsConsumer为对结果的处理者，timeout为超时时间。
+    void ping(Consumer<PingCollection> resultsConsumer, TimeValue timeout)
+}
+
+class ZenPing.PingResponse{
+    Ping的结果。
+    --
+    // 每一次ping都会递增ID，ID小的ping比较老。
+    -long id;
+    -ClusterName clusterName;
+    // ping的目标节点
+    -DiscoveryNode node;
+    // 目标节点认为master是谁
+    -DiscoveryNode master;
+    -long clusterStateVersion;
+}
+
+class ZenPing.PingCollection{
+    PingResponse的集合。每个node只存储最新的一份Response
+    Map<DiscoveryNode, PingResponse> pings
+}
+
+interface UnicastHostsProvider {
+    单播地址Provider，ES只有空实现，可通过插件形式来提供。
+    --
+    // 构建动态的单播地址列表
+    List<DiscoveryNode> buildDynamicNodes()
 }
 
 @enduml

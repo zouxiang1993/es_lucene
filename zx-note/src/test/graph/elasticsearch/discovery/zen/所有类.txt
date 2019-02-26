@@ -1,0 +1,17 @@
+MembershipAction
+NodeJoinController
+UnicastHostsProvider ： 单播地址Provider，ES只有空实现，可通过Plugin来提供。
+
+    Discovery -- ZenDiscovery
+选主服务：
+    ElectMasterService
+Ping：
+    ZenPing -- UnicastZenPing   PingContextProvider
+发布集群状态：
+    PublishClusterStateAction - PendingClusterStatesQueue， PendingClusterStateStats
+
+
+故障检测：
+FaultDetection
+MasterFaultDetection
+NodesFaultDetection

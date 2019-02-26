@@ -56,9 +56,9 @@ public interface ZenPing extends Releasable {
 
         private ClusterName clusterName;
 
-        private DiscoveryNode node;
+        private DiscoveryNode node;  // ping的目标节点
 
-        private DiscoveryNode master;
+        private DiscoveryNode master;  // 目标节点认为的master是谁
 
         private long clusterStateVersion;
 

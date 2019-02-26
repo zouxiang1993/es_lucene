@@ -1,0 +1,46 @@
+@startuml
+interface RestHandler{
+    Rest 请求处理器
+    --
+    // 处理Rest请求
+    +void handleRequest(RestRequest request, RestChannel channel, NodeClient client)
+    // 能否触发断路器
+    +boolean canTripCircuitBreaker()
+}
+
+abstract class BaseRestHandler implements RestHandler{
+    --
+    // 对请求的预处理，主要是消费所有的参数
+    // 返回一个处理函数的lambda表达式。
+    #{abstract} RestChannelConsumer prepareRequest(RestRequest request, NodeClient client)
+}
+
+class RestGetAction extends BaseRestHandler{
+    GET, "/{index}/{type}/{id}"
+    HEAD, "/{index}/{type}/{id}"
+}
+
+class RestDeleteAction extends BaseRestHandler{
+    DELETE, "/{index}/{type}/{id}"
+}
+
+class RestAnalyzeAction extends BaseRestHandler{
+    GET, "/_analyze"
+    GET, "/{index}/_analyze"
+    POST, "/_analyze"
+    POST, "/{index}/_analyze"
+}
+
+class RestIndexAction extends BaseRestHandler {
+    POST, "/{index}/{type}"
+    PUT, "/{index}/{type}/{id}"
+    POST, "/{index}/{type}/{id}"
+    PUT, "/{index}/{type}/{id}/_create"
+    POST, "/{index}/{type}/{id}/_create"
+}
+
+class RestXxxAction extends BaseRestHandler{
+    // ......
+}
+
+@enduml
