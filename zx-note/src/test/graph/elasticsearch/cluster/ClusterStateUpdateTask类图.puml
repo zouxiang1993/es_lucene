@@ -1,0 +1,37 @@
+@startuml
+
+interface ClusterStateTaskConfig{
+    --
+    // 超时时间
+    +TimeValue timeout()
+    // 优先级
+    +Priority priority()
+}
+
+interface ClusterStateTaskExecutor{
+    --
+    // 基于现有的集群状态和给定的Task来更新集群状态。
+    +ClusterTasksResult<T> execute(ClusterState currentState, List<T> tasks)
+    // 指示是否只能在Master上执行，默认为true
+    +boolean runOnlyOnMaster()
+    // 新集群状态发布之后的回调函数
+    +void clusterStatePublished(ClusterChangedEvent clusterChangedEvent)
+}
+
+interface ClusterStateTaskListener {
+    --
+    // 执行失败时的回调函数
+    void onFailure(String source, Exception e);
+    // 如果节点已经不再是Master了，task会被拒绝，然后调用此回调函数
+    default void onNoLongerMaster(String source)
+    // ???
+    default void clusterStateProcessed(String source, ClusterState oldState, ClusterState newState)
+}
+
+abstract class ClusterStateUpdateTask implements ClusterStateTaskConfig, ClusterStateTaskExecutor, ClusterStateTaskListener{
+    // 可以更新集群状态的Task
+    --
+
+}
+
+@enduml

@@ -65,9 +65,9 @@ public abstract class TaskBatcher {
             BatchedTask::getTask,
             Function.identity(),
             (a, b) -> { throw new IllegalStateException("cannot add duplicate task: " + a); },
-            IdentityHashMap::new));
+            IdentityHashMap::new));  // 去重1：任务自身的去重
 
-        synchronized (tasksPerBatchingKey) {
+        synchronized (tasksPerBatchingKey) {  // 去重2：提交的任务是否已经在任务队列tasksPerBatchingKey中已经存在？
             LinkedHashSet<BatchedTask> existingTasks = tasksPerBatchingKey.computeIfAbsent(firstTask.batchingKey,
                 k -> new LinkedHashSet<>(tasks.size()));
             for (BatchedTask existing : existingTasks) {
@@ -80,7 +80,7 @@ public abstract class TaskBatcher {
             }
             existingTasks.addAll(tasks);
         }
-
+        // 下面将任务交给线程池处理。
         if (timeout != null) {
             threadExecutor.execute(firstTask, timeout, () -> onTimeoutInternal(tasks, timeout));
         } else {

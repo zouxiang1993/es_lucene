@@ -110,7 +110,7 @@ public class ClusterService extends AbstractLifecycleComponent {
 
     private TimeValue slowTaskLoggingThreshold;
 
-    private volatile PrioritizedEsThreadPoolExecutor threadPoolExecutor;
+    private volatile PrioritizedEsThreadPoolExecutor threadPoolExecutor;  // 单线程，优先级 线程池
     private volatile ClusterServiceTaskBatcher taskBatcher;
 
     /**
@@ -473,7 +473,7 @@ public class ClusterService extends AbstractLifecycleComponent {
             List<ClusterServiceTaskBatcher.UpdateTask> safeTasks = tasks.entrySet().stream()
                 .map(e -> taskBatcher.new UpdateTask(config.priority(), source, e.getKey(), safe(e.getValue(), logger), executor))
                 .collect(Collectors.toList());
-            taskBatcher.submitTasks(safeTasks, config.timeout());
+            taskBatcher.submitTasks(safeTasks, config.timeout()); // 最终通过taskBatcher来提交任务
         } catch (EsRejectedExecutionException e) {
             // ignore cases where we are shutting down..., there is really nothing interesting
             // to be done here...
@@ -568,15 +568,15 @@ public class ClusterService extends AbstractLifecycleComponent {
         }
 
         long startTimeNS = currentTimeInNanos();
-        TaskOutputs taskOutputs = calculateTaskOutputs(taskInputs, previousClusterState, startTimeNS);
+        TaskOutputs taskOutputs = calculateTaskOutputs(taskInputs, previousClusterState, startTimeNS); // 执行Task
         taskOutputs.notifyFailedTasks();
 
-        if (taskOutputs.clusterStateUnchanged()) {
+        if (taskOutputs.clusterStateUnchanged()) { // 执行成功，但是没有改变集群状态
             taskOutputs.notifySuccessfulTasksOnUnchangedClusterState();
             TimeValue executionTime = TimeValue.timeValueMillis(Math.max(0, TimeValue.nsecToMSec(currentTimeInNanos() - startTimeNS)));
             logger.debug("processing [{}]: took [{}] no change in cluster_state", taskInputs.summary, executionTime);
             warnAboutSlowTaskIfNeeded(executionTime, taskInputs.summary);
-        } else {
+        } else { // 执行成功，并产生了新的集群状态
             ClusterState newClusterState = taskOutputs.newClusterState;
             if (logger.isTraceEnabled()) {
                 logger.trace("cluster state updated, source [{}]\n{}", taskInputs.summary, newClusterState);
@@ -584,7 +584,7 @@ public class ClusterService extends AbstractLifecycleComponent {
                 logger.debug("cluster state updated, version [{}], source [{}]", newClusterState.version(), taskInputs.summary);
             }
             try {
-                publishAndApplyChanges(taskInputs, taskOutputs);
+                publishAndApplyChanges(taskInputs, taskOutputs); // 发布集群状态
                 TimeValue executionTime = TimeValue.timeValueMillis(Math.max(0, TimeValue.nsecToMSec(currentTimeInNanos() - startTimeNS)));
                 logger.debug("processing [{}]: took [{}] done applying updated cluster_state (version: {}, uuid: {})", taskInputs.summary,
                     executionTime, newClusterState.version(), newClusterState.stateUUID());
@@ -738,7 +738,7 @@ public class ClusterService extends AbstractLifecycleComponent {
         if (newClusterState.nodes().isLocalNodeElectedMaster()) {
             logger.debug("publishing cluster state version [{}]", newClusterState.version());
             try {
-                clusterStatePublisher.accept(clusterChangedEvent, ackListener);
+                clusterStatePublisher.accept(clusterChangedEvent, ackListener); // 发布集群状态。
             } catch (Discovery.FailedToCommitClusterStateException t) {
                 final long version = newClusterState.version();
                 logger.warn(

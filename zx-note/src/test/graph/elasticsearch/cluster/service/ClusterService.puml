@@ -27,7 +27,7 @@ class ClusterService{
     // 发布集群任务的模块
     - BiConsumer<ClusterChangedEvent, Discovery.AckListener> clusterStatePublisher
     ---
-    以下方法在后续版本被拆分到MasterService中：
+    以下方法在后续版本被拆分到MasterService中,负责管理和运行集群任务：
     // 待执行的任务数量
     +int numberOfPendingTasks()
     // 待执行的任务列表
@@ -35,7 +35,7 @@ class ClusterService{
     // 提交集群层面的任务
     void submitStateUpdateTask(...)
     ---
-    以下方法在后续版本被拆分到ClusterApplierService中：
+    以下方法在后续版本被拆分到ClusterApplierService中，负责应用集群任务产生的集群状态：
     // 添加一个对集群状态的处理器
     +void addStateApplier(ClusterStateApplier applier)
     // 添加一个集群状态监听器
@@ -59,39 +59,7 @@ interface ClusterStateApplier{
     +void applyClusterState(ClusterChangedEvent event)
 }
 
-class ClusterState implements Diffable{
-    // 集群状态。 不可变对象。
-    // 只能通过master来进行更新，所有更新操作由单个线程顺序执行
-    // 每次更新完毕后。由Discovery.publish方法通知其他结点。
-    // 实现Diffable接口，可以只发送增量
-    ---
-    -String stateUUID // 增量更新时需比较的版本id
-    -ClusterName clusterName
-    -RoutingTable routingTable
-    -DiscoveryNodes nodes
-    -MetaData metaData
-    -ClusterBlocks blocks
-}
 
-class MetaData{
-    集群元数据。
-    详见cluster.metadata包
-}
-
-class RoutingTable{
-    // 每一个索引中的每一个分片，处在哪一个节点上
-    // 见elasticsearch.cluster.routing包
-}
-
-class DiscoveryNodes{
-    // 集群中所有的节点
-    // 见elasticsearch.cluster.node包
-}
-
-class ClusterBlocks{
-    // 表示集群级别的阻塞，用来阻止对集群的脏操作
-    // 见elasticsearch.cluster.block包
-}
 
 class NodeConnectionsService{
     // 负责连接到其他节点（当节点加入集群时）
@@ -118,24 +86,14 @@ class OperationRouting{
 
 ClusterService *-- ClusterSettings
 
-ClusterService *- DiscoverySettings
+ClusterService *-- DiscoverySettings
 
-ClusterService *---- OperationRouting
+ClusterService *--- OperationRouting
 
 ClusterService "1" *-- "n" ClusterStateApplier
 
 ClusterService *-- ClusterState
 
 ClusterService *-- NodeConnectionsService
-
-ClusterState *-- RoutingTable
-
-ClusterState *-- DiscoveryNodes
-
-ClusterState *-- MetaData
-
-ClusterState *-- ClusterBlocks
-
-
 
 @enduml

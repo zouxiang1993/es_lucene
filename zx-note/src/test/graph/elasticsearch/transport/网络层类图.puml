@@ -8,7 +8,6 @@ class NetworkModule{
     +TransportInterceptor getTransportInterceptor()
 }
 
-
 interface Transport{
     负责内部节点的RPC请求
     ---
@@ -28,7 +27,13 @@ interface HttpServerTransport{
     负责对用户的REST接口服务
 }
 
-class Netty4Transport implements Transport{
+abstract class TcpTransport<Channel> implements Transport{
+    --
+    // 处理RPC请求,通过Action的名称来获取处理类
+    #String handleRequest(...)
+}
+
+class Netty4Transport implements TcpTransport{
     在Netty4插件中实现
 }
 
@@ -41,4 +46,5 @@ class Netty4HttpServerTransport implements HttpServerTransport{
 
 NetworkModule -- Transport
 NetworkModule -- HttpServerTransport
+
 @enduml
