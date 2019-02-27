@@ -738,7 +738,7 @@ public class ClusterService extends AbstractLifecycleComponent {
         if (newClusterState.nodes().isLocalNodeElectedMaster()) {
             logger.debug("publishing cluster state version [{}]", newClusterState.version());
             try {
-                clusterStatePublisher.accept(clusterChangedEvent, ackListener); // 发布集群状态。
+                clusterStatePublisher.accept(clusterChangedEvent, ackListener); // 发布集群状态。 Discovery.publish(..)
             } catch (Discovery.FailedToCommitClusterStateException t) {
                 final long version = newClusterState.version();
                 logger.warn(

@@ -135,12 +135,12 @@ public class PublishClusterStateAction extends AbstractComponent {
         final Map<Version, BytesReference> serializedDiffs;
         final boolean sendFullVersion;
         try {
-            nodes = clusterChangedEvent.state().nodes();
+            nodes = clusterChangedEvent.state().nodes(); // 准备待发布的节点列表
             nodesToPublishTo = new HashSet<>(nodes.getSize());
             DiscoveryNode localNode = nodes.getLocalNode();
             final int totalMasterNodes = nodes.getMasterNodes().size();
             for (final DiscoveryNode node : nodes) {
-                if (node.equals(localNode) == false) {
+                if (node.equals(localNode) == false) {  // 排除自身节点
                     nodesToPublishTo.add(node);
                 }
             }
@@ -152,6 +152,7 @@ public class PublishClusterStateAction extends AbstractComponent {
             // sadly this is not water tight as it may that a failed diff based publishing to a node
             // will cause a full serialization based on an older version, which may fail after the
             // change has been committed.
+            // 准备待发布的内容。对于每个节点，如果上一次发布成功了，则准备增量内容，存储在serializedDiffs中；如果没成功，则准备全量内容，存储在serializedStates中。
             buildDiffAndSerializeStates(clusterChangedEvent.state(), clusterChangedEvent.previousState(),
                     nodesToPublishTo, sendFullVersion, serializedStates, serializedDiffs);
 
@@ -187,7 +188,8 @@ public class PublishClusterStateAction extends AbstractComponent {
         final TimeValue publishTimeout = discoverySettings.getPublishTimeout();
 
         final long publishingStartInNanos = System.nanoTime();
-
+        // 2PC第一阶段：向每个节点发布集群状态数据
+        // 2PC的第二阶段在sendingController#onNodeSendAck()方法中，即第一阶段的响应处理回调函数
         for (final DiscoveryNode node : nodesToPublishTo) {
             // try and serialize the cluster state once (or per version), so we don't serialize it
             // per node when we send it over the wire, compress it while we are at it...
@@ -198,13 +200,13 @@ public class PublishClusterStateAction extends AbstractComponent {
                 sendClusterStateDiff(clusterState, serializedDiffs, serializedStates, node, publishTimeout, sendingController);
             }
         }
-
+        // 等待。如果收到足够多的响应，则继续。如果超时了，则抛出异常
         sendingController.waitForCommit(discoverySettings.getCommitTimeout());
 
         try {
             long timeLeftInNanos = Math.max(0, publishTimeout.nanos() - (System.nanoTime() - publishingStartInNanos));
             final BlockingClusterStatePublishResponseHandler publishResponseHandler = sendingController.getPublishResponseHandler();
-            sendingController.setPublishingTimedOut(!publishResponseHandler.awaitAllNodes(TimeValue.timeValueNanos(timeLeftInNanos)));
+            sendingController.setPublishingTimedOut(!publishResponseHandler.awaitAllNodes(TimeValue.timeValueNanos(timeLeftInNanos))); // 等待第二阶段收到足够的回复，或者超时。
             if (sendingController.getPublishingTimedOut()) {
                 DiscoveryNode[] pendingNodes = publishResponseHandler.pendingNodes();
                 // everyone may have just responded
@@ -582,14 +584,14 @@ public class PublishClusterStateAction extends AbstractComponent {
         public synchronized void onNodeSendAck(DiscoveryNode node) {
             if (committed) {
                 assert sendAckedBeforeCommit.isEmpty();
-                sendCommitToNode(node, clusterState, this);
+                sendCommitToNode(node, clusterState, this); // 2PC 第2阶段，发送Commit信息。
             } else if (committedOrFailed()) {
                 logger.trace("ignoring ack from [{}] for cluster state version [{}]. already failed", node, clusterState.version());
             } else {
                 // we're still waiting
-                sendAckedBeforeCommit.add(node);
-                if (node.isMasterNode()) {
-                    checkForCommitOrFailIfNoPending(node);
+                sendAckedBeforeCommit.add(node);  // 加入等待列表
+                if (node.isMasterNode()) { // 只有主备节点的Ack才参与计数
+                    checkForCommitOrFailIfNoPending(node); // 检查数量是否足够，如果足够则向等待列表中所有节点发送Commit信息。
                 }
             }
         }
