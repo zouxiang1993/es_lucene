@@ -34,6 +34,8 @@ easyice: https://www.easyice.cn/%E6%89%80%E6%9C%89%E6%96%87%E7%AB%A0
 
 ES内部机制浅析（一、二、三）： http://leonlibraries.github.io/tags/Java/  
 
+知乎ES专栏： https://zhuanlan.zhihu.com/Elasticsearch  
+
 #### 社区 
 ES英文社区： https://discuss.elastic.co/c/elasticsearch/   
 ES中文社区： https://elasticsearch.cn/ 

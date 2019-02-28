@@ -662,13 +662,13 @@ public abstract class TransportReplicationAction<
             }
 
             // request does not have a shardId yet, we need to pass the concrete index to resolve shardId
-            final String concreteIndex = concreteIndex(state);
+            final String concreteIndex = concreteIndex(state);  // 确认索引名称
             final IndexMetaData indexMetaData = state.metaData().index(concreteIndex);
             if (indexMetaData == null) {
                 retry(new IndexNotFoundException(concreteIndex));
                 return;
             }
-            if (indexMetaData.getState() == IndexMetaData.State.CLOSE) {
+            if (indexMetaData.getState() == IndexMetaData.State.CLOSE) { // 确认索引没有关闭
                 throw new IndexClosedException(indexMetaData.getIndex());
             }
 

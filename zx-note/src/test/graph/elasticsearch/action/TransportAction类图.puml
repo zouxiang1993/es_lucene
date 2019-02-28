@@ -1,0 +1,42 @@
+@startuml
+abstract class TransportAction<ActionRequest, ActionResponse>{
+    #ThreadPool threadPool
+    #String actionName
+    #ActionFilter[] filters
+    --
+    +Task execute(Request request, ActionListener<Response> listener)
+    #{abstract} void doExecute(Request request, ActionListener<Response> listener)
+}
+
+
+abstract class TransportSingleShardAction<SingleShardRequest, ActionResponse> extends TransportAction{
+    在单个shard上执行的读操作。如果在一个副本上执行失败了，可以在另外的副本上执行。
+    --
+}
+
+class TransportAnalyzeAction extends TransportSingleShardAction
+class TransportGetAction extends TransportSingleShardAction
+class TransportExplainAction extends TransportSingleShardAction
+
+abstract class TransportReplicationAction extends TransportAction{
+    必须先在主分片上执行的操作，然后同步到副本分片上。
+    --
+}
+
+abstract class TransportWriteAction extends TransportReplicationAction{
+    写数据操作
+    --
+}
+
+class TransportShardBulkAction extends TransportWriteAction{
+}
+
+abstract class TransportSingleItemBulkWriteAction extends TransportWriteAction{
+
+}
+
+class TransportIndexAction extends TransportSingleItemBulkWriteAction
+
+class TransportDeleteAction extends TransportSingleItemBulkWriteAction
+
+@enduml
