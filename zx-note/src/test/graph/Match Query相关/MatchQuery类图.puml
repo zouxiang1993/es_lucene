@@ -1,0 +1,34 @@
+@startuml
+
+set namespaceSeparator ::
+
+enum MatchQuery.Type{
+    // 文本被分词，然后添加到一个boolean query中
+    +BOOLEAN
+    // 文本被分词，然后使用短语查询
+    +PHRASE
+    // 文本被分词，然后使用短语查询，最后一个词可以前缀匹配
+    +PHRASE_PREFIX
+}
+
+enum MatchQuery.ZeroTermsQuery{
+    // term数目为0时，返回空结果
+    +NONE
+    // term数目为0时，返回所有结果
+    +ALL
+}
+
+class MatchQuery{
+    #String analyzer
+    #Occur occur
+    #boolean enablePositionIncrements
+    #Float commonTermsCutoff
+    ---
+    +Query parse(Type type, String fieldName, Object value)
+}
+
+class MatchQuery.MatchQueryBuilder{
+    #Query newTermQuery(Term term)
+    #Query newSynonymQuery(Term[] terms)
+}
+@enduml

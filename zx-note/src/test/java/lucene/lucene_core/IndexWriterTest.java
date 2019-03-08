@@ -1,4 +1,4 @@
-package lucene;
+package lucene.lucene_core;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;

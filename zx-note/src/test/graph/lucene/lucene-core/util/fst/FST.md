@@ -35,7 +35,7 @@ FST查询时，从初始状态开始，沿箭头走到终止状态，途中所�
 - 查询dogs， 结果为2+6=8
  
 ## 3. Lucene中的FST
-Lucene中已经有FST的开源实现，在org.apache.lucene.util.fst包下，我使用的lucene版本为6.6.1。  
+Lucene中已经有FST的开源实现，在org.apache.lucene.lucene_core.util.fst包下，我使用的lucene版本为6.6.1。  
 lucene中的FST有以下特性：  
 - 构建最小FST的过程快速且内存消耗低(但是**输入必须有序**)
 - 构建完毕之后，整个FST全部用byte[]表示，反序列化快速且 Object的内存额外消耗低

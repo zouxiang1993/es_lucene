@@ -1,4 +1,4 @@
-package lucene.search;
+package lucene.lucene_core.search;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;

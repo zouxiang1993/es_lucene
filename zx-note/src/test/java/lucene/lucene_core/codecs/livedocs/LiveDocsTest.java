@@ -1,4 +1,4 @@
-package lucene.codecs.livedocs;
+package lucene.lucene_core.codecs.livedocs;
 
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;

@@ -1,4 +1,4 @@
-package lucene.codecs.termvectors;
+package lucene.lucene_core.codecs.termvectors;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;

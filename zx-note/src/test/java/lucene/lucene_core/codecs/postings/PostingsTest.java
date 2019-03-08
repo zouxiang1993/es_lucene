@@ -1,4 +1,4 @@
-package lucene.codecs.postings;
+package lucene.lucene_core.codecs.postings;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;

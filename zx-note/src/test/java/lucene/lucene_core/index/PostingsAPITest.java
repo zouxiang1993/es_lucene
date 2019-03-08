@@ -1,4 +1,4 @@
-package lucene.index;
+package lucene.lucene_core.index;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;

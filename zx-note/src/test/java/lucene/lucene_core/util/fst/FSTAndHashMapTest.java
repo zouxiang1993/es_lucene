@@ -1,4 +1,4 @@
-package lucene.util.fst;
+package lucene.lucene_core.util.fst;
 
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.IntsRef;
