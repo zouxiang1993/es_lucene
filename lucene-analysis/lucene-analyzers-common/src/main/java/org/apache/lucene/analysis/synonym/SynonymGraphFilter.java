@@ -196,15 +196,15 @@ public final class SynonymGraphFilter extends TokenFilter {
 
     // Try to parse a new synonym match at the current token:
 
-    if (parse()) {
+    if (parse()) { // 匹配到了同义词
       // A new match was found:
       releaseBufferedToken();
       //System.out.println("  syn: after parse, ret buffered=" + this);
       assert liveToken == false;
       return true;
     }
-
-    if (lookaheadNextRead == lookaheadNextWrite) {
+    // 没有匹配到同义词
+    if (lookaheadNextRead == lookaheadNextWrite) { // parse过程只读入了一个token
 
       // Fast path: parse pulled one token, but it didn't match
       // the start for any synonym, so we now return it "live" w/o having
@@ -247,6 +247,7 @@ public final class SynonymGraphFilter extends TokenFilter {
     return true;
   }
 
+  // 从outputBuffer中释放一个token作为结果，并修改各种Attribute
   private void releaseBufferedToken() throws IOException {
     //System.out.println("  releaseBufferedToken");
 
@@ -288,7 +289,7 @@ public final class SynonymGraphFilter extends TokenFilter {
     int matchInputLength = 0;
 
     BytesRef pendingOutput = fst.outputs.getNoOutput();
-    fst.getFirstArc(scratchArc);
+    fst.getFirstArc(scratchArc); // FST 查询初始化
 
     assert scratchArc.output == fst.outputs.getNoOutput();
 
@@ -308,7 +309,7 @@ public final class SynonymGraphFilter extends TokenFilter {
       final int bufferLen;
       final int inputEndOffset;
 
-      if (lookaheadUpto <= lookahead.getMaxPos()) {
+      if (lookaheadUpto <= lookahead.getMaxPos()) { // input buffer中还缓存有剩余的token
         // Still in our lookahead buffer
         BufferedInputToken token = lookahead.get(lookaheadUpto);
         lookaheadUpto++;
@@ -326,10 +327,10 @@ public final class SynonymGraphFilter extends TokenFilter {
 
         assert finished || liveToken == false;
 
-        if (finished) {
+        if (finished) { // 输入已经用完
           //System.out.println("    break: finished");
           break;
-        } else if (input.incrementToken()) {
+        } else if (input.incrementToken()) { // 读入下一个token
           //System.out.println("    input.incrToken");
           liveToken = true;
           buffer = termAtt.buffer();
@@ -340,7 +341,7 @@ public final class SynonymGraphFilter extends TokenFilter {
           inputEndOffset = offsetAtt.endOffset();
 
           lookaheadUpto++;
-        } else {
+        } else { // 读入下一个token返回false，说明输入已经用完
           // No more input tokens
           finished = true;
           //System.out.println("    break: now set finished");
@@ -355,11 +356,11 @@ public final class SynonymGraphFilter extends TokenFilter {
       int bufUpto = 0;
       while (bufUpto < bufferLen) {
         final int codePoint = Character.codePointAt(buffer, bufUpto, bufferLen);
-        if (fst.findTargetArc(ignoreCase ? Character.toLowerCase(codePoint) : codePoint, scratchArc, scratchArc, fstReader) == null) {
-          break byToken;
+        if (fst.findTargetArc(ignoreCase ? Character.toLowerCase(codePoint) : codePoint, scratchArc, scratchArc, fstReader) == null) { // 逐个字符的在FST中查找
+          break byToken; // 没找到,同义词匹配失败
         }
 
-        // Accum the output
+        // Accum the output  找到了，累积FST的输出
         pendingOutput = fst.outputs.add(pendingOutput, scratchArc.output);
         bufUpto += Character.charCount(codePoint);
       }
@@ -368,7 +369,7 @@ public final class SynonymGraphFilter extends TokenFilter {
 
       // OK, entire token matched; now see if this is a final
       // state in the FST (a match):
-      if (scratchArc.isFinal()) {
+      if (scratchArc.isFinal()) { // 到达了FST的可接受状态，但循环还会继续执行，说明遵循正向最大匹配规则
         matchOutput = fst.outputs.add(pendingOutput, scratchArc.nextFinalOutput);
         matchInputLength = matchLength;
         matchEndOffset = inputEndOffset;
@@ -377,18 +378,18 @@ public final class SynonymGraphFilter extends TokenFilter {
 
       // See if the FST can continue matching (ie, needs to
       // see the next input token):
-      if (fst.findTargetArc(SynonymMap.WORD_SEPARATOR, scratchArc, scratchArc, fstReader) == null) {
+      if (fst.findTargetArc(SynonymMap.WORD_SEPARATOR, scratchArc, scratchArc, fstReader) == null) { // 已经没有匹配更长串的可能了
         // No further rules can match here; we're done
         // searching for matching rules starting at the
         // current input position.
         break;
-      } else {
+      } else { // 还可能匹配到更长的串
         // More matching is possible -- accum the output (if
         // any) of the WORD_SEP arc:
         pendingOutput = fst.outputs.add(pendingOutput, scratchArc.output);
         doFinalCapture = true;
         if (liveToken) {
-          capture();
+          capture(); // 记录当前token的状态
         }
       }
     }
@@ -441,13 +442,13 @@ public final class SynonymGraphFilter extends TokenFilter {
     }
 
     // How many synonyms we will insert over this match:
-    final int count = code >>> 1;
+    final int count = code >>> 1; // 同义词总数
 
     // TODO: we could encode this instead into the FST:
 
     // 1st pass: count how many new nodes we need
     List<List<String>> paths = new ArrayList<>();
-    for(int outputIDX=0;outputIDX<count;outputIDX++) {
+    for(int outputIDX=0;outputIDX<count;outputIDX++) {  // 遍历每一个同义词
       int wordID = bytesReader.readVInt();
       synonyms.words.get(wordID, scratchBytes);
       scratchChars.copyUTF8Bytes(scratchBytes);
@@ -483,7 +484,7 @@ public final class SynonymGraphFilter extends TokenFilter {
 
     // First, fanout all tokens departing start node for these new side paths:
     int newNodeCount = 0;
-    for(List<String> path : paths) {
+    for(List<String> path : paths) { // 加入每条边的第一个节点
       int pathEndNode;
       //System.out.println("    path size=" + path.size());
       if (path.size() == 1) {
@@ -497,7 +498,7 @@ public final class SynonymGraphFilter extends TokenFilter {
     }
 
     // We must do the original tokens last, else the offsets "go backwards":
-    if (keepOrig) {
+    if (keepOrig) { // synonymMap中的includeOrigin参数，表示是否包含原token。
       BufferedInputToken token = lookahead.get(lookaheadNextRead);
       int inputEndNode;
       if (matchInputLength == 1) {
@@ -515,7 +516,7 @@ public final class SynonymGraphFilter extends TokenFilter {
     nextNodeOut = endNode;
 
     // Do full side-path for each syn output:
-    for(int pathID=0;pathID<paths.size();pathID++) {
+    for(int pathID=0;pathID<paths.size();pathID++) { // 加入每条边的所有节点
       List<String> path = paths.get(pathID);
       if (path.size() > 1) {
         int lastNode = outputBuffer.get(pathID).endNode;
