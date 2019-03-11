@@ -71,7 +71,7 @@ public class SynonymMap {
     private final HashMap<CharsRef,MapEntry> workingSet = new HashMap<>();
     private final BytesRefHash words = new BytesRefHash();
     private final BytesRefBuilder utf8Scratch = new BytesRefBuilder();
-    private int maxHorizontalContext;
+    private int maxHorizontalContext; // 记录短语中最大的词数
     private final boolean dedup;
 
     /** Default constructor, passes {@code dedup=true}. */
@@ -85,10 +85,10 @@ public class SynonymMap {
       this.dedup = dedup;
     }
 
-    private static class MapEntry {
-      boolean includeOrig;
+    private static class MapEntry {  // 表示一个输入对应的多个输出
+      boolean includeOrig; // 是否包含自身？
       // we could sort for better sharing ultimately, but it could confuse people
-      ArrayList<Integer> ords = new ArrayList<>();
+      ArrayList<Integer> ords = new ArrayList<>(); // 所有输出在BytesRefHash中的序号列表
     }
 
     /** Sugar: just joins the provided terms with {@link
@@ -159,7 +159,7 @@ public class SynonymMap {
       //System.out.println("fmap.add input=" + input + " numInputWords=" + numInputWords + " output=" + output + " numOutputWords=" + numOutputWords);
       utf8Scratch.copyChars(output.chars, output.offset, output.length);
       // lookup in hash
-      int ord = words.add(utf8Scratch.get());
+      int ord = words.add(utf8Scratch.get()); // 确认输出在hash中的位置
       if (ord < 0) {
         // already exists in our hash
         ord = (-ord)-1;
@@ -168,7 +168,7 @@ public class SynonymMap {
         //System.out.println("  output=" + output + " new ord=" + ord);
       }
       
-      MapEntry e = workingSet.get(input);
+      MapEntry e = workingSet.get(input); // 输入是否已经存在
       if (e == null) {
         e = new MapEntry();
         workingSet.put(CharsRef.deepCopyOf(input), e); // make a copy, since we will keep around in our map    
@@ -180,7 +180,7 @@ public class SynonymMap {
       maxHorizontalContext = Math.max(maxHorizontalContext, numOutputWords);
     }
 
-    private int countWords(CharsRef chars) {
+    private int countWords(CharsRef chars) { // 按分隔符拆分，统计短语中的词的总数
       int wordCount = 1;
       int upto = chars.offset;
       final int limit = chars.offset + chars.length;
@@ -253,21 +253,21 @@ public class SynonymMap {
           if (dedupSet != null) {
             // box once
             final Integer ent = output.ords.get(i);
-            if (dedupSet.contains(ent)) {
+            if (dedupSet.contains(ent)) { // 输出去重, 默认行为
               continue;
             }
             dedupSet.add(ent);
           }
-          scratchOutput.writeVInt(output.ords.get(i));   
+          scratchOutput.writeVInt(output.ords.get(i));   // 写入每一个output的序号
           count++;
         }
 
         final int pos = scratchOutput.getPosition();
-        scratchOutput.writeVInt(count << 1 | (output.includeOrig ? 0 : 1));
+        scratchOutput.writeVInt(count << 1 | (output.includeOrig ? 0 : 1)); // 写入一个标志位： count 和 includeOrig
         final int pos2 = scratchOutput.getPosition();
         final int vIntLen = pos2-pos;
 
-        // Move the count + includeOrig to the front of the byte[]:
+        // Move the count + includeOrig to the front of the byte[]:  将标志位移到最前面
         System.arraycopy(scratch.bytes(), pos, spare, 0, vIntLen);
         System.arraycopy(scratch.bytes(), 0, scratch.bytes(), vIntLen, pos);
         System.arraycopy(spare, 0, scratch.bytes(), 0, vIntLen);
