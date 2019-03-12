@@ -98,7 +98,7 @@ public final class SynonymGraphFilter extends TokenFilter {
   private final ByteArrayDataInput bytesReader = new ByteArrayDataInput();
   private final BytesRef scratchBytes = new BytesRef();
   private final CharsRefBuilder scratchChars = new CharsRefBuilder();
-  private final LinkedList<BufferedOutputToken> outputBuffer = new LinkedList<>();
+  private final LinkedList<BufferedOutputToken> outputBuffer = new LinkedList<>(); // 输出的buffer
 
   private int nextNodeOut;
   private int lastNodeOut;
@@ -124,7 +124,7 @@ public final class SynonymGraphFilter extends TokenFilter {
     protected BufferedInputToken newInstance() {
       return new BufferedInputToken();
     }
-  };
+  };  // 输入的buffer
 
   static class BufferedInputToken implements RollingBuffer.Resettable {
     final CharsRefBuilder term = new CharsRefBuilder();

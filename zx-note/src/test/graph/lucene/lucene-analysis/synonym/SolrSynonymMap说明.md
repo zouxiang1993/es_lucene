@@ -1,11 +1,6 @@
-#### 显式映射的缺点
-    如果配置了 i pod => ipod的显式映射，那么在索引时倒排索引中只写入了ipod，
-    导致在查询时搜索"pod"不能召回有"i pod"的文档, 必须搜"i pod"才能召回
-    
-    建议GB网站所有多语言到英语的同义词使用显式映射来配置。
- 
-#### SolrSynonymMap
-SolrSynonymMap(org.apache.lucene.analysis.synonym.SolrSynonymParser)可以看做是一个数据结构，存储**短语到同义词的映射关系**。  
+### SolrSynonymMap
+SolrSynonymMap(通过org.apache.lucene.analysis.synonym.SolrSynonymParser来构造)
+可以看做是一个数据结构，存储**短语到同义词的映射关系**。  
 SolrSynonymMap接收输入A，输出A的所有同义词 [S1, S2, S3 ...]  
 SolrSynonymMap一般通过一个文件来配置
  
@@ -26,6 +21,9 @@ SolrSynonymMap一般通过一个文件来配置
     A' => D'   
     B' => C'  
     B' => D'
+    此时，
+    接受输入A', 输出[C', D']
+    接受输入B', 输出[C', D']
     ```  
 3. 等效同义词。例如： 
     ```
@@ -49,7 +47,12 @@ SolrSynonymMap一般通过一个文件来配置
     B' => C'
     C' => A' 
     C' => B' 
-    includeOrigin=true
+    includeOrigin=true (同义词包含自身)
+    
+    此时,
+    接受输入A', 输出[A', B', C']
+    接受输入B', 输出[A', B', C']
+    接受输入C', 输出[A', B', C']
     ```
     如果expand=false,则添加所有输入到第一个的映射关系：
     ```
@@ -60,6 +63,12 @@ SolrSynonymMap一般通过一个文件来配置
     A' => A' 
     B' => A'
     C' => A'
+    includeOrigin=false
+    
+    此时，
+    接受输入A', 输出[A']
+    接受输入B', 输出[A']
+    接受输入C', 输出[A']
     ```
 4. 同义词配置项之间会自动合并，例如： 
     ```
@@ -68,3 +77,6 @@ SolrSynonymMap一般通过一个文件来配置
     等价于: 
     foo => foo bar, baz
     ```
+#### 配置时的注意事项
+1. 如果配置了 i pod => ipod 的显式映射，那么在索引时倒排索引中只会写入ipod，
+导致在查询时搜索"pod"不能召回有"i pod"的文档, 必须搜"i pod"才能召回
