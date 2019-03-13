@@ -94,6 +94,7 @@ public final class GraphTokenStreamFiniteStrings {
 
   /**
    * Returns whether the provided state is the start of multiple side paths of different length (eg: new york, ny)
+   * 以state状态开头的所有边中，只要存在两条边的目标状态不相同，就被认为是有sidePath
    */
   public boolean hasSidePath(int state) {
     int numT = det.initTransition(state, transition);

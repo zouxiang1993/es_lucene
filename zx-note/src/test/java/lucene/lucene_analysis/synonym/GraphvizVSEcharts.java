@@ -39,14 +39,16 @@ import java.util.List;
  */
 public class GraphvizVSEcharts {
 
-    private final String text = "fast wi fi network is down";
+//    private final String text = "fast wi fi network is down";
+    private final String text = "fast wi fi network has down";
     private TokenStream ts;
 
     @Before
     public void setup() throws Exception {
         List<String> lines = Arrays.asList(new String[]{
                 "token1, token2",
-//                "fast, speedy",
+                "wi fi network, re dian",
+                "has down,wan cheng"
 //                "wi fi network, re dian",
 //                "wi fi,wifi"
         });
@@ -58,7 +60,7 @@ public class GraphvizVSEcharts {
                 Tokenizer tok = new StandardTokenizer();
                 TokenStream sink = new SynonymGraphFilter(tok, synonymMap, false);
 //                sink = new FlattenGraphFilter(sink);
-                sink = new ShingleFilter(sink);
+//                sink = new ShingleFilter(sink);
                 return new TokenStreamComponents(tok, sink);
             }
         };

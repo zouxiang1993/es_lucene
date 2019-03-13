@@ -1,0 +1,43 @@
+@startuml
+start
+      note
+      hasSidePath的含义：
+      从一个节点出发的多条边中，如果存在两条边
+      的目标节点不同，就被认为是hasSidePath
+      end note
+: 根据TokenStream构造一个状态机，也可以视作一张图;
+: 找出图中的所有割点;
+: 按割点将图分成多个段;
+fork
+partition 第1段{
+    if (hasSidePath?) then (yes)
+      : 生成从该段的开始状态到结束状态的所有路径;
+      : 对于每条路径，生成一个BooleanQuery;
+      fork
+        : 用 <b>MUST</b> 串联路径上的所有Term\n形成一个BooleanQuery;
+      fork again
+        : 用 <b>MUST</b> 串联路径上的所有Term\n形成一个BooleanQuery;
+      end fork
+      : 用 <b>should</b> 串联所有路径的Query再生成一个BooleanQuery;
+    else (no)
+      if (单个词?) then (yes)
+        :生成TermQuery;
+      else (no)
+        :生成SynonymQuery;
+      endif
+    endif
+}
+
+fork again
+partition 第2段{
+    : ...;
+}
+fork again
+partition 第N段{
+    : ...;
+}
+end fork
+: 多个段组合成BooleanQuery;
+
+stop
+@enduml

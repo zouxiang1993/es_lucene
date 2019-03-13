@@ -265,7 +265,7 @@ public class QueryBuilder {
    * @param source     the token stream to create the query from
    * @param operator   default boolean operator used for this query
    * @param field      field to create queries against
-   * @param quoted     true if phrases should be generated when terms occur at more than one position
+   * @param quoted     true if phrases should be generated when terms occur at more than one position (如果一个词占了不止一个position，即positionLength>1, 例如同义词，是否需要写成短语匹配)
    * @param phraseSlop slop factor for phrase/multiphrase queries
    */
   protected Query createFieldQuery(TokenStream source, BooleanClause.Occur operator, String field, boolean quoted, int phraseSlop) {
@@ -501,7 +501,7 @@ public class QueryBuilder {
     source.reset();
     GraphTokenStreamFiniteStrings graph = new GraphTokenStreamFiniteStrings(source);
     BooleanQuery.Builder builder = new BooleanQuery.Builder();
-    int[] articulationPoints = graph.articulationPoints();
+    int[] articulationPoints = graph.articulationPoints(); // 找图的割点
     int lastState = 0;
     for (int i = 0; i <= articulationPoints.length; i++) {
       int start = lastState;
