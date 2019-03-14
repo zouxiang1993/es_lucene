@@ -1,7 +1,10 @@
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.simple.Sentence;
+import edu.stanford.nlp.simple.Token;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -30,13 +33,24 @@ public class StanfordNLPTest {
         props.setProperty("annotators", "tokenize,ssplit,pos,lemma");
 
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-        CoreDocument document = new CoreDocument("drove droves");
+        CoreDocument document = new CoreDocument("clothes");
         pipeline.annotate(document);
 
         String lemma0 = document.tokens().get(0).lemma();
-        String lemma1 = document.tokens().get(1).lemma();
-        System.out.println(lemma0 + "\t" + lemma1);  // 结果: drive	drove
+//        String lemma1 = document.tokens().get(1).lemma();
+//        System.out.println(lemma0 + "\t" + lemma1);  // 结果: drive	drove
+        System.out.println(lemma0);
 
+    }
+
+    @Test
+    public void test2() {
+        Sentence sentence = new Sentence(Arrays.asList("earrings"));
+        Token token = new Token(sentence, 0);
+        String lemma = token.lemma();
+        System.out.println(lemma);
+        token = null;
+        sentence = null;
     }
 }
 
