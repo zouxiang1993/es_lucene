@@ -1,10 +1,11 @@
-### SolrSynonymMap
+## 同义词词典——SolrSynonymMap
 SolrSynonymMap(通过org.apache.lucene.analysis.synonym.SolrSynonymParser来构造)
 可以看做是一个数据结构，存储**短语到同义词的映射关系**。  
+SolrSynonymMap内部使用FST来存储同义词。    
 SolrSynonymMap接收输入A，输出A的所有同义词 [S1, S2, S3 ...]  
 SolrSynonymMap一般通过一个文件来配置
  
-#### 配置文件说明 
+### 配置文件说明 
 1. 空行以及井号'#'开头的注释行被忽略
 2. 显式映射。例如: 
     ```

@@ -61,7 +61,8 @@ public class StanfordStemFilterTest {
      */
     @Test
     public void testStanfordStemAndPorterStem() {
-        final String text = "ear earring earrings cloth clothes clothing micro";
+//        final String text = "ear earring earrings cloth clothes clothing micro";
+        final String text = "front knot knotted bikini earrings";
         String stanfordResult = analyze(stanfordAnalyzer, text);
         String porterResult = analyze(porterAnalyzer, text);
         System.out.println("origin  \t" + text);

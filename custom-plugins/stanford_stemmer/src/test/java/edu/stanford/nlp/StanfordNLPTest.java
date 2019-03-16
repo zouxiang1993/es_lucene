@@ -1,3 +1,5 @@
+package edu.stanford.nlp;
+
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.simple.Sentence;
@@ -10,7 +12,7 @@ import java.util.Properties;
 /**
  * <pre>
  *
- *  File: StanfordNLPTest.java
+ *  File: edu.stanford.nlp.StanfordNLPTest.java
  *
  *  Copyright (c) 2019, globalegrow.com All Rights Reserved.
  *

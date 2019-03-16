@@ -47,8 +47,8 @@ public class GraphvizVSEcharts {
     public void setup() throws Exception {
         List<String> lines = Arrays.asList(new String[]{
                 "token1, token2",
-                "wi fi network, re dian",
-                "has down,wan cheng"
+                "wi fi network, hotspot",
+                "speedy, fast"
 //                "wi fi network, re dian",
 //                "wi fi,wifi"
         });

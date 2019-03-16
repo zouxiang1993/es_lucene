@@ -1,3 +1,5 @@
+package edu.stanford.nlp;
+
 import edu.stanford.nlp.coref.data.CorefChain;
 import edu.stanford.nlp.ie.util.RelationTriple;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -12,7 +14,7 @@ import java.util.Properties;
 /**
  * <pre>
  *
- *  File: BasicPipelineExample.java
+ *  File: edu.stanford.nlp.BasicPipelineExample.java
  *
  *  Copyright (c) 2019, globalegrow.com All Rights Reserved.
  *

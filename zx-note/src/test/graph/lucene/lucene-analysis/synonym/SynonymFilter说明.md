@@ -1,3 +1,4 @@
+# Lucene中的同义词
 Lucene的TokenFilter中，有SynonymFilter和SynonymGraphFilter两种来处理同义词。  
 SynonymFilter不能很好的处理多词同义词，已经被弃用，建议使用SynonymGraphFilter  
 
