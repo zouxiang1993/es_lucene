@@ -1,7 +1,5 @@
 package com.globalegrow.esearch.plugin.stanfordstem;
 
-import edu.stanford.nlp.pipeline.CoreDocument;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.simple.Sentence;
 import edu.stanford.nlp.simple.Token;
 import org.apache.logging.log4j.Logger;
@@ -12,8 +10,9 @@ import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
-import java.util.Properties;
 
 /**
  * <pre>
@@ -36,6 +35,24 @@ public final class StanfordStemFilter extends TokenFilter {
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final KeywordAttribute keywordAttr = addAttribute(KeywordAttribute.class);
 
+    /**
+     * 为了在ES启动时加载插件的过程中初始化Stanford CoreNLP , 默认是懒加载
+     */
+    protected static void init() {
+        logger.info("StanfordStemFilter static初始化");
+        AccessController.doPrivileged(
+                new PrivilegedAction<Void>() {
+                    @Override
+                    public Void run() {
+                        Sentence sentence = new Sentence("xxx");
+                        Token token = new Token(sentence, 0);
+                        String lemma = token.lemma();
+                        return null;
+                    }
+                }
+        );
+    }
+
     public StanfordStemFilter(TokenStream in) {
         super(in);
     }
@@ -45,19 +62,18 @@ public final class StanfordStemFilter extends TokenFilter {
         if (!input.incrementToken())
             return false;
         if (!keywordAttr.isKeyword()) { // 支持stemmer_override
-            stem();
+            AccessController.doPrivileged( // Stanford CoreNLP需要某些权限
+                    new PrivilegedAction<Void>() {
+                        @Override
+                        public Void run() {
+                            stem();
+                            return null;
+                        }
+                    }
+            );
         }
         return true;
     }
-
-//    private static final StanfordCoreNLP pipeline;
-//    static {
-//        Properties props = new Properties();
-//        // 要用到的是lemma, 它依赖 tokenize, ssplit, pos
-//        props.setProperty("annotators", "tokenize,ssplit,pos,lemma");
-//
-//        pipeline = new StanfordCoreNLP(props);
-//    }
 
     /**
      * 使用Stanford CoreNLP 对当前token进行词干提取
@@ -68,10 +84,6 @@ public final class StanfordStemFilter extends TokenFilter {
             Sentence sentence = new Sentence(Arrays.asList(originToken));
             Token token = new Token(sentence, 0);
             String lemma = token.lemma();
-
-//            CoreDocument document = new CoreDocument(originToken);
-//            pipeline.annotate(document);
-//            String lemma = document.tokens().get(0).lemma();
 
             if (originToken.equals(lemma)) { // 没有发生变化
                 return;

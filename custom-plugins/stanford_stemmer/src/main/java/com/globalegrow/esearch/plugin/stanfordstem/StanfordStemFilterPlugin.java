@@ -33,6 +33,7 @@ public class StanfordStemFilterPlugin extends Plugin implements AnalysisPlugin {
     @Override
     public Map<String, AnalysisModule.AnalysisProvider<TokenFilterFactory>> getTokenFilters() {
         Map map = new HashMap();
+        StanfordStemFilter.init();
         map.put("stanford_stem", new AnalysisModule.AnalysisProvider<TokenFilterFactory>() {
             @Override
             public TokenFilterFactory get(IndexSettings indexSettings, Environment environment, String name, Settings settings) throws IOException {
@@ -41,7 +42,7 @@ public class StanfordStemFilterPlugin extends Plugin implements AnalysisPlugin {
 
             @Override
             public boolean requiresAnalysisSettings() {
-                return true;
+                return false;
             }
         });
         return map;

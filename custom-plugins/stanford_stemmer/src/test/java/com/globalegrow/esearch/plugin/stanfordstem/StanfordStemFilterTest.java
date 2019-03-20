@@ -13,7 +13,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.Reader;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Scanner;
@@ -37,8 +36,8 @@ import java.util.Scanner;
 public class StanfordStemFilterTest {
     Analyzer stanfordAnalyzer = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String s, Reader reader) {
-            Tokenizer tok = new StandardTokenizer(reader);
+        protected TokenStreamComponents createComponents(String fieldName) {
+            Tokenizer tok = new StandardTokenizer();
             TokenStream sink = new StandardFilter(tok);
             sink = new LowerCaseFilter(sink);
             sink = new StanfordStemFilter(sink);
@@ -47,8 +46,8 @@ public class StanfordStemFilterTest {
     };
     Analyzer porterAnalyzer = new Analyzer() {
         @Override
-        protected TokenStreamComponents createComponents(String s, Reader reader) {
-            Tokenizer tok = new StandardTokenizer(reader);
+        protected TokenStreamComponents createComponents(String fieldName) {
+            Tokenizer tok = new StandardTokenizer();
             TokenStream sink = new StandardFilter(tok);
             sink = new LowerCaseFilter(sink);
             sink = new PorterStemFilter(sink);
