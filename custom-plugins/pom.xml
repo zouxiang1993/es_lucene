@@ -16,6 +16,7 @@
         <module>extend_mapping_char_filter</module>
         <module>stanford_stemmer</module>
         <module>extend_stemmer_override_filter</module>
+        <module>extend_synonyms</module>
     </modules>
 
     <dependencies>

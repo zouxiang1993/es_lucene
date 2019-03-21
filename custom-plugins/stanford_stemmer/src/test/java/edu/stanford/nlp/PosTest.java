@@ -26,7 +26,7 @@ public class PosTest {
     @Test
     public void test1() {
 //        Sentence sentence = new Sentence("front knotted bikini");
-        Sentence sentence = new Sentence(" coffee holder and coffee dress");
+        Sentence sentence = new Sentence("shoe dress");
         List<Token> tokens = sentence.tokens();
         for (int i = 0; i < tokens.size(); i++) {
             System.out.print(tokens.get(i).word() + "/" + sentence.posTag(i) + "\t");
