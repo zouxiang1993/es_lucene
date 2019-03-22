@@ -38,6 +38,22 @@
                     <groupId>org.apache.lucene</groupId>
                     <artifactId>lucene-core</artifactId>
                 </exclusion>
+                <!--
+                这2个maven依赖有问题，会导致ES报jar hell错误。换成org.glassfish.jaxb的依赖
+                https://blog.csdn.net/drchzy/article/details/80019474
+                -->
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -62,8 +78,21 @@
                     <groupId>org.apache.lucene</groupId>
                     <artifactId>lucene-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
@@ -88,6 +117,21 @@
             <version>6.6.1</version>
             <scope>provided</scope>
         </dependency>
+        <!--        <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-core</artifactId>
+                    <version>2.2.11</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-xjc</artifactId>
+                    <version>2.2.11</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
+                    <version>2.2.11</version>
+                </dependency>-->
     </dependencies>
 
     <build>
