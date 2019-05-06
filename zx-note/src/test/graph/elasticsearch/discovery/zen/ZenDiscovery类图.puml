@@ -1,0 +1,11 @@
+@startuml
+
+interface Discovery{
+
+}
+
+class ZenDiscovery implements Discovery{
+
+}
+
+@enduml

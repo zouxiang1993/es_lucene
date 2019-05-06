@@ -30,12 +30,12 @@ import java.io.IOException;
  * the addresses the transport is bound to, and the other is the published one that represents the address clients
  * should communicate on.
  *
- *
+ * 参照： https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html
  */
 public class BoundTransportAddress implements Streamable {
-
+    // 一个Node可以bound到多个地址，这些地址都可以接受用户请求
     private TransportAddress[] boundAddresses;
-
+    // 一个Node只能publish到一个地址，用于集群节点之间的通信。
     private TransportAddress publishAddress;
 
     BoundTransportAddress() {

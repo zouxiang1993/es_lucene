@@ -58,7 +58,7 @@ public interface ZenPing extends Releasable {
 
         private DiscoveryNode node;  // ping的目标节点
 
-        private DiscoveryNode master;  // 目标节点认为的master是谁
+        private DiscoveryNode master;  // 目标节点认为的master是谁（投票？）
 
         private long clusterStateVersion;
 

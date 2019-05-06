@@ -1,0 +1,46 @@
+@startuml
+
+interface Discovery {
+    ---
+    // 返回本地节点
+    +DiscoveryNode localNode();
+
+    // ??
+    +void setAllocationService(AllocationService allocationService)
+
+    // 从master向集群发布状态变更的信息，只能在master节点上调用 ★★★
+    +void publish(ClusterChangedEvent clusterChangedEvent, AckListener ackListener)
+
+    +DiscoveryStats stats()
+
+    +DiscoverySettings getDiscoverySettings();
+
+    // 节点启动时，触发第一次加入集群的过程  ★★★
+    +void startInitialJoin();
+
+    +int getMinimumMasterNodes();
+}
+
+class BlockingClusterStatePublishResponseHandler{
+    // 从master向非master节点发布一个新的集群状态时，用来处理得到的响应信息
+    // 允许两种结束条件： 1. 所有节点都返回结果  2. 超过一个时间限制
+    ---
+    // 构造方法。传入一个接收信息的节点列表
+    +BlockingClusterStatePublishResponseHandler(Set<DiscoveryNode> publishingToNodes)
+    // 当接收到某个节点的响应时调用。
+    + void onResponse(DiscoveryNode node)
+    // 当接收到某个节点的失败响应时调用。
+    + void onFailure(DiscoveryNode node, Exception e)
+    // 阻塞调用。等待所有节点返回 或者 超时。
+    // 如果所有节点都有响应，则返回true；如果超时，则返回false
+    + boolean awaitAllNodes(TimeValue timeout)
+    // 还未响应的节点列表
+    + DiscoveryNode[] pendingNodes()
+}
+
+class AckClusterStatePublishResponseHandler extends BlockingClusterStatePublishResponseHandler{
+    // 允许设置一个AckListener，在每个Node响应时将会通知到AckListener
+    +AckClusterStatePublishResponseHandler(Set<DiscoveryNode> publishingToNodes, Discovery.AckListener ackListener)
+}
+
+@enduml

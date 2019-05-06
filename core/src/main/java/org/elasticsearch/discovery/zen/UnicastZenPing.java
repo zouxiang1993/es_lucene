@@ -128,7 +128,7 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
     private final Map<Integer, PingingRound> activePingingRounds = newConcurrentMap();
 
     // a list of temporal responses a node will return for a request (holds responses from other nodes)
-    private final Queue<PingResponse> temporalResponses = ConcurrentCollections.newQueue();
+    private final Queue<PingResponse> temporalResponses = ConcurrentCollections.newQueue(); // 暂存来自其他节点的ping信息。
 
     private final UnicastHostsProvider hostsProvider;
 
@@ -164,7 +164,7 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
             resolveTimeout);
 
         transportService.registerRequestHandler(ACTION_NAME, UnicastPingRequest::new, ThreadPool.Names.SAME,
-            new UnicastPingRequestHandler());
+            new UnicastPingRequestHandler());  // 注册 接收到其他节点的ping请求时的处理函数
 
         final ThreadFactory threadFactory = EsExecutors.daemonThreadFactory(settings, "[unicast_connect]");
         unicastZenPingExecutorService = EsExecutors.newScaling(
@@ -318,8 +318,8 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
         final ConnectionProfile connectionProfile =
             ConnectionProfile.buildSingleChannelProfile(TransportRequestOptions.Type.REG, requestDuration, requestDuration);
         final PingingRound pingingRound = new PingingRound(pingingRoundIdGenerator.incrementAndGet(), seedNodes, resultsConsumer,
-            nodes.getLocalNode(), connectionProfile);
-        activePingingRounds.put(pingingRound.id(), pingingRound);
+            nodes.getLocalNode(), connectionProfile); // 表示一轮ping
+        activePingingRounds.put(pingingRound.id(), pingingRound);  // 所有正在进行的ping
         final AbstractRunnable pingSender = new AbstractRunnable() {
             @Override
             public void onFailure(Exception e) {
@@ -333,7 +333,7 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
                 sendPings(requestDuration, pingingRound);
             }
         };
-        threadPool.generic().execute(pingSender);
+        threadPool.generic().execute(pingSender);  // TODO：为什么要发送3次？
         threadPool.schedule(TimeValue.timeValueMillis(scheduleDuration.millis() / 3), ThreadPool.Names.GENERIC, pingSender);
         threadPool.schedule(TimeValue.timeValueMillis(scheduleDuration.millis() / 3 * 2), ThreadPool.Names.GENERIC, pingSender);
         threadPool.schedule(scheduleDuration, ThreadPool.Names.GENERIC, new AbstractRunnable() {
@@ -462,8 +462,8 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
         pingRequest.timeout = timeout;
         ClusterState lastState = contextProvider.clusterState();
 
-        pingRequest.pingResponse = createPingResponse(lastState);
-
+        pingRequest.pingResponse = createPingResponse(lastState); // 生成这次ping附带的信息
+        // TODO: temporalResponses的作用。
         Set<DiscoveryNode> nodesFromResponses = temporalResponses.stream().map(pingResponse -> {
             assert clusterName.equals(pingResponse.clusterName()) :
                 "got a ping request from a different cluster. expected " + clusterName + " got " + pingResponse.clusterName();
@@ -586,15 +586,15 @@ public class UnicastZenPing extends AbstractComponent implements ZenPing {
             }
         };
     }
-
+    // 接收到其他节点的ping请求时的处理函数。
     private UnicastPingResponse handlePingRequest(final UnicastPingRequest request) {
         assert clusterName.equals(request.pingResponse.clusterName()) :
             "got a ping request from a different cluster. expected " + clusterName + " got " + request.pingResponse.clusterName();
         temporalResponses.add(request.pingResponse);
         // add to any ongoing pinging
-        activePingingRounds.values().forEach(p -> p.addPingResponseToCollection(request.pingResponse));
+        activePingingRounds.values().forEach(p -> p.addPingResponseToCollection(request.pingResponse)); // TODO: ???
         threadPool.schedule(TimeValue.timeValueMillis(request.timeout.millis() * 2), ThreadPool.Names.SAME,
-            () -> temporalResponses.remove(request.pingResponse));
+            () -> temporalResponses.remove(request.pingResponse)); // 两倍间隔时间后移除
 
         List<PingResponse> pingResponses = CollectionUtils.iterableAsArrayList(temporalResponses);
         pingResponses.add(createPingResponse(contextProvider.clusterState()));
