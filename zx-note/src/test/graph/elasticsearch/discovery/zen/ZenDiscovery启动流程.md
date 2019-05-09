@@ -12,7 +12,9 @@ discoveryTypes.put("zen",
 ```
 
 构造完成之后，加入集群的调用入口：  
-1. org/elasticsearch/node/Node.java:708 
+1. org/elasticsearch/node/Node.java:706
 ```
+discovery.start();
+transportService.acceptIncomingRequests();
 discovery.startInitialJoin();  
 ```

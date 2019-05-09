@@ -486,7 +486,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
             }
 
             try {
-                Thread.sleep(this.joinRetryDelay.millis());
+                Thread.sleep(this.joinRetryDelay.millis()); // 休眠一段时间后再重试。
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -894,7 +894,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
         // filter responses
         final List<ZenPing.PingResponse> pingResponses = filterPingResponses(fullPingResponses, masterElectionIgnoreNonMasters, logger);  // 根据配置决定是否需要过滤掉非主备节点
 
-        List<DiscoveryNode> activeMasters = new ArrayList<>();  // 每个节点认为的master
+        List<DiscoveryNode> activeMasters = new ArrayList<>();  // 每个节点认为的master， 集群当前活跃master列表
         for (ZenPing.PingResponse pingResponse : pingResponses) {
             // We can't include the local node in pingMasters list, otherwise we may up electing ourselves without
             // any check / verifications from other nodes in ZenDiscover#innerJoinCluster()
@@ -925,7 +925,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
         } else { // 直接从activeMasters里面选出master
             assert !activeMasters.contains(localNode) : "local node should never be elected as master when other nodes indicate an active master";
             // lets tie break between discovered nodes
-            return electMaster.tieBreakActiveMasters(activeMasters);
+            return electMaster.tieBreakActiveMasters(activeMasters); // 选一个最小值
         }
     }
 
@@ -1183,7 +1183,7 @@ public class ZenDiscovery extends AbstractLifecycleComponent implements Discover
                     if (!currentJoinThread.compareAndSet(null, currentThread)) {
                         return;
                     }
-                    while (running.get() && joinThreadActive(currentThread)) {
+                    while (running.get() && joinThreadActive(currentThread)) { // 如果当前线程是join线程，则不断尝试加入集群。
                         try {
                             innerJoinCluster();
                             return;

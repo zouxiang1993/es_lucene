@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * 在选主过程中，处理其他节点的join请求。
  * This class processes incoming join request (passed zia {@link ZenDiscovery}). Incoming nodes
  * are directly added to the cluster state or are accumulated during master election.
  */
