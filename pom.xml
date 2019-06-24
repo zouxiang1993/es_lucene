@@ -55,6 +55,10 @@
         <module>lucene-spatial3d</module>
         <module>lucene-spatial-extras</module>
         <module>lucene-suggest</module>
+        <module>lucene-demo</module>
+        <module>lucene-facet</module>
+        <module>lucene-expressions</module>
+        <module>lucene-suggest</module>
         <module>zx-note</module>
         <module>custom-plugins</module>
         <module>plugins</module>
@@ -62,6 +66,7 @@
     </modules>
 
     <build>
+        <finalName>esearch-server</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
