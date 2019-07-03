@@ -111,7 +111,7 @@ public final class NativeFSLockFactory extends FSLockFactory {
       FileLock lock = null;
       try {
         channel = FileChannel.open(realPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        lock = channel.tryLock();
+        lock = channel.tryLock(); // 获取一个文件锁，当前jvm内的所有线程都可以获取，但其他进程不能再获取（进程间的排他性）
         if (lock != null) {
           return new NativeFSLock(lock, channel, realPath, creationTime);
         } else {

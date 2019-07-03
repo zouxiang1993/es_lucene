@@ -1,5 +1,8 @@
 @startuml
-
+skinparam class{
+    BackgroundColor<<Important>> PaleGreen
+    BorderColor<<Important>> SpringGreen
+}
 interface RandomAccessInput{
     // 随机访问的API，不会记录当前读到文件的什么位置
     // 所有的读操作都是根据绝对位置来读
@@ -11,6 +14,8 @@ interface RandomAccessInput{
 }
 
 abstract class DataInput{
+    // 实现Lucene底层读操作的基类，线程不安全，只能在单个线程内使用。
+    // 如果要在其他线程使用，必须先clone
     +{abstract} byte readByte()
     +{abstract} void readBytes(byte[] b, int offset, int len)
     +short readShort()
@@ -43,8 +48,9 @@ class InputStreamDataInput extends DataInput{
     // 包装一个普通的InputStream
 }
 
-abstract class ByteBufferIndexInput extends IndexInput implements RandomAccessInput{
-    // 用ByteBuffer的数组来表示一个文件
+abstract class ByteBufferIndexInput<<Important>> extends IndexInput implements RandomAccessInput{
+    // ★★★★★
+    // 用ByteBuffer[]来表示一个文件
 }
 
 abstract class BufferedIndexInput extends IndexInput implements RandomAccessInput{

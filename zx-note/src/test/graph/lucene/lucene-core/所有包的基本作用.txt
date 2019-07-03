@@ -1,5 +1,8 @@
 store : 基本的I/O API
+    Directory / DataInput / DataOutput / Lock
+
 codecs : 定义索引文件的结构，编码/解码方式
+
 document : 文档的逻辑表示
 
 analysis: 文本分析。将文本转化为 可索引/可搜索的 token 的API

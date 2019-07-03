@@ -1,4 +1,10 @@
 @startuml
+
+skinparam class{
+    BackgroundColor<<Important>> PaleGreen
+    BorderColor<<Important>> SpringGreen
+}
+
 abstract class Directory{
     Directory表示一些扁平文件的集合, 这些文件都只能在创建时写入一次。
     写入之后，就只能读或者删除，不可再修改。
@@ -49,7 +55,8 @@ class SimpleFSDirectory extends FSDirectory{
     //
 }
 
-class MMapDirectory extends FSDirectory{
+class MMapDirectory<<Important>> extends FSDirectory{
+
 }
 
 class NIOFSDirectory extends FSDirectory{

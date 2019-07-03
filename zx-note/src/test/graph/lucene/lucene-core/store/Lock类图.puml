@@ -15,6 +15,7 @@ abstract class Lock{
 }
 
 abstract class LockFactory{
+    ---
     // 获取一个锁
     +{abstract} Lock obtainLock(Directory dir, String lockName)
 }

@@ -1,4 +1,9 @@
 @startuml
+skinparam class{
+    BackgroundColor<<Important>> PaleGreen
+    BorderColor<<Important>> SpringGreen
+}
+
 abstract class DataOutput{
     为Lucene最底层的各种数据类型执行写操作
     --
@@ -30,7 +35,7 @@ class RAMOutputStream extends IndexOutput{
     // 一种在内存中的IndexOutput实现
 }
 
-class OutputStreamIndexOutput extends IndexOutput{
+class OutputStreamIndexOutput<<Important>> extends IndexOutput{
     // 带缓冲功能的IndexOutput实现，
     // 将数据写到一个OutputStream中
 }
