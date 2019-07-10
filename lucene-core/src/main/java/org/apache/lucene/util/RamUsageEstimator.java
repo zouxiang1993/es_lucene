@@ -128,7 +128,7 @@ public final class RamUsageEstimator {
    * A constant specifying the object alignment boundary inside the JVM. Objects will
    * always take a full multiple of this constant, possibly wasting some space. 
    */
-  public final static int NUM_BYTES_OBJECT_ALIGNMENT;
+  public final static int NUM_BYTES_OBJECT_ALIGNMENT; // 默认值为8，即java堆中的对象起始地址要对齐至8的倍数。
 
   /**
    * Sizes of primitive classes.

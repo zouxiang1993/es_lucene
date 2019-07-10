@@ -94,8 +94,8 @@ final class Lucene54DocValuesConsumer extends DocValuesConsumer implements Close
     long minValue = Long.MAX_VALUE;
     long maxValue = Long.MIN_VALUE;
     long gcd = 0;
-    long missingCount = 0;
-    long zeroCount = 0;
+    long missingCount = 0; // 空值总数
+    long zeroCount = 0;    // 零值总数
     // TODO: more efficient?
     HashSet<Long> uniqueValues = null;
     long missingOrdCount = 0;
@@ -375,7 +375,7 @@ final class Lucene54DocValuesConsumer extends DocValuesConsumer implements Close
       }
       count++;
     }
-    meta.writeVInt(minLength == maxLength ? BINARY_FIXED_UNCOMPRESSED : BINARY_VARIABLE_UNCOMPRESSED);
+    meta.writeVInt(minLength == maxLength ? BINARY_FIXED_UNCOMPRESSED : BINARY_VARIABLE_UNCOMPRESSED);  // 定长还是变长
     if (missingCount == 0) {
       meta.writeLong(ALL_LIVE);
     } else if (missingCount == count) {

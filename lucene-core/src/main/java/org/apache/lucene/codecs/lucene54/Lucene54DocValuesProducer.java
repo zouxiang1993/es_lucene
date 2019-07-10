@@ -118,7 +118,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
                                         Lucene54DocValuesFormat.VERSION_CURRENT,
                                         state.segmentInfo.getId(),
                                         state.segmentSuffix);
-        numFields = readFields(in, state.fieldInfos);
+        numFields = readFields(in, state.fieldInfos);   // 读每个字段的docvalues元数据
       } catch (Throwable exception) {
         priorE = exception;
       } finally {
@@ -229,7 +229,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
 
   private int readFields(IndexInput meta, FieldInfos infos) throws IOException {
     int numFields = 0;
-    int fieldNumber = meta.readVInt();
+    int fieldNumber = meta.readVInt(); // 读字段编号
     while (fieldNumber != -1) {
       numFields++;
       FieldInfo info = infos.fieldInfo(fieldNumber);
@@ -237,7 +237,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
         // trickier to validate more: because we use multiple entries for "composite" types like sortedset, etc.
         throw new CorruptIndexException("Invalid field number: " + fieldNumber, meta);
       }
-      byte type = meta.readByte();
+      byte type = meta.readByte(); // 读 docvalues 类型
       if (type == Lucene54DocValuesFormat.NUMERIC) {
         numerics.put(info.name, readNumericEntry(info, meta));
       } else if (type == Lucene54DocValuesFormat.BINARY) {
@@ -312,7 +312,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
 
   private NumericEntry readNumericEntry(FieldInfo info, IndexInput meta) throws IOException {
     NumericEntry entry = new NumericEntry();
-    entry.format = meta.readVInt();
+    entry.format = meta.readVInt(); // 格式/压缩类型
     entry.missingOffset = meta.readLong();
     if (entry.format == SPARSE_COMPRESSED) {
       // sparse bits need a bit more metadata
@@ -325,14 +325,14 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
     entry.offset = meta.readLong();
     entry.count = meta.readVLong();
     switch(entry.format) {
-      case CONST_COMPRESSED:
+      case CONST_COMPRESSED: // 如果只有两种字段值：要么null值，要么是一个常量值。则存储一个常量值和一个bitset表示缺失该字段的docId集合
         entry.minValue = meta.readLong();
         if (entry.count > Integer.MAX_VALUE) {
           // currently just a limitation e.g. of bits interface and so on.
           throw new CorruptIndexException("illegal CONST_COMPRESSED count: " + entry.count, meta);
         }
         break;
-      case GCD_COMPRESSED:
+      case GCD_COMPRESSED: // 存一个最大公约数
         entry.minValue = meta.readLong();
         entry.gcd = meta.readLong();
         entry.bitsPerValue = meta.readVInt();
@@ -1066,7 +1066,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
     } else if (offset == ALL_LIVE) {
       return new Bits.MatchAllBits(count);
     } else {
-      int length = (int) ((count + 7L) >>> 3);
+      int length = (int) ((count + 7L) >>> 3);  // 除以8，1byte8个文档
       final RandomAccessInput in = data.randomAccessSlice(offset, length);
       return new Bits() {
         @Override
