@@ -1,5 +1,6 @@
 package com.globalegrow.esearch.plugin.stanfordstem;
 
+import edu.stanford.nlp.simple.Document;
 import edu.stanford.nlp.simple.Sentence;
 import edu.stanford.nlp.simple.Token;
 import org.apache.logging.log4j.Logger;
@@ -10,9 +11,10 @@ import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * <pre>
@@ -34,6 +36,19 @@ public final class StanfordStemFilter extends TokenFilter {
     private static Logger logger = ESLoggerFactory.getLogger("stanford-stem");
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final KeywordAttribute keywordAttr = addAttribute(KeywordAttribute.class);
+    private static final Properties EMPTY_PROPS;
+
+    static {
+        Properties prop = null;
+        try {
+            Field field = Document.class.getDeclaredField("EMPTY_PROPS");
+            field.setAccessible(true);
+            prop= (Properties) field.get(null);
+        }catch (Exception e){
+            logger.error("StanfordStemFilter初始化失败", e);
+        }
+        EMPTY_PROPS = prop;
+    }
 
     /**
      * 为了在ES启动时加载插件的过程中初始化Stanford CoreNLP , 默认是懒加载
@@ -81,7 +96,9 @@ public final class StanfordStemFilter extends TokenFilter {
     private void stem() {
         try {
             final String originToken = termAtt.toString();
-            Sentence sentence = new Sentence(Arrays.asList(originToken));
+            Document document = new Document(originToken);
+            Sentence sentence = document.sentence(0, EMPTY_PROPS);
+
             Token token = new Token(sentence, 0);
             String lemma = token.lemma();
 
