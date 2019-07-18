@@ -58,7 +58,6 @@
         <module>lucene-demo</module>
         <module>lucene-facet</module>
         <module>lucene-expressions</module>
-        <module>lucene-suggest</module>
         <module>zx-note</module>
         <module>custom-plugins</module>
         <module>plugins</module>

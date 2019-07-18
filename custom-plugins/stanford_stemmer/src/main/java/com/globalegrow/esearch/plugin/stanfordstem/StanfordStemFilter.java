@@ -8,6 +8,7 @@ import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+import org.apache.lucene.util.SetOnce;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 
 import java.io.IOException;
@@ -39,15 +40,25 @@ public final class StanfordStemFilter extends TokenFilter {
     private static final Properties EMPTY_PROPS;
 
     static {
-        Properties prop = null;
-        try {
-            Field field = Document.class.getDeclaredField("EMPTY_PROPS");
-            field.setAccessible(true);
-            prop= (Properties) field.get(null);
-        }catch (Exception e){
-            logger.error("StanfordStemFilter初始化失败", e);
-        }
-        EMPTY_PROPS = prop;
+        final Properties prop;
+        final SetOnce<Properties> setOnce = new SetOnce<>();
+        AccessController.doPrivileged(
+                new PrivilegedAction<Void>() {
+                    @Override
+                    public Void run() {
+                        try {
+                            Field field = Document.class.getDeclaredField("EMPTY_PROPS");
+                            field.setAccessible(true);
+                            setOnce.set((Properties) field.get(null));
+                        } catch (Exception e) {
+                            logger.error("StanfordStemFilter初始化失败", e);
+                            setOnce.set(null);
+                        }
+                        return null;
+                    }
+                }
+        );
+        EMPTY_PROPS = setOnce.get();
     }
 
     /**
