@@ -1,0 +1,72 @@
+@startuml
+
+interface Channel{
+    +boolean isOpen()
+    +void close()
+}
+
+interface ReadableByteChannel extends Channel{
+    --
+    单向的Channel，只能读
+    --
+    +int read(ByteBuffer dst)
+}
+
+interface WritableByteChannel extends Channel{
+    --
+    单向的Channel，只能写
+    ---
+    +int write(ByteBuffer src)
+}
+
+interface ByteChannel extends ReadableByteChannel, WritableByteChannel{
+    --
+    双向传输数据
+    --
+}
+
+interface ScatteringByteChannel extends ReadableByteChannel{
+    --
+    // 可以将数据读到多个ByteBuffer中
+    --
+    +long read(ByteBuffer[] dsts, int offset, int length)
+    +long read(ByteBuffer[] dsts)
+}
+
+interface GatheringByteChannel extends WritableByteChannel{
+    --
+    // 提供将多个ByteBuffer写出的功能
+    --
+    +long write(ByteBuffer[] srcs, int offset, int length)
+    +long write(ByteBuffer[] srcs)
+}
+
+interface SeekableByteChannel extends ByteChannel{
+    --
+    // 可以定位的ByteChannel
+    --
+    +long position()
+    +SeekableByteChannel position(long newPosition)
+    +long size()
+    +SeekableByteChannel truncate(long size)
+}
+
+abstract class FileChannel implements SeekableByteChannel, GatheringByteChannel, ScatteringByteChannel{
+    --
+    读写文件的Channel
+    --
+    {static} FileChannel open(Path path, OpenOption... options)
+    --
+    // 强制将对文件的更新写到存储介质上去
+    +{abstract} void force(boolean metaData)
+    // 将内容传输到另外一个Channel
+    +{abstract} long transferTo(long position, long count, WritableByteChannel target)
+    +{abstract} long transferFrom(ReadableByteChannel src, long position, long count)
+    // 将FileChannel的某个区域直接映射到内存中
+    +{abstract} MappedByteBuffer map(MapMode mode, long position, long size)
+}
+
+abstract class SocketChannel
+abstract class FileChannel
+
+@enduml
