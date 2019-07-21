@@ -64,6 +64,8 @@ abstract class FileChannel implements SeekableByteChannel, GatheringByteChannel,
     +{abstract} long transferFrom(ReadableByteChannel src, long position, long count)
     // 将FileChannel的某个区域直接映射到内存中
     +{abstract} MappedByteBuffer map(MapMode mode, long position, long size)
+    // 获取FileChannel中一个区域的锁
+    +{abstract} FileLock lock(long position, long size, boolean shared)
 }
 
 abstract class SocketChannel

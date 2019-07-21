@@ -1,0 +1,25 @@
+@startuml
+
+abstract class Buffer{
+
+}
+
+abstract class ByteBuffer extends Buffer{
+
+}
+
+abstract class LongBuffer extends Buffer
+
+abstract class DoubleBuffer extends Buffer
+
+abstract class 其他Buffer extends Buffer
+
+abstract class MappedByteBuffer extends ByteBuffer{
+    --
+    // 将全部内容加载进物理内存
+    + MappedByteBuffer load()
+    // 强制将所有更新写回磁盘
+    + MappedByteBuffer force()
+}
+
+@enduml
