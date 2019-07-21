@@ -1,4 +1,10 @@
 @startuml
+
+skinparam class{
+    BackgroundColor<<Important>> PaleGreen
+    BorderColor<<Important>> SpringGreen
+}
+
 abstract class IndexReader{
     // 访问索引在某一个时间点的视图
     ---
@@ -37,8 +43,10 @@ abstract class BaseCompositeReader<R extends IndexReader> extends CompositeReade
 
 }
 
-abstract class DirectoryReader extends BaseCompositeReader{
+abstract class DirectoryReader<<Important>> extends BaseCompositeReader{
     // 读取一个Directory中的索引
+    --
+    {static} DirectoryReader open(final Directory directory)
 }
 
 class StandardDirectoryReader extends DirectoryReader{
@@ -78,7 +86,7 @@ abstract class CodecReader extends LeafReader{
     +{abstract} PointsReader getPointsReader()
 }
 
-class SegmentReader extends CodecReader{
+class SegmentReader<<Important>> extends CodecReader{
     // 单个segment的Reader
 }
 @enduml

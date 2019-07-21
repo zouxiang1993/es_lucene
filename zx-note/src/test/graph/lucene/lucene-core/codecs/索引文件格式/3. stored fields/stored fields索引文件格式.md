@@ -39,7 +39,7 @@ stored fields 总共分两个文件存储。
 其中主要记录了每个chuck中第一个文档的doc ID和 每个chuck的开始位置。用于快速定位文档所在的chuck  
 详见: http://lucene.apache.org/core/6_6_1/core/org/apache/lucene/codecs/compressing/CompressingStoredFieldsIndexWriter.html  
 
-- FieldsIndex (.fdx) --> Block^BlockCount
+- ChunkIndex (.fdx) --> Block^BlockCount
 - BlockCount是Block总数，并没有显式的存储
 
 - Block --> BlockChunks, DocBases, StartPointers

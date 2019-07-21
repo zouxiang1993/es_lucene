@@ -194,7 +194,7 @@ public abstract class FSDirectory extends BaseDirectory {
    *  also specify a custom {@link LockFactory}. */
   public static FSDirectory open(Path path, LockFactory lockFactory) throws IOException {
     if (Constants.JRE_IS_64BIT && MMapDirectory.UNMAP_SUPPORTED) {
-      return new MMapDirectory(path, lockFactory);
+      return new MMapDirectory(path, lockFactory); // 首选
     } else if (Constants.WINDOWS) {
       return new SimpleFSDirectory(path, lockFactory);
     } else {

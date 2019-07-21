@@ -104,12 +104,12 @@ final class SegmentCoreReaders {
 
       segment = si.info.name;
 
-      coreFieldInfos = codec.fieldInfosFormat().read(cfsDir, si.info, "", context);
+      coreFieldInfos = codec.fieldInfosFormat().read(cfsDir, si.info, "", context);  // 读取 field info 索引文件
       
       final SegmentReadState segmentReadState = new SegmentReadState(cfsDir, si.info, coreFieldInfos, context);
       final PostingsFormat format = codec.postingsFormat();
       // Ask codec for its Fields
-      fields = format.fieldsProducer(segmentReadState);
+      fields = format.fieldsProducer(segmentReadState); // TODO: 读取倒排索引文件 !!!
       assert fields != null;
       // ask codec for its Norms: 
       // TODO: since we don't write any norms file if there are no norms,
@@ -122,7 +122,7 @@ final class SegmentCoreReaders {
         normsProducer = null;
       }
   
-      fieldsReaderOrig = si.info.getCodec().storedFieldsFormat().fieldsReader(cfsDir, si.info, coreFieldInfos, context);
+      fieldsReaderOrig = si.info.getCodec().storedFieldsFormat().fieldsReader(cfsDir, si.info, coreFieldInfos, context);  // 读取 storeed fields索引文件
 
       if (coreFieldInfos.hasVectors()) { // open term vector files only as needed
         termVectorsReaderOrig = si.info.getCodec().termVectorsFormat().vectorsReader(cfsDir, si.info, coreFieldInfos, context);

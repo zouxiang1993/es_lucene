@@ -164,8 +164,8 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
       
       if (version >= VERSION_CHUNK_STATS) {
         fieldsStream.seek(maxPointer);
-        numChunks = fieldsStream.readVLong();
-        numDirtyChunks = fieldsStream.readVLong();
+        numChunks = fieldsStream.readVLong();  // chuck总数
+        numDirtyChunks = fieldsStream.readVLong(); // 过早的flush到磁盘的chuck总数
         if (numDirtyChunks > numChunks) {
           throw new CorruptIndexException("invalid chunk counts: dirty=" + numDirtyChunks + ", total=" + numChunks, fieldsStream);
         }
@@ -364,7 +364,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
   /**
    * Keeps state about the current block of documents.
    */
-  private class BlockState {
+  private class BlockState { // 一个时刻永远只会加载一个chunk进内存
 
     private int docBase, chunkDocs;
 
@@ -378,7 +378,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
     private long startPointer;
 
     private final BytesRef spare = new BytesRef();
-    private final BytesRef bytes = new BytesRef();
+    private final BytesRef bytes = new BytesRef();   // 解压缩后的内容
 
     boolean contains(int docID) {
       return docID >= docBase && docID < docBase + chunkDocs;
@@ -406,9 +406,9 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
     }
 
     private void doReset(int docID) throws IOException {
-      docBase = fieldsStream.readVInt();
+      docBase = fieldsStream.readVInt();  // chunk中第一个文档的docID
       final int token = fieldsStream.readVInt();
-      chunkDocs = token >>> 1;
+      chunkDocs = token >>> 1;  // chunk中的文档总数
       if (contains(docID) == false
           || docBase + chunkDocs > numDocs) {
         throw new CorruptIndexException("Corrupted: docID=" + docID
@@ -434,7 +434,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
         } else {
           final PackedInts.ReaderIterator it = PackedInts.getReaderIteratorNoHeader(fieldsStream, PackedInts.Format.PACKED, packedIntsVersion, chunkDocs, bitsPerStoredFields, 1);
           for (int i = 0; i < chunkDocs; ++i) {
-            numStoredFields[i] = (int) it.next();
+            numStoredFields[i] = (int) it.next();   // 每一个文档的字段总数
           }
         }
 
@@ -471,7 +471,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
 
       startPointer = fieldsStream.getFilePointer();
 
-      if (merging) {
+      if (merging) {  // 如果是在执行merge，则立即解压。否则延迟解压过程，需要的时候再解压。
         final int totalLength = offsets[chunkDocs];
         // decompress eagerly
         if (sliced) {
@@ -557,7 +557,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
         };
       } else {
         fieldsStream.seek(startPointer);
-        decompressor.decompress(fieldsStream, totalLength, offset, length, bytes);
+        decompressor.decompress(fieldsStream, totalLength, offset, length, bytes); // 只解压属于当前文档的一段内容
         assert bytes.length == length;
         documentInput = new ByteArrayDataInput(bytes.bytes, bytes.offset, bytes.length);
       }
@@ -601,7 +601,7 @@ public final class CompressingStoredFieldsReader extends StoredFieldsReader {
           skipField(doc.in, bits);
           break;
         case STOP:
-          return; // 停止，可能可以避免解压后面的分片
+          return; // 停止
       }
     }
   }

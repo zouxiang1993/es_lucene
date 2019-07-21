@@ -50,7 +50,7 @@ public final class SegmentReader extends CodecReader {
   // tells us the number of live docs:
   private final int numDocs;
 
-  final SegmentCoreReaders core;
+  final SegmentCoreReaders core;  // 核心数据， 可能有多个SegmentReader实例（只有deletes不同）会引用同一份核心数据
   final SegmentDocValues segDocValues;
 
   /** True if we are holding RAM only liveDocs or DV updates, i.e. the SegmentCommitInfo delGen doesn't match our liveDocs. */

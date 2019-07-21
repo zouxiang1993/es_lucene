@@ -68,10 +68,10 @@ public final class CompressingStoredFieldsIndexReader implements Cloneable, Acco
 
     for (;;) {
       final int numChunks = fieldsIndexIn.readVInt();
-      if (numChunks == 0) {
+      if (numChunks == 0) { // 0表示结束
         break;
       }
-      if (blockCount == docBases.length) {
+      if (blockCount == docBases.length) {  // 数组扩容
         final int newSize = ArrayUtil.oversize(blockCount + 1, 8);
         docBases = Arrays.copyOf(docBases, newSize);
         startPointers = Arrays.copyOf(startPointers, newSize);
@@ -82,16 +82,16 @@ public final class CompressingStoredFieldsIndexReader implements Cloneable, Acco
       }
 
       // doc bases
-      docBases[blockCount] = fieldsIndexIn.readVInt();
-      avgChunkDocs[blockCount] = fieldsIndexIn.readVInt();
-      final int bitsPerDocBase = fieldsIndexIn.readVInt();
+      docBases[blockCount] = fieldsIndexIn.readVInt();  // block中第一个文档的docID
+      avgChunkDocs[blockCount] = fieldsIndexIn.readVInt();  // block中所有的chunk的平均文档数目
+      final int bitsPerDocBase = fieldsIndexIn.readVInt(); // 应该是 BitsPerDocBaseDelta
       if (bitsPerDocBase > 32) {
         throw new CorruptIndexException("Corrupted bitsPerDocBase: " + bitsPerDocBase, fieldsIndexIn);
       }
       docBasesDeltas[blockCount] = PackedInts.getReaderNoHeader(fieldsIndexIn, PackedInts.Format.PACKED, packedIntsVersion, numChunks, bitsPerDocBase);
 
       // start pointers
-      startPointers[blockCount] = fieldsIndexIn.readVLong();
+      startPointers[blockCount] = fieldsIndexIn.readVLong();  //  每个文档的开始指针
       avgChunkSizes[blockCount] = fieldsIndexIn.readVLong();
       final int bitsPerStartPointer = fieldsIndexIn.readVInt();
       if (bitsPerStartPointer > 64) {

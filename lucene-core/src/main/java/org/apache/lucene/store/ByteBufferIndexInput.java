@@ -34,9 +34,9 @@ import java.nio.ByteBuffer;
  * are a power-of-two (<code>chunkSizePower</code>).
  */
 abstract class ByteBufferIndexInput extends IndexInput implements RandomAccessInput {
-  protected final long length;
-  protected final long chunkSizeMask;
-  protected final int chunkSizePower;
+  protected final long length; // 索引文件的长度
+  protected final long chunkSizeMask; // 掩码
+  protected final int chunkSizePower; // chunkSize = 1 << chunkSizePower
   protected final ByteBufferGuard guard;
   
   protected ByteBuffer[] buffers;
