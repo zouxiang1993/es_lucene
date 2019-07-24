@@ -37,24 +37,29 @@ public final class StanfordStemFilter extends TokenFilter {
     private static Logger logger = ESLoggerFactory.getLogger("stanford-stem");
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final KeywordAttribute keywordAttr = addAttribute(KeywordAttribute.class);
-    private static MaxentTagger maxentTagger = MaxentTagger.getInstance();
+    private static MaxentTagger maxentTagger;
+
+    static {
+        AccessController.doPrivileged(
+                new PrivilegedAction<Void>() {
+                    @Override
+                    public Void run() {
+                        maxentTagger = MaxentTagger.getInstance();
+                        return null;
+                    }
+                }
+        );
+    }
 
     /**
      * 为了在ES启动时加载插件的过程中初始化Stanford CoreNLP , 默认是懒加载
      */
     protected static void init() {
-        logger.info("StanfordStemFilter static初始化");
-        AccessController.doPrivileged(
-                new PrivilegedAction<Void>() {
-                    @Override
-                    public Void run() {
-                        String result = stem("running");
-                        if (!"run".equalsIgnoreCase(result)) {
-                            logger.error("StanfordStemFilter初始化失败， 期望结果: run, 实际结果: " + result);
-                        }
-                        return null;
-                    }
-                });
+        logger.info("StanfordStemFilter static初始化, (测试权限)");
+        String result = stem("running");
+        if (!"run".equalsIgnoreCase(result)) {
+            logger.error("StanfordStemFilter初始化失败， 期望结果: run, 实际结果: " + result);
+        }
     }
 
     public StanfordStemFilter(TokenStream in) {
@@ -66,30 +71,18 @@ public final class StanfordStemFilter extends TokenFilter {
         if (!input.incrementToken())
             return false;
         if (!keywordAttr.isKeyword()) { // 支持stemmer_override
-            AccessController.doPrivileged( // Stanford CoreNLP需要某些权限
-                    new PrivilegedAction<Void>() {
-                        @Override
-                        public Void run() {
-                            doIncrementToken();
-                            return null;
-                        }
-                    }
-            );
+            try {
+                final String originToken = termAtt.toString();
+                String result = stem(termAtt.toString());
+                if (originToken.equals(result)) { // 没有发生变化
+                } else {
+                    termAtt.setEmpty().append(result);
+                }
+            } catch (Exception e) {
+                logger.error("stem error", e);
+            }
         }
         return true;
-    }
-
-    private void doIncrementToken() {
-        try {
-            final String originToken = termAtt.toString();
-            String result = stem(termAtt.toString());
-            if (originToken.equals(result)) { // 没有发生变化
-            } else {
-                termAtt.setEmpty().append(result);
-            }
-        } catch (Exception e) {
-            logger.error("stem error", e);
-        }
     }
 
     /**
