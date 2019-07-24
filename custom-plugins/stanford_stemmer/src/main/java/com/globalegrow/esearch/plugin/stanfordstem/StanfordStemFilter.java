@@ -1,21 +1,19 @@
 package com.globalegrow.esearch.plugin.stanfordstem;
 
-import edu.stanford.nlp.simple.Document;
-import edu.stanford.nlp.simple.Sentence;
-import edu.stanford.nlp.simple.Token;
+import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.ling.TaggedWord;
+import edu.stanford.nlp.process.Morphology;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
-import org.apache.lucene.util.SetOnce;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Properties;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * <pre>
@@ -37,46 +35,17 @@ public final class StanfordStemFilter extends TokenFilter {
     private static Logger logger = ESLoggerFactory.getLogger("stanford-stem");
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final KeywordAttribute keywordAttr = addAttribute(KeywordAttribute.class);
-    private static final Properties EMPTY_PROPS;
-
-    static {
-        final Properties prop;
-        final SetOnce<Properties> setOnce = new SetOnce<>();
-        AccessController.doPrivileged(
-                new PrivilegedAction<Void>() {
-                    @Override
-                    public Void run() {
-                        try {
-                            Field field = Document.class.getDeclaredField("EMPTY_PROPS");
-                            field.setAccessible(true);
-                            setOnce.set((Properties) field.get(null));
-                        } catch (Exception e) {
-                            logger.error("StanfordStemFilter初始化失败", e);
-                            setOnce.set(null);
-                        }
-                        return null;
-                    }
-                }
-        );
-        EMPTY_PROPS = setOnce.get();
-    }
+    private static MaxentTagger maxentTagger = MaxentTagger.getInstance();
 
     /**
      * 为了在ES启动时加载插件的过程中初始化Stanford CoreNLP , 默认是懒加载
      */
     protected static void init() {
         logger.info("StanfordStemFilter static初始化");
-        AccessController.doPrivileged(
-                new PrivilegedAction<Void>() {
-                    @Override
-                    public Void run() {
-                        Sentence sentence = new Sentence("xxx");
-                        Token token = new Token(sentence, 0);
-                        String lemma = token.lemma();
-                        return null;
-                    }
-                }
-        );
+        String result = stem("running");
+        if (!"run".equalsIgnoreCase(result)) {
+            logger.error("StanfordStemFilter初始化失败， 期望结果: run, 实际结果: " + result);
+        }
     }
 
     public StanfordStemFilter(TokenStream in) {
@@ -88,15 +57,16 @@ public final class StanfordStemFilter extends TokenFilter {
         if (!input.incrementToken())
             return false;
         if (!keywordAttr.isKeyword()) { // 支持stemmer_override
-            AccessController.doPrivileged( // Stanford CoreNLP需要某些权限
-                    new PrivilegedAction<Void>() {
-                        @Override
-                        public Void run() {
-                            stem();
-                            return null;
-                        }
-                    }
-            );
+            try {
+                final String originToken = termAtt.toString();
+                String result = stem(termAtt.toString());
+                if (originToken.equals(result)) { // 没有发生变化
+                } else {
+                    termAtt.setEmpty().append(result);
+                }
+            } catch (Exception e) {
+                logger.error("stem error", e);
+            }
         }
         return true;
     }
@@ -104,23 +74,41 @@ public final class StanfordStemFilter extends TokenFilter {
     /**
      * 使用Stanford CoreNLP 对当前token进行词干提取
      */
-    private void stem() {
-        try {
-            final String originToken = termAtt.toString();
-            Document document = new Document(originToken);
-            Sentence sentence = document.sentence(0, EMPTY_PROPS);
+    private static String stem(String word) {
+        word = word.replaceAll("('|’)s$", ""); // 所有格的问题。
+        String tag = tag(word); // 词性
+        Morphology morphology = new Morphology();
+        if (tag == null || tag.isEmpty()) {
+            return morphology.lemma(word, null);
+        } else {
+            return morphology.lemma(word, tag);
+        }
+    }
 
-            Token token = new Token(sentence, 0);
-            String lemma = token.lemma();
-
-            if (originToken.equals(lemma)) { // 没有发生变化
-                return;
-            } else {
-                termAtt.setEmpty().append(lemma);
+    /**
+     * 词性标注
+     *
+     * @param word
+     * @return
+     */
+    private static String tag(final String word) {
+        List<TaggedWord> taggedWords = maxentTagger.tagSentence(Arrays.asList(new HasWord() {
+            @Override
+            public String word() {
+                return word;
             }
 
-        } catch (Exception e) {
-            logger.error("stem error", e);
+            @Override
+            public void setWord(String word) {
+                throw new UnsupportedOperationException();
+            }
+        }), false);
+        if (taggedWords != null && taggedWords.size() > 0) {
+            TaggedWord taggedWord = taggedWords.get(0);
+            if (taggedWord != null) {
+                return taggedWord.tag();
+            }
         }
+        return null;
     }
 }
