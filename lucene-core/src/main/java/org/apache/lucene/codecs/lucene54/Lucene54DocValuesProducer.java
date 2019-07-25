@@ -155,7 +155,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
   }
 
   private void readSortedField(FieldInfo info, IndexInput meta) throws IOException {
-    // sorted = binary + numeric
+    // sorted = binary + numeric  : sorted是由binary 和 numeric两种docvalues组合而成。 binary是去重后的唯一表格，numeric记录在表格中的位置。
     if (meta.readVInt() != info.number) {
       throw new CorruptIndexException("sorted entry for field: " + info.name + " is corrupt", meta);
     }
@@ -238,12 +238,12 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
         throw new CorruptIndexException("Invalid field number: " + fieldNumber, meta);
       }
       byte type = meta.readByte(); // 读 docvalues 类型
-      if (type == Lucene54DocValuesFormat.NUMERIC) {
+      if (type == Lucene54DocValuesFormat.NUMERIC) { // 数值型 ！！！
         numerics.put(info.name, readNumericEntry(info, meta));
       } else if (type == Lucene54DocValuesFormat.BINARY) {
         BinaryEntry b = readBinaryEntry(info, meta);
         binaries.put(info.name, b);
-      } else if (type == Lucene54DocValuesFormat.SORTED) {
+      } else if (type == Lucene54DocValuesFormat.SORTED) { // 字符串型 ！！！
         readSortedField(info, meta);
       } else if (type == Lucene54DocValuesFormat.SORTED_SET) {
         SortedSetEntry ss = readSortedSetEntry(meta);
@@ -399,15 +399,15 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
     entry.count = meta.readVLong();
     entry.offset = meta.readLong();
     switch(entry.format) {
-      case BINARY_FIXED_UNCOMPRESSED:
+      case BINARY_FIXED_UNCOMPRESSED:  // 定长
         break;
-      case BINARY_PREFIX_COMPRESSED:
+      case BINARY_PREFIX_COMPRESSED:   // 前缀压缩
         entry.addressesOffset = meta.readLong();
         entry.packedIntsVersion = meta.readVInt();
         entry.blockSize = meta.readVInt();
         entry.reverseIndexOffset = meta.readLong();
         break;
-      case BINARY_VARIABLE_UNCOMPRESSED:
+      case BINARY_VARIABLE_UNCOMPRESSED:  // 变长
         entry.addressesOffset = meta.readLong();
         final int blockShift = meta.readVInt();
         entry.addressesMeta = DirectMonotonicReader.loadMeta(meta, entry.count + 1, blockShift);
@@ -500,7 +500,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
           public long get(long id) {
             return delta + values.get(id);
           }
-        };
+        };  // 存储的是每个值与最小值的差值
       }
       case GCD_COMPRESSED: {
         RandomAccessInput slice = this.data.randomAccessSlice(entry.offset, entry.endOffset - entry.offset);
@@ -512,7 +512,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
           public long get(long id) {
             return min + mult * quotientReader.get(id);
           }
-        };
+        };  // 1. 求与最小值的差值  // 2. 求最大公约数
       }
       case TABLE_COMPRESSED: {
         RandomAccessInput slice = this.data.randomAccessSlice(entry.offset, entry.endOffset - entry.offset);
@@ -523,7 +523,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
           public long get(long id) {
             return table[(int) ords.get(id)];
           }
-        };
+        };  // 存储一个表格，然后再存每个值在表格中的序号。
       }
       case SPARSE_COMPRESSED:
         final SparseBits docsWithField = getSparseLiveBits(entry);
