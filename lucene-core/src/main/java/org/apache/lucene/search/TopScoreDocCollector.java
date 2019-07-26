@@ -181,7 +181,7 @@ public abstract class TopScoreDocCollector extends TopDocsCollector<ScoreDoc> {
 
   // prevents instantiation
   TopScoreDocCollector(int numHits) {
-    super(new HitQueue(numHits, true));
+    super(new HitQueue(numHits, true)); // 已经预填充了哨兵对象
     // HitQueue implements getSentinelObject to return a ScoreDoc, so we know
     // that at this point top() is already initialized.
     pqTop = pq.top();

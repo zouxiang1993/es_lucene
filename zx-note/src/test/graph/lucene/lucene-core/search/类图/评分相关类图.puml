@@ -21,7 +21,7 @@ note right of Weight
 end note
 
 abstract class Weight{
-    计算查询权重，并构造Scorer
+    <b>Query的内部表示</b>。 计算查询权重，并构造Scorer
     --
     // 解析出Query中所有出现的Term，放入set中
     +{abstract} void extractTerms(Set<Term> terms)

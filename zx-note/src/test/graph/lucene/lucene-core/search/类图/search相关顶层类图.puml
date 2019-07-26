@@ -1,0 +1,66 @@
+@startuml
+
+abstract class Query{
+    // 用户查询的抽象表示
+    --
+    // 重写为简单的Query
+    +Query rewrite(IndexReader reader)
+    +Weight createWeight(IndexSearcher searcher, boolean needsScores)
+}
+
+abstract class Weight{
+    <b>Query的内部表示</b>。 计算查询权重，并构造Scorer
+    Weight的主要目的是保证查询过程不会修改Query对象，
+    这样Query实例就可以被重用。
+    <b><font color=red>依赖 IndexSearch 的状态应该放在Weight中
+    <b><font color=red>依赖 LeafReader 的状态应该放在Scorer中
+    --
+    // 创建一个Scorer
+    +{abstract} Scorer scorer(LeafReaderContext context)
+    // 创建一个BulkScorer
+    +BulkScorer bulkScorer(LeafReaderContext context)
+}
+
+abstract class Scorer {
+    --
+    // 返回匹配当前Query的所有文档的迭代器，
+       遍历迭代器的过程中调用score()来打分
+    +{abstract} DocIdSetIterator iterator()
+    // 当前正在打分的文档ID
+    +{abstract} int docID()
+    // 当前文档的得分
+    +{abstract} float score()
+}
+
+abstract class BulkScorer{
+    一次性给一批文档打分
+    --
+    //
+    +void score(LeafCollector collector, Bits acceptDocs)
+    +{abstract} int score(LeafCollector collector, Bits acceptDocs, int min, int max)
+}
+
+interface LeafCollector{
+    <b>将打分过程从文档收集的过程中解耦</b>
+    如果不需要打分，可以直接忽略。
+    如果需要打分，则先需要通过setScorer()方法来持有一个Scorer实例，
+    然后在collect(int)方法中通过调用Scorer.score()方法来为当前文档打分
+    ---
+    +void setScorer(Scorer scorer)
+    +void collect(int doc)
+}
+
+interface Collector{
+    主要用来收集一个查询的原始结果，
+    并进行排序或一些自定义的结果过滤
+    ---
+    // 新建一个LeafCollector, 用来收集指定的context
+    +LeafCollector getLeafCollector(LeafReaderContext context)
+    // 是否需要打分
+    +boolean needsScores()
+}
+
+Query -right-- Weight
+Weight -down-- Scorer
+Weight -down-- BulkScorer
+@enduml

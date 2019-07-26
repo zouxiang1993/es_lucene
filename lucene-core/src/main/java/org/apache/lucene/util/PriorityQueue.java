@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
  *
  * @lucene.internal
  */
-public abstract class PriorityQueue<T> implements Iterable<T> {
+public abstract class PriorityQueue<T> implements Iterable<T> {  // 用小根堆来实现的优先级队列
   private int size = 0;
   private final int maxSize;
   private final T[] heap;
@@ -64,11 +64,11 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
     this.heap = h;
     this.maxSize = maxSize;
 
-    if (prepopulate) {
+    if (prepopulate) { // 用哨兵对象预填充
       // If sentinel objects are supported, populate the queue with them
       T sentinel = getSentinelObject();
       if (sentinel != null) {
-        heap[1] = sentinel;
+        heap[1] = sentinel; // 只是为了少new一个对象吗?
         for (int i = 2; i < heap.length; i++) {
           heap[i] = getSentinelObject();
         }

@@ -357,7 +357,7 @@ public final class Lucene50PostingsFormat extends PostingsFormat {
    * Filename extension for document number, frequencies, and skip data.
    * See chapter: <a href="#Frequencies">Frequencies and Skip Data</a>
    */
-  public static final String DOC_EXTENSION = "doc";
+  public static final String DOC_EXTENSION = "doc";  // 倒排表 和 词频
 
   /**
    * Filename extension for positions. 
@@ -439,7 +439,7 @@ public final class Lucene50PostingsFormat extends PostingsFormat {
 
   @Override
   public FieldsProducer fieldsProducer(SegmentReadState state) throws IOException {
-    PostingsReaderBase postingsReader = new Lucene50PostingsReader(state);
+    PostingsReaderBase postingsReader = new Lucene50PostingsReader(state);  // 用来读取倒排表
     boolean success = false;
     try {
       FieldsProducer ret = new BlockTreeTermsReader(postingsReader, state);

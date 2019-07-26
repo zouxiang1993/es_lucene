@@ -1,61 +1,44 @@
 @startuml
 participant LeafCollector
 participant Collector
-participant CollectorManager
 participant IndexSearcher
 participant Query
 participant Weight
-participant Similarity
+participant Scorer
 participant BulkScorer
 
 autonumber
 --> IndexSearcher : search(Query query, int n)
 activate IndexSearcher
-    create CollectorManager
-    IndexSearcher --> CollectorManager : new
-    IndexSearcher --> IndexSearcher : search(Query, CollectorManager)
     activate IndexSearcher
-        IndexSearcher --> CollectorManager :newCollector()
-        activate CollectorManager
-            create Collector
-            CollectorManager --> Collector : new
-        deactivate CollectorManager
-        IndexSearcher --> IndexSearcher : search(Query, Collector)
-        activate IndexSearcher
-            == 创建Weight ==
-            IndexSearcher --> IndexSearcher : createNormalizedWeight(\nQuery, boolean needsScore)
-            activate IndexSearcher
-                IndexSearcher --> IndexSearcher : rewrite(Query)
-                IndexSearcher --> IndexSearcher : createWeight(..)
-                activate IndexSearcher
-                    IndexSearcher --> Query : createWeight()
-                    activate Query
-                        create Weight
-                        Query --> Weight : new
-                    deactivate Query
-                deactivate IndexSearcher
-                IndexSearcher --> Weight : getValueForNormalization
-                IndexSearcher --> Similarity : queryNorm
-                IndexSearcher --> Weight : normalize
-            deactivate IndexSearcher
-            == 创建Weight结束==
-            IndexSearcher --> IndexSearcher : search(List<LeafReaderContext>\n, Weight, Collector)
-            activate IndexSearcher
-                IndexSearcher --> Collector : getLeafCollector
-                activate Collector
-                    create LeafCollector
-                    Collector --> LeafCollector : new
-                deactivate Collector
-                IndexSearcher --> Weight : bulkScorer
-                activate Weight
-                    create BulkScorer
-                    Weight --> BulkScorer : new
-                deactivate Weight
-                IndexSearcher --> BulkScorer : score(LeafCollector, Bits acceptDocs)
-                activate BulkScorer
-                deactivate BulkScorer
-            deactivate IndexSearcher
-        deactivate IndexSearcher
+        create Collector
+        IndexSearcher --> Collector : new
+        IndexSearcher --> Query : rewrite()
+        IndexSearcher --> Query : createWeight()
+        create Weight
+        Query --> Weight : new
+        ==遍历每一个segment==
+        IndexSearcher --> Collector : getLeafCollector
+        activate Collector
+            create LeafCollector
+            Collector --> LeafCollector : new
+        deactivate Collector
+        IndexSearcher --> Weight : bulkScorer
+        activate Weight
+            Weight --> Weight : scorer()
+            activate Weight
+                create Scorer
+                Weight --> Scorer : new
+            deactivate Weight
+            create BulkScorer
+            Weight --> BulkScorer : new
+        deactivate Weight
+        IndexSearcher --> BulkScorer : score(LeafCollector, Bits acceptDocs)
+        ==遍历每一个文档==
+        BulkScorer --> LeafCollector : collect()
+        LeafCollector --> Scorer : score()
+        activate BulkScorer
+        deactivate BulkScorer
     deactivate IndexSearcher
 deactivate IndexSearcher
 
