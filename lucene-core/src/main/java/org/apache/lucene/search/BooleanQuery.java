@@ -158,7 +158,7 @@ public class BooleanQuery extends Query implements Iterable<BooleanClause> {
     this.clauses = Collections.unmodifiableList(Arrays.asList(clauses));
     clauseSets = new EnumMap<>(Occur.class);
     // duplicates matter for SHOULD and MUST
-    clauseSets.put(Occur.SHOULD, new Multiset<>());
+    clauseSets.put(Occur.SHOULD, new Multiset<>());   // 重复的子句会影响SHOULD和MUST的得分，但是对FILTER和MUST_NOT没有影响
     clauseSets.put(Occur.MUST, new Multiset<>());
     // but not for FILTER and MUST_NOT
     clauseSets.put(Occur.FILTER, new HashSet<>());
@@ -254,8 +254,8 @@ public class BooleanQuery extends Query implements Iterable<BooleanClause> {
       }
     }
 
-    // recursively rewrite
-    {
+    // recursively rewrite   递归rewrite每一个子句
+    { // 括号--能更早的回收builder对象
       Builder builder = new Builder();
       builder.setDisableCoord(isCoordDisabled());
       builder.setMinimumNumberShouldMatch(getMinimumNumberShouldMatch());

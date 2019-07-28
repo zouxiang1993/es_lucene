@@ -4,7 +4,7 @@ Collector相关
     CollectorManager - MultiCollectorManager
 
 Rescorer
-    Rescorer, SortRescorer
+    Rescorer, SortRescorer QueryRescorer
 
 Rewrite:
     DocValuesRewriteMethod
@@ -17,36 +17,29 @@ Weight相关
 
 Query相关
     Query
-    TermQuery
+    TermQuery / TermInSetQuery / SynonymQuery
+    PointRangeQuery / PointInSetQuery /
+    BooleanQuery
+    MatchAllDocsQuery / MatchNoDocsQuery
+
     AutomatonQuery
     BlendedTermQuery
-    BooleanQuery
     BoostQuery
     ConstantScoreQuery
     DisjunctionMaxQuery
     FieldValueQuery
     FuzzyQuery
     IndexOrDocValuesQuery
-    LRUQueryCache
     LegacyNumericRangeQuery
-    MatchAllDocsQuery
-    MatchNoDocsQuery
     MultiPhraseQuery
     MultiTermQuery
     MultiTermQueryConstantScoreWrapper
-    NGramPhraseQuery
-    PhraseQuery
-    PointInSetQuery
-    PointRangeQuery
+    PhraseQuery / NGramPhraseQuery
     PrefixQuery
-    QueryCache
-    QueryCachingPolicy
-    QueryRescorer
+    QueryCache / LRUQueryCache
+    QueryCachingPolicy / UsageTrackingQueryCachingPolicy
     RegexpQuery
-    SynonymQuery
-    TermInSetQuery
     TermRangeQuery
-    UsageTrackingQueryCachingPolicy
     WildcardQuery
 
 Scorer相关
