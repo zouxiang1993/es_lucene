@@ -15,15 +15,17 @@ abstract class Weight{
     <b><font color=red>依赖 IndexSearch 的状态应该放在Weight中
     <b><font color=red>依赖 LeafReader 的状态应该放在Scorer中
     --
-    // 创建一个Scorer
+    // 创建一个Scorer  <b>Weight负责生成匹配Query的DISI,并传递给Scorer
+    // <b> 每个Weight的Scorer方法都很重要
     +{abstract} Scorer scorer(LeafReaderContext context)
     // 创建一个BulkScorer
     +BulkScorer bulkScorer(LeafReaderContext context)
 }
 
 abstract class Scorer {
+    负责计算得分
     --
-    // 返回匹配当前Query的所有文档的迭代器，
+    // 返回**匹配当前Query的所有文档的迭代器**，
        遍历迭代器的过程中调用score()来打分
     +{abstract} DocIdSetIterator iterator()
     // 当前正在打分的文档ID

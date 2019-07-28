@@ -65,10 +65,10 @@ public class Lucene60PointsReader extends PointsReader implements Closeable {
                                    Lucene60PointsFormat.INDEX_VERSION_START,
                                    readState.segmentInfo.getId(),
                                    readState.segmentSuffix);
-        int count = indexIn.readVInt();
+        int count = indexIn.readVInt();  // field总数
         for(int i=0;i<count;i++) {
-          int fieldNumber = indexIn.readVInt();
-          long fp = indexIn.readVLong();
+          int fieldNumber = indexIn.readVInt();  // field编号
+          long fp = indexIn.readVLong();  // 该field在.dim文件中的起始位置
           fieldToFileOffset.put(fieldNumber, fp);
         }
       } catch (Throwable t) {
@@ -102,7 +102,7 @@ public class Lucene60PointsReader extends PointsReader implements Closeable {
         int fieldNumber = ent.getKey();
         long fp = ent.getValue();
         dataIn.seek(fp);
-        BKDReader reader = new BKDReader(dataIn);
+        BKDReader reader = new BKDReader(dataIn); // 为每一个field构建一个BKDReader
         readers.put(fieldNumber, reader);
       }
 

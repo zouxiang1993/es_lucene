@@ -60,7 +60,7 @@ public final class BKDReader implements Accountable {
   /** Caller must pre-seek the provided {@link IndexInput} to the index location that {@link BKDWriter#finish} returned */
   public BKDReader(IndexInput in) throws IOException {
     version = CodecUtil.checkHeader(in, BKDWriter.CODEC_NAME, BKDWriter.VERSION_START, BKDWriter.VERSION_CURRENT);
-    numDims = in.readVInt();
+    numDims = in.readVInt(); // 维数
     maxPointsInLeafNode = in.readVInt();
     bytesPerDim = in.readVInt();
     bytesPerIndexEntry = numDims == 1 && version >= BKDWriter.VERSION_IMPLICIT_SPLIT_DIM_1D ? bytesPerDim : bytesPerDim + 1;

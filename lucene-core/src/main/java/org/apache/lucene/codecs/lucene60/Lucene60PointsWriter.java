@@ -50,7 +50,7 @@ public class Lucene60PointsWriter extends PointsWriter implements Closeable {
   protected final Map<String,Long> indexFPs = new HashMap<>();
 
   final SegmentWriteState writeState;
-  final int maxPointsInLeafNode;
+  final int maxPointsInLeafNode;  // 每个叶子节点中的最大point数目
   final double maxMBSortInHeap;
   private boolean finished;
 

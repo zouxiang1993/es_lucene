@@ -17,6 +17,7 @@ Weight相关
 
 Query相关
     Query
+    TermQuery
     AutomatonQuery
     BlendedTermQuery
     BooleanQuery
@@ -44,7 +45,6 @@ Query相关
     RegexpQuery
     SynonymQuery
     TermInSetQuery
-    TermQuery
     TermRangeQuery
     UsageTrackingQueryCachingPolicy
     WildcardQuery
