@@ -2,14 +2,12 @@ package lucene.lucene_core.search;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.junit.Test;
@@ -17,10 +15,13 @@ import org.junit.Test;
 import java.io.IOException;
 
 /**
- * Lucene是利用point value 来进行数值范围查询的
+ * Lucene是利用doc values来进行字段排序的
  */
-public class PointRangeQueryTest {
-
+public class SortTest {
+    /**
+     * @see TopFieldCollector
+     * @see FieldComparator
+     */
     @Test
     public void test1() throws IOException {
         Directory directory = new RAMDirectory();
@@ -31,15 +32,19 @@ public class PointRangeQueryTest {
         indexWriter.addDocument(createDocument(10));
         IndexReader reader = DirectoryReader.open(indexWriter);
         IndexSearcher searcher = new IndexSearcher(reader);
-
-        Query query = IntPoint.newRangeQuery("age", 4, 8);
-        TopDocs topDocs = searcher.search(query, 5);
-        System.out.println("结果总数: " + topDocs.totalHits);
+        Sort sort = new Sort();
+        sort.setSort(new SortField("age", SortField.Type.INT, true));
+        TopFieldDocs topFieldDocs = searcher.search(new MatchAllDocsQuery(), 5, sort);
+        System.out.println("总数: " + topFieldDocs.totalHits);
+        for (ScoreDoc scoreDoc : topFieldDocs.scoreDocs) {
+            FieldDoc fieldDoc = (FieldDoc) scoreDoc;
+            System.out.println("文档ID: " + fieldDoc.doc + ", 字段值= " + fieldDoc.fields[0]);
+        }
     }
 
     private Document createDocument(int age) {
         Document document = new Document();
-        Field field = new IntPoint("age", age);
+        Field field = new NumericDocValuesField("age", age);
         document.add(field);
         return document;
     }

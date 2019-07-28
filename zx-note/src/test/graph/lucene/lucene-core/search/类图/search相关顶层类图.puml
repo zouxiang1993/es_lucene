@@ -44,6 +44,7 @@ abstract class BulkScorer{
 
 interface LeafCollector{
     <b>将打分过程从文档收集的过程中解耦</b>
+    <b><font color=red>也负责排序</b>
     如果不需要打分，可以直接忽略。
     如果需要打分，则先需要通过setScorer()方法来持有一个Scorer实例，
     然后在collect(int)方法中通过调用Scorer.score()方法来为当前文档打分
@@ -53,8 +54,7 @@ interface LeafCollector{
 }
 
 interface Collector{
-    主要用来收集一个查询的原始结果，
-    并进行排序或一些自定义的结果过滤
+    主要用来收集一个查询的原始结果
     ---
     // 新建一个LeafCollector, 用来收集指定的context
     +LeafCollector getLeafCollector(LeafReaderContext context)
