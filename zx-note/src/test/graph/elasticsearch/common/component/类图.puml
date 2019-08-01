@@ -1,0 +1,49 @@
+@startuml
+abstract class AbstractComponent{
+    // 提供获取Logger和Settings的功能
+    ---
+    #Logger logger;
+    #DeprecationLogger deprecationLogger;
+    #Settings settings;
+    ---
+    +String nodeName()
+}
+
+interface LifecycleComponent{
+    // 具有生命周期的容器
+    ---
+    // 当前处在生命周期的哪一种状态
+    +Lifecycle.State lifecycleState()
+    // 启动
+    +void start()
+    // 停止
+    +void stop()
+}
+
+abstract class AbstractLifecycleComponent extends AbstractComponent implements LifecycleComponent{
+    ---
+    #Lifecycle lifecycle
+    #{abstract} void doStart()
+    #{abstract} void doStop()
+    #{abstract} void doClose()
+}
+
+class Lifecycle{
+    +State state()
+    +boolean stoppedOrClosed()
+    +boolean canMoveToStarted()
+    +boolean moveToStarted()
+    +boolean canMoveToStopped()
+    +boolean moveToStopped()
+}
+
+enum Lifecycle.State{
+    INITIALIZED, // 初始化完毕
+    STARTED,     // 已启动
+    STOPPED,     // 停止(还可以再次启动)
+    CLOSED       // 关闭(彻底销毁，无法再次启动)
+}
+
+Lifecycle *-down-- Lifecycle.State
+AbstractLifecycleComponent *-right-- Lifecycle
+@enduml

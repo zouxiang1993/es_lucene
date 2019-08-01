@@ -1,0 +1,28 @@
+@startuml
+package java.util.concurrent{
+    class ExecutorService
+    interface RejectedExecutionHandler{
+        +void rejectedExecution(Runnable r, ThreadPoolExecutor executor)
+    }
+    class ThreadPoolExecutor
+    interface BlockingQueue
+}
+
+package org.elasticsearch.common.util.concurrent{
+    interface XRejectedExecutionHandler extends RejectedExecutionHandler{
+        +long rejected(); // 被拒绝的任务总数
+    }
+    class EsAbortPolicy implements XRejectedExecutionHandler
+    class EsExecutors{
+        // 构造Executor的工厂和工具方法
+    }
+    class EsThreadPoolExecutor extends ThreadPoolExecutor
+    class PrioritizedEsThreadPoolExecutor extends EsThreadPoolExecutor
+    class SizeBlockingQueue<E> implements BlockingQueue{
+        // 包装另一个BlockingQueue，并为其提供size检查的功能。
+        // 由于没有任何的同步措施，这里的size检查是比较宽松的。
+    }
+    class ThreadContext
+}
+
+@enduml

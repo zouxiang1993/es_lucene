@@ -2,18 +2,22 @@
 
 set namespaceSeparator ::
 
+note as N1
+    泛型参数：
+    命令类型: Action
+    请求参数: Request extends ActionRequest
+    响应: Response extends ActionResponse
+    请求构造器: RequestBuilder extends ActionRequestBuilder<Request, Response, RequestBuilder>
+end note
+
 interface ElasticsearchClient{
-    // 泛型参数：
-    // Request extends ActionRequest
-    // Response extends ActionResponse
-    // RequestBuilder extends ActionRequestBuilder<Request, Response, RequestBuilder>
+    用来执行命令(Action)的Client
     ---
-    // action：命令种类   request: 请求参数
-    +ActionFuture<Response> execute(Action<Request, Response, RequestBuilder> action, Request request)
+    +ActionFuture<Response> execute(Action action, Request request)
     // 同上，listener是收到结果后的回调函数
-    +void execute(Action<Request, Response, RequestBuilder> action, Request request, ActionListener<Response> listener)
+    +void execute(Action action, Request request, ActionListener<Response> listener)
     // 初始化一个RequestBuilder, 用来构造Request
-    +RequestBuilder prepareExecute(Action<Request, Response, RequestBuilder> action)
+    +RequestBuilder prepareExecute(Action action)
     // 返回该client用于执行请求的线程池
     ThreadPool threadPool()
 }
@@ -25,64 +29,48 @@ interface Client extends ElasticsearchClient{
     +AdminClient admin()
     +Settings settings()
     // 所有操作都是异步的，有两种形式
-    // 1. 返回ActionFuture  2. 回调 Listener
-    index
-    update
-    delete
-    bulk
-    get
-    multiGet
-    search
-    searchScroll
-    clearScroll
-    multiSearch
+    // <font color="red">1. 返回ActionFuture  2. 传入一个Listener 回调
+    index / update / delete / bulk
+    get / multiGet
+    search / multiSearch
+    searchScroll / clearScroll
     termVectors
     explain
     fieldCaps
 }
 
 abstract class AbstractClient implements Client{
+    #{abstract} void doExecute(Action action, Request request, ActionListener listener);
 }
 
 interface ClusterAdminClient extends ElasticsearchClient{
-    对集群操作
+    对集群的操作
     ---
-    health
-    state
+    health / state
     updateSettings
     reroute
-    nodesInfo
-    clusterStats
-    listTasks
-    getTask
-    cancelTasks
+    nodesInfo / clusterStats
+    listTasks / getTask / cancelTasks
 }
 
 class AbstractClient.ClusterAdmin implements ClusterAdminClient{
 }
 
 interface IndicesAdminClient extends ElasticsearchClient{
-    对索引操作
+    对索引的操作
     ---
-    exists
-    typesExists
+    exists / typesExists
     stats
     recoveries
     segments
     shardStores
-    create
-    delete
-    close
-    open
+    create / delete / open / close
     refresh
-    flush
-    syncedFlush
+    flush / syncedFlush
     forceMerge
     upgrade
-    getMappings
-    putMapping
-    aliases
-    getAliases
+    getMappings / putMapping
+    aliases / getAliases
     clearCache
     updateSettings
     analyze
@@ -97,6 +85,11 @@ abstract class TransportClient extends AbstractClient{
 class NodeClient extends AbstractClient{
     // 在本地Node执行Action
     ---
+    // 两类Action之间的映射关系
+    -Map<GenericAction, TransportAction> actions
+    ---
+    // 完成从GenericAction到TransportAction之间的转换
+    -TransportAction transportAction(GenericAction action)
 }
 
 interface AdminClient{
@@ -104,5 +97,5 @@ interface AdminClient{
     +IndicesAdminClient indices()
 }
 
-Client -left-- AdminClient
+AbstractClient -left-- AdminClient
 @enduml
