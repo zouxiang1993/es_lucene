@@ -9,8 +9,10 @@ class NetworkModule{
 }
 
 interface Transport{
-    负责内部节点的RPC请求
+    管理内部节点之间的连接, 负责内部节点的RPC请求
     ---
+    // 绑定到了哪些地址
+    +BoundTransportAddress boundAddress()
     // 节点是否已经连接
     +boolean nodeConnected(DiscoveryNode node)
     // 连接到给定的节点
@@ -21,6 +23,16 @@ interface Transport{
     +long serverOpen()
     // 获取到一个节点的连接
     +Connection getConnection(DiscoveryNode node)
+    +Connection openConnection(DiscoveryNode node, ConnectionProfile profile)
+}
+
+interface Transport.Connection{
+    // 已经连接的节点列表
+    #ConcurrentMap<DiscoveryNode, NodeChannels> connectedNodes
+    ---
+    +DiscoveryNode getNode()
+    // <font color="red">向连接的节点发送请求
+    +void sendRequest(......)
 }
 
 interface HttpServerTransport{
@@ -29,7 +41,7 @@ interface HttpServerTransport{
 
 abstract class TcpTransport<Channel> implements Transport{
     --
-    // 处理RPC请求,通过Action的名称来获取处理类
+    // <font color="red">处理其他节点发送来的RPC请求
     #String handleRequest(...)
 }
 
@@ -46,5 +58,6 @@ class Netty4HttpServerTransport implements HttpServerTransport{
 
 NetworkModule -- Transport
 NetworkModule -- HttpServerTransport
+Transport.Connection -right- Transport
 
 @enduml

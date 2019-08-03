@@ -124,6 +124,7 @@ public abstract class TcpTransport<Channel> extends AbstractLifecycleComponent i
     // the scheduled internal ping interval setting, defaults to disabled (-1)
     public static final Setting<TimeValue> PING_SCHEDULE =
         timeSetting("transport.ping_schedule", TimeValue.timeValueSeconds(-1), Setting.Property.NodeScope);
+    // 两个节点之间总共13个TCP长连接: 2 recovery + 3 bulk + 6 reg + 1 state + 1 ping
     public static final Setting<Integer> CONNECTIONS_PER_NODE_RECOVERY =
         intSetting("transport.connections_per_node.recovery", 2, 1, Setting.Property.NodeScope);
     public static final Setting<Integer> CONNECTIONS_PER_NODE_BULK =

@@ -41,7 +41,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 路由操作
+ * 将 index / search / get 等操作路由到特定的分片上
  */
 public class OperationRouting extends AbstractComponent {
 

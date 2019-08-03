@@ -1,6 +1,6 @@
 @startuml
 
-note left of ClusterService
+note right of ClusterService
 5.6.4版本中的ClusterService，在后续版本被拆分成<b>MasterService</b>和<b>ClusterApplierService</b>：
 MasterService只有主节点会执行这个类中的方法，即只有主节点会提交集群状态更改的任务。
 主节点和从节点都会应用集群状态，因此都会执行ClusterApplierService中的方法。
@@ -15,17 +15,21 @@ Applier负责将集群状态应用到组件内部，对Applier的调用在集群
 end note
 
 class ClusterService{
+    持有集群状态ClusterState, 并负责ClusterState的更新
     ---
+    -AtomicReference<ClusterState> state // 最新的集群状态
     // 三种优先级的集群状态更改
     -Collection<ClusterStateApplier> highPriorityStateAppliers
     -Collection<ClusterStateApplier> normalPriorityStateAppliers
     -Collection<ClusterStateApplier> lowPriorityStateAppliers
-    -AtomicReference<ClusterState> state // 最新的集群状态
     -PrioritizedEsThreadPoolExecutor threadPoolExecutor // 执行任务的线程池
     -NodeConnectionsService nodeConnectionsService
     -OperationRouting operationRouting
     // 发布集群任务的模块
     - BiConsumer<ClusterChangedEvent, Discovery.AckListener> clusterStatePublisher
+    ---
+    // 返回当前的集群状态
+    +ClusterState state()
     ---
     以下方法在后续版本被拆分到MasterService中,负责管理和运行集群任务：
     // 待执行的任务数量
@@ -40,8 +44,6 @@ class ClusterService{
     +void addStateApplier(ClusterStateApplier applier)
     // 添加一个集群状态监听器
     +void addListener(ClusterStateListener listener)
-    // 返回当前的集群状态
-    +ClusterState state()
     // 各个模块调用这个方法提交一个集群状态更新的任务
     + .. submitStateUpdateTask(..)
 }

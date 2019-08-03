@@ -27,7 +27,7 @@ class ZenPing.PingResponse{
     // ping的目标节点
     -DiscoveryNode node;
 
-    // 目标节点认为master是谁
+    // 目标节点认为master是谁 (投票)
     -DiscoveryNode master;
 
     -long clusterStateVersion;
