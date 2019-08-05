@@ -19,11 +19,12 @@ class IndexShardRoutingTable{
     -boolean allShardsStarted
 }
 class ShardRouting{
-    // 单个Shard的路由信息
+    // 单个副本的路由信息
     ---
     -ShardId shardId
     -String currentNodeId
     -String relocatingNodeId
+    // 是否是主分片
     -boolean primary
     // 在不同的状态持有不同的字段
     -ShardRoutingState state

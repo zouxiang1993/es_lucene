@@ -1,0 +1,51 @@
+@startuml
+
+interface CheckedRunnable<E extends Exception>{
+    +void run() throws E
+}
+
+abstract class SearchPhase implements CheckedRunnable{
+    -String name
+    ---
+    +String getName()
+}
+
+class FetchSearchPhase extends SearchPhase{
+    此阶段将前一阶段的查询结果合并到一起，并计算topN的结果，
+    然后到所有相关的shard上去取回topN hits
+}
+
+abstract class InitialSearchPhase extends SearchPhase{
+    ---
+    // 在一个shard上执行
+    #{abstract} void executePhaseOnShard(SearchShardIterator shardIt, ShardRouting shard, SearchActionListener listener)
+    // 当一个shard上执行成功时调用
+    #{abstract} void onShardSuccess(FirstResult result)
+    // 当所有任务成功时调用
+    #{abstract} void onPhaseDone()
+}
+
+abstract class AbstractSearchAsyncAction extends InitialSearchPhase implements SearchPhaseContext
+
+class ExpandSearchPhase extends SearchPhase{
+    此阶段只在查询中有field collapse时才会执行
+    ---
+}
+
+class DfsQueryPhase extends SearchPhase{
+}
+
+interface SearchPhaseContext{
+    ---
+    // 当前查询的总shard数
+    +int getNumShards()
+    +SearchTask getTask()
+    +SearchRequest getRequest()
+    +SearchResponse buildSearchResponse(..)
+    +void onPhaseFailure(..)
+    +void onShardFailure(..)
+    +ShardSearchTransportRequest buildShardSearchRequest(..)
+    +void executeNextPhase(SearchPhase currentPhase, SearchPhase nextPhase)
+}
+
+@enduml

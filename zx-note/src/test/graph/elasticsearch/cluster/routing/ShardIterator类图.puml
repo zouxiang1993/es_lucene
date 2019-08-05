@@ -1,0 +1,29 @@
+@startuml
+
+interface ShardsIterator{
+    用来迭代一些分片副本(ShardRouting)
+    ---
+    ShardRouting nextOrNull()
+}
+
+interface ShardIterator extends ShardsIterator{
+    用来迭代一组具有相同shard id的分片副本
+    （即同一个分片的一组副本）
+    ---
+    // 关联的shardId
+    +ShardId shardId()
+}
+
+class PlainShardsIterator implements ShardsIterator{
+}
+
+class PlainShardIterator extends PlainShardsIterator implements ShardIterator{
+}
+
+class GroupShardsIterator{
+    用来迭代一组ShardIterator
+}
+
+GroupShardsIterator "1" *-- "n" ShardIterator
+
+@enduml

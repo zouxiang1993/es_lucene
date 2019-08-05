@@ -184,11 +184,11 @@ public class TransportSearchAction extends HandledTransportAction<SearchRequest,
         final Map<String, OriginalIndices> remoteClusterIndices = remoteClusterService.groupIndices(searchRequest.indicesOptions(),
             searchRequest.indices(), idx -> indexNameExpressionResolver.hasIndexOrAlias(idx, clusterState));
         OriginalIndices localIndices = remoteClusterIndices.remove(RemoteClusterAware.LOCAL_CLUSTER_GROUP_KEY);
-        if (remoteClusterIndices.isEmpty()) {
+        if (remoteClusterIndices.isEmpty()) { // 只需要在本地节点执行
             executeSearch((SearchTask)task, timeProvider, searchRequest, localIndices, remoteClusterIndices, Collections.emptyList(),
                 (clusterName, nodeId) -> null, clusterState, Collections.emptyMap(), listener, clusterState.getNodes()
                     .getDataNodes().size());
-        } else {
+        } else {  // 还需要集群中的其他节点执行
             remoteClusterService.collectSearchShards(searchRequest.indicesOptions(), searchRequest.preference(), searchRequest.routing(),
                 remoteClusterIndices, ActionListener.wrap((searchShardsResponses) -> {
                     List<SearchShardIterator> remoteShardIterators = new ArrayList<>();

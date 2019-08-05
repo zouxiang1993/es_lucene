@@ -2,12 +2,38 @@
 abstract class TransportAction<ActionRequest, ActionResponse>{
     #ThreadPool threadPool
     #String actionName
-    #ActionFilter[] filters
+    #ActionFilter[] filters // 链式的过滤器
+    #TaskManager taskManager
     --
     +Task execute(Request request, ActionListener<Response> listener)
     #{abstract} void doExecute(Request request, ActionListener<Response> listener)
 }
 
+abstract class HandledTransportAction extends TransportAction{
+    将自身作为一个handler注册到TransportService中
+}
+
+abstract class TransportMasterNodeAction extends HandledTransportAction{
+    需要在master节点上执行的操作
+    --
+    // 执行器的名称
+    #{abstract} String executor()
+    #{abstract} Response newResponse()
+    #{abstract} void masterOperation(Request request, ClusterState state, ActionListener<Response> listener)
+    // 如果本地节点不是master, 能否在本地节点执行, 默认为false
+    #boolean localExecute(Request request)
+    #{abstract} ClusterBlockException checkBlock(Request request, ClusterState state)
+}
+
+abstract class TransportMasterNodeReadAction extends TransportMasterNodeAction{
+    需要在master上执行的读操作。如果有需要，也可以在本地节点上执行。
+}
+
+class TransportClusterHealthAction extends TransportMasterNodeReadAction
+
+class TransportSearchAction extends HandledTransportAction{
+
+}
 
 abstract class TransportSingleShardAction<SingleShardRequest, ActionResponse> extends TransportAction{
     在单个shard上执行的读操作。如果在一个副本上执行失败了，可以在另外的副本上执行。
