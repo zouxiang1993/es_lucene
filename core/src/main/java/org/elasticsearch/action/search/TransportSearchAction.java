@@ -135,8 +135,8 @@ public class TransportSearchAction extends HandledTransportAction<SearchRequest,
      */
     static class SearchTimeProvider {
 
-        private final long absoluteStartMillis;
-        private final long relativeStartNanos;
+        private final long absoluteStartMillis;  // System.currentTimeMillis()不够精确
+        private final long relativeStartNanos;   // System.nanoTimes()更加精确，更适合用来计算耗时
         private final LongSupplier relativeCurrentNanosProvider;
 
         /**

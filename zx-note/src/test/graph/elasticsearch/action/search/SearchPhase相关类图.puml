@@ -16,6 +16,9 @@ class FetchSearchPhase extends SearchPhase{
 }
 
 abstract class InitialSearchPhase extends SearchPhase{
+    封装了将请求分发到每个shard上并收集结果的逻辑。
+    如果在某个shard上执行失败，则会将请求重新发送到它的其他副本，
+    直到这个shard的所有副本都耗尽
     ---
     // 在一个shard上执行
     #{abstract} void executePhaseOnShard(SearchShardIterator shardIt, ShardRouting shard, SearchActionListener listener)
@@ -25,7 +28,25 @@ abstract class InitialSearchPhase extends SearchPhase{
     #{abstract} void onPhaseDone()
 }
 
-abstract class AbstractSearchAsyncAction extends InitialSearchPhase implements SearchPhaseContext
+abstract class AbstractSearchAsyncAction extends InitialSearchPhase implements SearchPhaseContext{
+    ---
+    // phase执行完毕后，调用getNextPhase获取下一个phase来执行。
+    +{final} void onPhaseDone()
+    // 返回下一个要执行的Phase
+    #{abstract} SearchPhase getNextPhase(..)
+}
+
+class SearchQueryThenFetchAsyncAction extends AbstractSearchAsyncAction{
+    ---
+    // nextPhase是一个FetchSearchPhase
+    #SearchPhase getNextPhase(..)
+}
+
+class SearchDfsQueryThenFetchAsyncAction extends AbstractSearchAsyncAction{
+}
+
+class CanMatchPreFilterSearchPhase extends AbstractSearchAsyncAction{
+}
 
 class ExpandSearchPhase extends SearchPhase{
     此阶段只在查询中有field collapse时才会执行
@@ -45,6 +66,7 @@ interface SearchPhaseContext{
     +void onPhaseFailure(..)
     +void onShardFailure(..)
     +ShardSearchTransportRequest buildShardSearchRequest(..)
+    // 执行下一个phase
     +void executeNextPhase(SearchPhase currentPhase, SearchPhase nextPhase)
 }
 

@@ -117,7 +117,7 @@ abstract class InitialSearchPhase<FirstResult extends SearchPhaseResult> extends
                             lastShard),
                     e);
             if (!lastShard) {
-                performPhaseOnShard(shardIndex, shardIt, nextShard);
+                performPhaseOnShard(shardIndex, shardIt, nextShard);  // 在其他副本上重试
             } else {
                 maybeExecuteNext(); // move to the next execution if needed
                 // no more shards active, add a failure
@@ -157,7 +157,7 @@ abstract class InitialSearchPhase<FirstResult extends SearchPhaseResult> extends
 
     private void maybeExecuteNext() {
         final int index = shardExecutionIndex.getAndIncrement();
-        if (index < shardsIts.size()) {
+        if (index < shardsIts.size()) { // 在限制了并发数时才可能会执行
             final SearchShardIterator shardRoutings = shardsIts.get(index);
             performPhaseOnShard(index, shardRoutings, shardRoutings.nextOrNull());
         }

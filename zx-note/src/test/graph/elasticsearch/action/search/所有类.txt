@@ -1,0 +1,37 @@
+查询阶段:
+    SearchPhase / FetchSearchPhase / ExpandSearchPhase / DfsQueryPhase
+    InitialSearchPhase / AbstractSearchAsyncAction / SearchQueryThenFetchAsyncAction / SearchDfsQueryThenFetchAsyncAction / CanMatchPreFilterSearchPhase
+    SearchPhaseContext
+
+
+SearchAction / TransportSearchAction / SearchType / SearchTask
+SearchRequest / SearchResponse / SearchResponseSections / SearchRequestBuilder / SearchActionListener
+
+TODO:
+    CountedCollector
+    SearchPhaseController
+    SearchShardIterator
+    SearchTransportService
+    ShardSearchFailure
+
+MultiSearch相关：
+    MultiSearchAction / TransportMultiSearchAction
+    MultiSearchRequest / MultiSearchResponse / MultiSearchRequestBuilder
+
+Scroll相关：
+    TransportSearchHelper
+    ClearScrollAction
+    ClearScrollController
+    ClearScrollRequestBuilder
+    ClearScrollRequest
+    ClearScrollResponse
+    SearchScrollAction
+    SearchScrollAsyncAction
+    SearchScrollQueryAndFetchAsyncAction
+    SearchScrollQueryThenFetchAsyncAction
+    SearchScrollRequestBuilder
+    SearchScrollRequest
+    TransportClearScrollAction
+    TransportSearchScrollAction
+    ParsedScrollId
+    ScrollIdForNode

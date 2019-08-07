@@ -49,7 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Service that can store task results.
+ * Service that can store task results.   将Task的结果持久化到ES的.task索引中
  */
 public class TaskResultsService extends AbstractComponent {
 

@@ -5,7 +5,10 @@ note left of TransportService
 end note
 
 class TransportService{
+    ---
     // 发送请求，handler中定义了对响应的处理
-    +void sendRequest(DiscoveryNode node,String action,TransportRequest request, TransportResponseHandler<T> handler)
+    + void sendRequest(DiscoveryNode node,String action,TransportRequest request, TransportResponseHandler<T> handler)
+    // 注册一个处理器，处理接收到的RPC请求。
+    + void registerRequestHandler(String action, Supplier<Request> requestFactory, String executor, TransportRequestHandler<Request> handler)
 }
 @enduml

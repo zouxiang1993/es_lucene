@@ -44,17 +44,17 @@ abstract class CancellableTask extends Task {
     #void onCancelled()
 }
 
-class LoggingTaskListener
+class TaskManager{
+    - Map<Long, Task> tasks
+    - Map<Long, Task> cancellableTasks
+    --
+    // 将一个request注册成一个Task
+    +Task register(String type, String action, TaskAwareRequest request)
+    // 取消一个Task
+    +boolean cancel(CancellableTask task, String reason, Runnable listener)
+    // 取消一个Task的注册
+    +Task unregister(Task task)
+}
 
-class RawTaskStatus
-
-interface TaskAwareRequest
-
-interface TaskListener
-
-class TaskManager
-
-
-
-class TaskResultService
+Task "1" -- "1" TaskInfo
 @enduml

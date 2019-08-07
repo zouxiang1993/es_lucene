@@ -41,6 +41,7 @@ public abstract class ActionRequest extends TransportRequest {
 
     /**
      * Should this task store its result after it has finished?
+     * 任务完成之后，是否将它的结果写入到 .task 索引中
      */
     public boolean getShouldStoreResult() {
         return false;

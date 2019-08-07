@@ -126,7 +126,7 @@ public class TransportService extends AbstractLifecycleComponent {
 
     /** if set will call requests sent to this id to shortcut and executed locally */
     volatile DiscoveryNode localNode = null;
-    private final Transport.Connection localNodeConnection = new Transport.Connection() {
+    private final Transport.Connection localNodeConnection = new Transport.Connection() {  // 本地节点的连接，直接向本地节点发送请求
         @Override
         public DiscoveryNode getNode() {
             return localNode;
