@@ -1,0 +1,18 @@
+@startuml
+abstract class SearchContext {
+    封装了执行search时所需的状态，它持有shard在某个时间点的快照，
+    允许从一个query/ phase 向另一个传递状态
+    ---
+    -InnerHitsContext innerHitsContext
+    ---
+    // 应该在其他参数都设置完毕之后、主查询执行之前调用
+    +{abstract} void preProcess(boolean rewrite)
+    // 自动将所有必须的filters应用到query上
+    +{abstract} Query buildFilteredQuery(Query query)
+}
+
+class DefaultSearchContext extends SearchContext{
+
+}
+
+@enduml

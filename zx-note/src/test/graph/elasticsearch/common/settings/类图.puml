@@ -1,0 +1,60 @@
+@startuml
+
+class SettingsModule{
+
+}
+
+class Settings {
+    // 不可变的Setting集合
+    ---
+    -Map<String, String> settings
+}
+
+class Setting<T> {
+    - Key key
+    // 默认值的Supplier
+    -Function<Settings, String> defaultValue
+    -Setting<T> fallbackSetting
+    // 解析函数，将一个字符串解析成配置
+    -Function<String, T> parser
+    // 属性集
+    -EnumSet<Property> properties
+}
+
+enum Setting.Property{
+    ---
+    // 在某些API中需要被过滤掉(安全相关)
+    Filtered,
+    // 是否被多个模块共享。例如，可以被定义多次 ???
+    Shared,
+    // 是否支持动态更新
+    Dynamic,
+    // 是否已经不能再被修改
+    Final,
+    // 是否已经弃用
+    Deprecated,
+    // 节点层面的配置
+    NodeScope,
+    // 索引层面的配置
+    IndexScope
+}
+
+class SettingsFilter{
+}
+
+abstract class AbstractScopedSettings{
+}
+
+class ClusterSettings extends AbstractScopedSettings{
+}
+
+class IndexScopedSettings extends AbstractScopedSettings{
+}
+
+SettingsModule *-up- ClusterSettings
+SettingsModule *-up- IndexScopedSettings
+SettingsModule *-down- Settings
+SettingsModule *-down- SettingsFilter
+Settings *-- Setting
+Setting "1" *-- "0..n" Setting.Property
+@enduml
