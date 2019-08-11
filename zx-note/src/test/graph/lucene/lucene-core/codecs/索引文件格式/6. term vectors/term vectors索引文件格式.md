@@ -1,3 +1,5 @@
+## 用途： 高亮、 文档之间的相似度
+
 参考资料：  
 http://lucene.apache.org/core/6_6_1/core/org/apache/lucene/codecs/lucene50/Lucene50TermVectorsFormat.html
 

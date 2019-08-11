@@ -1,3 +1,5 @@
+## 用途：范围查询 PointRangeQuery
+
 k-d tree 参考资料:   
 https://en.wikipedia.org/wiki/K-d_tree  
 https://blog.sengxian.com/algorithms/k-dimensional-tree   

@@ -9,6 +9,7 @@ ES官方文档中文翻译： http://cwiki.apachecn.org/pages/viewpage.action?pa
 Kibana用户指南： https://www.elastic.co/guide/en/kibana/current/index.html 
 
 #### 博客
+Lucene相关：https://www.amazingkoala.com.cn/Lucene/list_9_3.html  
 Michael McCandless: http://blog.mikemccandless.com/  
 刘超觉先： http://www.cnblogs.com/forfuture1978/   
 Lucene & Solr 博客： https://blog.csdn.net/zteny?t=1  
