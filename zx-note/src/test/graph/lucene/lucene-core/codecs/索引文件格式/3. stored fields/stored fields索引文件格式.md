@@ -16,7 +16,7 @@ stored fields 总共分两个文件存储。
 - DocBase : 第一个文档的doc ID 
 - ChunkDocs : chuck中的doc总数 
 - DocFieldCounts : 每一个doc的field数目
-- DocLengths : 解压后每一个doc的byte[]长度，用于快速定位到一个doc
+- DocLengths : 压缩后每一个doc的byte[]长度，用于快速定位到一个doc
 - CompressedDocs --> 多个文档Docs**压缩**后的形式
 - Docs --> Doc^ChunkDocs
 - Doc --> <FieldNumAndType, Value>^DocFieldCount
