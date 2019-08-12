@@ -995,7 +995,7 @@ final class SegmentTermsEnum extends TermsEnum {
     //if (DEBUG) {
     //System.out.println("BTTR.docs seg=" + segment);
     //}
-    currentFrame.decodeMetaData();
+    currentFrame.decodeMetaData(); // decode出指向.doc / .pos / .pay文件的指针
     //if (DEBUG) {
     //System.out.println("  state=" + currentFrame.state);
     //}

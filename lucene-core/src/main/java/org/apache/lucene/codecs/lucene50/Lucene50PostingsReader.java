@@ -354,11 +354,11 @@ public final class Lucene50PostingsReader extends PostingsReaderBase {
       assert left > 0;
 
       if (left >= BLOCK_SIZE) {
-        forUtil.readBlock(docIn, encoded, docDeltaBuffer);
+        forUtil.readBlock(docIn, encoded, docDeltaBuffer);   // docID 差值
 
         if (indexHasFreq) {
           if (needsFreq) {
-            forUtil.readBlock(docIn, encoded, freqBuffer);
+            forUtil.readBlock(docIn, encoded, freqBuffer); // 词频
           } else {
             forUtil.skipBlock(docIn); // skip over freqs
           }
@@ -378,7 +378,7 @@ public final class Lucene50PostingsReader extends PostingsReaderBase {
       if (docUpto == docFreq) {
         return doc = NO_MORE_DOCS;
       }
-      if (docBufferUpto == BLOCK_SIZE) {
+      if (docBufferUpto == BLOCK_SIZE) { // 已经消耗完一个block，读入下一个block进行填充
         refillDocs();
       }
 
