@@ -116,7 +116,7 @@ public final class CompressingTermVectorsReader extends TermVectorsReader implem
     long maxPointer = -1;
     
     // Load the index into memory
-    final String indexName = IndexFileNames.segmentFileName(segment, segmentSuffix, VECTORS_INDEX_EXTENSION);
+    final String indexName = IndexFileNames.segmentFileName(segment, segmentSuffix, VECTORS_INDEX_EXTENSION);  // 读取.tvx文件，结构与.fdx相同
     try (ChecksumIndexInput input = d.openChecksumInput(indexName, context)) {
       Throwable priorE = null;
       try {
@@ -138,7 +138,7 @@ public final class CompressingTermVectorsReader extends TermVectorsReader implem
 
     try {
       // Open the data file and read metadata
-      final String vectorsStreamFN = IndexFileNames.segmentFileName(segment, segmentSuffix, VECTORS_EXTENSION);
+      final String vectorsStreamFN = IndexFileNames.segmentFileName(segment, segmentSuffix, VECTORS_EXTENSION);  // 读取.tvd文件
       vectorsStream = d.openInput(vectorsStreamFN, context);
       final String codecNameDat = formatName + CODEC_SFX_DAT;
       int version2 = CodecUtil.checkIndexHeader(vectorsStream, codecNameDat, VERSION_START, VERSION_CURRENT, si.getId(), segmentSuffix);
@@ -269,8 +269,8 @@ public final class CompressingTermVectorsReader extends TermVectorsReader implem
       for (int i = docBase; i < doc; ++i) {
         sum += reader.next();
       }
-      skip = sum;
-      numFields = (int) reader.next();
+      skip = sum; // 可以跳过前面所有文档的字段
+      numFields = (int) reader.next(); // 要查的文档的字段总数
       sum += numFields;
       for (int i = doc + 1; i < docBase + chunkDocs; ++i) {
         sum += reader.next();

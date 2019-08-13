@@ -127,7 +127,7 @@ public final class Lucene50TermVectorsFormat extends CompressingTermVectorsForma
 
   /** Sole constructor. */
   public Lucene50TermVectorsFormat() {
-    super("Lucene50TermVectors", "", CompressionMode.FAST, 1 << 12, 1024);
+    super("Lucene50TermVectors", "", CompressionMode.FAST, 1 << 12, 1024);  // chuckSize : 1 << 12 = 4KB
   }
 
 }
