@@ -657,7 +657,7 @@ final class SegmentTermsEnumFrame {
     // was fooz (and, eg, first term in the next block will
     // bee fop).
     //if (DEBUG) System.out.println("      block end");
-    if (exactOnly) {
+    if (exactOnly) {  // 找到了要查的Term
       fillTerm();
     }
 

@@ -556,7 +556,7 @@ final class SegmentTermsEnum extends TermsEnum {
       return false;
     }
 
-    currentFrame.loadBlock();
+    currentFrame.loadBlock(); // 已经定位到一个block中
 
     final SeekStatus result = currentFrame.scanToTerm(target, true);            
     if (result == SeekStatus.FOUND) {

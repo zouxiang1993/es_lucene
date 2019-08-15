@@ -53,10 +53,10 @@ import org.apache.lucene.util.MathUtil;
 
 public abstract class MultiLevelSkipListWriter {
   /** number of levels in this skip list */
-  protected int numberOfSkipLevels;
+  protected int numberOfSkipLevels;  // 层数
   
   /** the skip interval in the list with level = 0 */
-  private int skipInterval;
+  private int skipInterval;  // 第0层的interval与 block 的大小相同，指向每一个block的开头
 
   /** skipInterval used for level &gt; 0 */
   private int skipMultiplier;
