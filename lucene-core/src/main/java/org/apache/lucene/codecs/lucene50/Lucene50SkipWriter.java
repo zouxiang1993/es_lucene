@@ -137,17 +137,17 @@ final class Lucene50SkipWriter extends MultiLevelSkipListWriter {
     this.curPayPointer = payFP;
     this.curPosBufferUpto = posBufferUpto;
     this.curPayloadByteUpto = payloadByteUpto;
-    bufferSkip(numDocs);
+    bufferSkip(numDocs); // numDocs表示当前在写第几个文档，也就是在跳跃表中的位置
   }
   
   @Override
   protected void writeSkipData(int level, IndexOutput skipBuffer) throws IOException {
     int delta = curDoc - lastSkipDoc[level];
 
-    skipBuffer.writeVInt(delta);
+    skipBuffer.writeVInt(delta); // 1. 存储docID增量
     lastSkipDoc[level] = curDoc;
 
-    skipBuffer.writeVLong(curDocPointer - lastSkipDocPointer[level]);
+    skipBuffer.writeVLong(curDocPointer - lastSkipDocPointer[level]); // 2. 存储倒排表.doc文件指针的增量
     lastSkipDocPointer[level] = curDocPointer;
 
     if (fieldHasPositions) {

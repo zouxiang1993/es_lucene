@@ -379,7 +379,7 @@ public final class Lucene50PostingsReader extends PostingsReaderBase {
         return doc = NO_MORE_DOCS;
       }
       if (docBufferUpto == BLOCK_SIZE) { // 已经消耗完一个block，读入下一个block进行填充
-        refillDocs();
+        refillDocs(); // nextDoc只需要读docID和词频，不会去读跳跃表的数据
       }
 
       accum += docDeltaBuffer[docBufferUpto];

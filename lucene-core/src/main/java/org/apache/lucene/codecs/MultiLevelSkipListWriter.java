@@ -135,7 +135,7 @@ public abstract class MultiLevelSkipListWriter {
       df /= skipMultiplier;
     }
     
-    long childPointer = 0;
+    long childPointer = 0; // 指向下一层的指针
     
     for (int level = 0; level < numLevels; level++) {
       writeSkipData(level, skipBuffer[level]);
@@ -163,7 +163,7 @@ public abstract class MultiLevelSkipListWriter {
     //System.out.println("skipper.writeSkip fp=" + skipPointer);
     if (skipBuffer == null || skipBuffer.length == 0) return skipPointer;
     
-    for (int level = numberOfSkipLevels - 1; level > 0; level--) {
+    for (int level = numberOfSkipLevels - 1; level > 0; level--) {  // 先写高层，再写低层
       long length = skipBuffer[level].getFilePointer();
       if (length > 0) {
         output.writeVLong(length);
