@@ -55,34 +55,34 @@ public abstract class MultiLevelSkipListReader implements Closeable {
   private int docCount;
 
   /** skipStream for each level. */
-  private IndexInput[] skipStream;
+  private IndexInput[] skipStream; // 每一层的输入流
 
   /** The start pointer of each skip level. */
-  private long skipPointer[];
+  private long skipPointer[];  // 每一层的起始指针
 
   /**  skipInterval of each level. */
-  private int skipInterval[];
+  private int skipInterval[];  // 每一层的跳跃间隔
 
   /** Number of docs skipped per level.
    * It's possible for some values to overflow a signed int, but this has been accounted for.
    */
-  private int[] numSkipped;
+  private int[] numSkipped; // 每一层已经跳过的文档数目
 
   /** Doc id of current skip entry per level. */
-  protected int[] skipDoc;            
+  protected int[] skipDoc;  // 当前每一层所处元素的文档ID
 
   /** Doc id of last read skip entry with docId &lt;= target. */
   private int lastDoc;
 
   /** Child pointer of current skip entry per level. */
-  private long[] childPointer;
+  private long[] childPointer; // 当前元素 每一层指向下层的指针
 
   /** childPointer of last read skip entry with docId &lt;=
    *  target. */
   private long lastChildPointer;
   
   private boolean inputIsBuffered;
-  private final int skipMultiplier;
+  private final int skipMultiplier; // 除第0层以外，每一层的跳跃间隔
 
   /** Creates a {@code MultiLevelSkipListReader}. */
   protected MultiLevelSkipListReader(IndexInput skipStream, int maxSkipLevels, int skipInterval, int skipMultiplier) {
@@ -154,7 +154,7 @@ public abstract class MultiLevelSkipListReader implements Closeable {
     numSkipped[level] += skipInterval[level];
 
     // numSkipped may overflow a signed int, so compare as unsigned.
-    if (Integer.compareUnsigned(numSkipped[level], docCount) > 0) {
+    if (Integer.compareUnsigned(numSkipped[level], docCount) > 0) { // 该层已经读完
       // this skip list is exhausted
       skipDoc[level] = Integer.MAX_VALUE;
       if (numberOfSkipLevels > level) numberOfSkipLevels = level; 
@@ -224,13 +224,13 @@ public abstract class MultiLevelSkipListReader implements Closeable {
     
     int toBuffer = numberOfLevelsToBuffer;
     
-    for (int i = numberOfSkipLevels - 1; i > 0; i--) {
+    for (int i = numberOfSkipLevels - 1; i > 0; i--) { // 从高到低读取跳表的每一层的位置指针，只有最高层读入内存
       // the length of the current level
       long length = skipStream[0].readVLong();
       
       // the start pointer of the current level
       skipPointer[i] = skipStream[0].getFilePointer();
-      if (toBuffer > 0) {
+      if (toBuffer > 0) {  // 由于toBuffer=1，这里会将跳表最高层的数据全部读取到内存进行缓存
         // buffer this level
         skipStream[i] = new SkipBuffer(skipStream[0], (int) length);
         toBuffer--;

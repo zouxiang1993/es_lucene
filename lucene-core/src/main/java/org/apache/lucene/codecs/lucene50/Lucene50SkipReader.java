@@ -177,8 +177,8 @@ final class Lucene50SkipReader extends MultiLevelSkipListReader {
 
   @Override
   protected int readSkipData(int level, IndexInput skipStream) throws IOException {
-    int delta = skipStream.readVInt();
-    docPointer[level] += skipStream.readVLong();
+    int delta = skipStream.readVInt();  // doc id 差值
+    docPointer[level] += skipStream.readVLong(); // docids指针差值
 
     if (posPointer != null) {
       posPointer[level] += skipStream.readVLong();

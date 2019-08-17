@@ -233,7 +233,7 @@ public final class Lucene50PostingsWriter extends PushPostingsWriterBase {
     docBufferUpto++;
     docCount++;
 
-    if (docBufferUpto == BLOCK_SIZE) {
+    if (docBufferUpto == BLOCK_SIZE) { // 每一个Block中存放128个文档，先是128个docID差值， 再是128个freq
       forUtil.writeBlock(docDeltaBuffer, encoded, docOut);
       if (writeFreqs) {
         forUtil.writeBlock(freqBuffer, encoded, docOut);
