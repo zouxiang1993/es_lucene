@@ -64,7 +64,7 @@ public final class DirectMonotonicWriter {
     final float avgInc = (float) ((double) (buffer[bufferSize-1] - buffer[0]) / Math.max(1, bufferSize - 1));
     for (int i = 0; i < bufferSize; ++i) {
       final long expected = (long) (avgInc * (long) i);
-      buffer[i] -= expected;
+      buffer[i] -= expected; // 与期望值的差值
     }
 
     long min = buffer[0];

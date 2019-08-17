@@ -95,7 +95,7 @@ final class Lucene54DocValuesConsumer extends DocValuesConsumer implements Close
     long maxValue = Long.MIN_VALUE;
     long gcd = 0;
     long missingCount = 0; // 空值总数
-    long zeroCount = 0;    // 零值总数
+    long zeroCount = 0;    // 零值总数, 数值为0或者空的总数
     // TODO: more efficient?
     HashSet<Long> uniqueValues = null;
     long missingOrdCount = 0;
@@ -192,7 +192,7 @@ final class Lucene54DocValuesConsumer extends DocValuesConsumer implements Close
     meta.writeByte(Lucene54DocValuesFormat.NUMERIC);
     meta.writeVInt(format);
     if (format == SPARSE_COMPRESSED) {
-      meta.writeLong(data.getFilePointer());
+      meta.writeLong(data.getFilePointer()); // 指向.dvd文件的指针
       final long numDocsWithValue;
       switch (numberType) {
         case VALUE:
