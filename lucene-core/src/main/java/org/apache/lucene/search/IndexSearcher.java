@@ -587,7 +587,7 @@ public class IndexSearcher {
   */
   public <C extends Collector, T> T search(Query query, CollectorManager<C, T> collectorManager) throws IOException {
     if (executor == null) {
-      final C collector = collectorManager.newCollector();
+      final C collector = collectorManager.newCollector(); // 一个线程使用一个Collector
       search(query, collector);
       return collectorManager.reduce(Collections.singletonList(collector));
     } else {

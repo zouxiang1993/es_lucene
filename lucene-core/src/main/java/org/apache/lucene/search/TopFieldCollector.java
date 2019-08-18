@@ -258,7 +258,7 @@ public abstract class TopFieldCollector extends TopDocsCollector<Entry> {
 
   private static final ScoreDoc[] EMPTY_SCOREDOCS = new ScoreDoc[0];
 
-  private final boolean fillFields;
+  private final boolean fillFields; // 是否需要填充字段的值
 
   /*
    * Stores the maximum score value encountered, needed for normalizing. If

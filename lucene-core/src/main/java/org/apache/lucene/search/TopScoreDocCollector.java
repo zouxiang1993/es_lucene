@@ -61,7 +61,7 @@ public abstract class TopScoreDocCollector extends TopDocsCollector<ScoreDoc> {
 
         @Override
         public void collect(int doc) throws IOException {
-          float score = scorer.score();
+          float score = scorer.score(); // 计算当前文档的得分
 
           // This collector cannot handle these scores:
           assert score != Float.NEGATIVE_INFINITY;
@@ -76,7 +76,7 @@ public abstract class TopScoreDocCollector extends TopDocsCollector<ScoreDoc> {
           }
           pqTop.doc = doc + docBase;
           pqTop.score = score;
-          pqTop = pq.updateTop();
+          pqTop = pq.updateTop(); // 更新小根堆
         }
 
       };
