@@ -1,0 +1,64 @@
+@startuml
+
+class Object {
+    所有对象（包括数组）都是Object的子类
+    ---
+    +native Class<?> getClass()
+    +native int hashCode()
+    +boolean equals(Object obj)
+    +String toString()
+    +final native void wait(long timeout)
+    +final void wait(long timeout, int nanos)
+    +final void wait()
+    +final native void notify()
+    +final native void notifyAll()
+    #native Object clone()
+    #void finalize()
+}
+
+class Class<T> {
+    表示类或者接口,enum也是一种类，注解也是一种接口
+    ---
+    // 定位、加载、解析、初始化一个类
+    +{static} Class<?> forName(String className)
+    +{static} Class<?> forName(String name, boolean initialize, ClassLoader loader)
+    ---
+    // 将这个Class对象转换为一个子类的对象
+    + <U> Class<? extends U> asSubclass(Class<U> clazz)
+    // 将obj强制转换成当前Class对象所表示的对象
+    +T cast(Object obj)
+    + String getName()
+    // 委托类加载器来寻找一个资源
+    +URL getResource(String name)
+    +InputStream getResourceAsStream(String name)
+    +boolean isPrimitive()
+    +boolean isArray()
+    +boolean isEnum()
+    ...
+    +boolean isInstance(Object obj)
+    // 使用无参构造函数创建一个新对象
+    +T newInstance()
+    ----
+    <font color=blue><b>反射相关
+    // 获取接口类型
+    +AnnotatedType[] getAnnotatedInterfaces()
+    // 获取父类类型
+    +AnnotatedType	getAnnotatedSuperclass()
+    // 获取注解类型
+    + <A extends Annotation> A getAnnotation(Class<A> annotationClass)
+    + ClassLoader	getClassLoader()
+    // 返回数组的基础元素类型
+    + Class<?> getComponentType()
+    // 根据参数类型获取对应的构造器, 只会返回public的
+    + Constructor<T> getConstructor(Class<?>... parameterTypes)
+    // 会返回所有的构造器,不只是public的
+    + Constructor<?> getDeclaredConstructor(Class<?>... parameterTypes)
+    // 返回所有的public, protected, private, default的字段，但不包括从父类中继承来的字段
+    +Field[] getDeclaredFields()
+    +Method[] getDeclaredMethods()
+    // 返回所有public的字段或者方法，包括从父类中继承的得来的。
+    +Field[] getFields()
+    +Method[] getMethods()
+}
+
+@enduml

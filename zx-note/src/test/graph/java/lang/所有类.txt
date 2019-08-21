@@ -1,0 +1,38 @@
+类与对象:
+ 	Object, Class
+
+Exception & Error
+	Throwable, Exception, Error, StackTraceElement
+
+基础数据类型
+	Number, Void, Enum
+	Byte, Boolean, Character, Double, Float, Integer, Long, Short
+
+接口:
+	Appendable, AutoCloseable, CharSequence, Cloneable, Comparable, Iterable, Readable, Runnable
+
+注解:
+	Deprecated, Override, SuppressWarnings, FunctionalInterface, SafeVarargs
+
+String相关:
+	String, StringBuffer, StringBuilder, AbstractStringBuilder, StringCoding
+
+线程相关:
+	Thread, ThreadGroup, ThreadLocal, InheritableThreadLocal
+
+进程相关(例如java调用python):
+	Process, ProcessBuilder, ProcessEnvironment, ProcessImpl
+
+反射:
+	Package
+
+工具类:
+	Math, StrictMath
+
+运行时环境信息:
+	Runtime
+
+ClassLoader, ClassValue
+RuntimePermission
+SecurityManager
+System
