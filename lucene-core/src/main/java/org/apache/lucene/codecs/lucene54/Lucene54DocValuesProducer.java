@@ -1066,7 +1066,7 @@ final class Lucene54DocValuesProducer extends DocValuesProducer implements Close
     } else if (offset == ALL_LIVE) {
       return new Bits.MatchAllBits(count);
     } else {
-      int length = (int) ((count + 7L) >>> 3);  // 除以8，1byte8个文档
+      int length = (int) ((count + 7L) >>> 3);  // 除以8，1byte8个文档  +7确保>>>3后依然能覆盖所有文档
       final RandomAccessInput in = data.randomAccessSlice(offset, length);
       return new Bits() {
         @Override

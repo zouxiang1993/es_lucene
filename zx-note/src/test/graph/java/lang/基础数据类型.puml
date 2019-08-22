@@ -1,0 +1,119 @@
+@startuml
+
+abstract class Number{
+    +{abstract} int intValue()
+    +{abstract} long longValue()
+    +{abstract} float floatValue()
+    +{abstract} double doubleValue()
+    +byte byteValue()
+    +short shortValue()
+}
+
+class Byte extends Number{
+    取值范围: -128 ~ 127
+    对所有的byte值对应的Byte对象都有一个缓存
+    ---
+    +{static} byte parseByte(String s)
+    +{static} Byte valueOf(String s)
+    +{static} int toUnsignedInt(byte x)
+    +{static} long toUnsignedLong(byte x)
+}
+
+class Short extends Number{
+    取值范围: -32768 ~ 32767
+    对 -128 ~ 127 范围内的对象有缓存
+    ---
+    +{static} short parseShort(String s)
+}
+
+class Integer extends Number{
+    对 -128 ~ 127 范围内的对象有缓存
+    ---
+    // 转换成不同进制的字符串
+    +{static} String toString(int i, int radix)
+    +{static} String toHexString(int i)
+    +{static} String toOctalString(int i)
+    +{static} String toBinaryString(int i)
+    // 将各种进制的字符串转换成int
+    +{static} int parseInt(String s, int radix)
+    // 返回一个整数, 只有i的最高位是1，其余全是0
+    +{static} int highestOneBit(int i)
+    // 返回一个整数，只有i的最低位是1，其余全是0
+    +{static} int lowestOneBit(int i)
+    // 二进制前导零个数
+    +{static} int numberOfLeadingZeros(int i)
+    // 后缀零个数
+    +{static} int numberOfTrailingZeros(int i)
+    // 二进制中1的个数
+    +{static} int bitCount(int i)
+    // 左移一段距离，溢出的部分补充到最右边
+    +{static} int rotateLeft(int i, int distance)
+    // 右移一段距离, 溢出的部分补充到最左边
+    +{static} int rotateRight(int i, int distance)
+    // 按二进制位反转
+    +{static} int reverse(int i)
+    // 按字节反转 (大端小端的问题?)
+    +{static} int reverseBytes(int i)
+    // 符号函数
+    +{static} int signum(int i)
+}
+
+class Long extends Number {
+    对 -128 ~ 127 范围内的对象有缓存
+    ---
+    方法和Integer差不多
+}
+
+class Float extends Number {
+    +{static} float parseFloat(String s)
+    +{static} boolean isNaN(float v)
+    +{static} boolean isInfinite(float v)
+    // 将float的二进制位解释成一个int
+    +{static} int floatToIntBits(float value)
+    +{static} native float intBitsToFloat(int bits)
+}
+
+class Double extends Number {
+    ---
+    方法和Float差不多
+    +{static} double longBitsToDouble(long bits)
+    +{static} long doubleToLongBits(double value)
+}
+
+class Boolean {
+    boolean的封装类，只拥有一个boolean类型的字段,
+    提供String到Boolean之间的转换方法和一些常量
+    ---
+    +{static} boolean parseBoolean(String s)
+    +{static} Boolean valueOf(boolean b)
+    +{static} Boolean valueOf(String s)
+    +{static} String toString(boolean b)
+    +{static} boolean logicalAnd(boolean a, boolean b)
+    +{static} boolean logicalOr(boolean a, boolean b)
+    +{static} boolean logicalXor(boolean a, boolean b)
+    ---
+    + boolean booleanValue()
+}
+
+
+class Character {
+    codePoint取值 —— Unicode字符编码范围: U+0000 ~ U+10FFFF
+    java中每个char占2字节，共16位
+    java用1~2个char来表示一个Unicode字符,
+    每个char的前5位固定为11011，
+    如果第6位为1, 表示该Unicode字符用一个char表示 :
+    范围: 1101 1000 0000 0000 ~ 1101 1011 1111 1111      \uD800 ~ \uDBFF
+    如果第6位为0, 表示该Unicode字符用两个char表示，后面还紧跟着一个char
+    范围: 1101 1100 0000 0000 ~ 1101 1111 1111 1111      \uDC00 ~ \uDFFF
+}
+
+abstract class Enum{
+    // 名称
+    +String name()
+    // 序号
+    +int ordinal()
+    // 根据名称获取枚举类型
+    +<T extends Enum<T>> T valueOf(Class<T> enumType, String name)
+}
+
+@enduml

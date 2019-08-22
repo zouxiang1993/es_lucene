@@ -1,12 +1,15 @@
 类与对象:
  	Object, Class
 
+基础数据类型
+	Void, Enum, Boolean, Character,
+	Number, Byte, Short, Integer, Long, Float, Double
+
+
+
+
 Exception & Error
 	Throwable, Exception, Error, StackTraceElement
-
-基础数据类型
-	Number, Void, Enum
-	Byte, Boolean, Character, Double, Float, Integer, Long, Short
 
 接口:
 	Appendable, AutoCloseable, CharSequence, Cloneable, Comparable, Iterable, Readable, Runnable
