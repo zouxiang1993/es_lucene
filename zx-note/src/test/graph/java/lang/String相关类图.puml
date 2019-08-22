@@ -1,0 +1,46 @@
+@startuml
+interface CharSequence {
+    +int length()
+    +char charAt(int index)
+    +CharSequence subSequence(int start, int end)
+}
+
+interface Appendable {
+    +Appendable append(CharSequence csq)
+    +Appendable append(CharSequence csq, int start, int end)
+    +Appendable append(char c)
+}
+
+class String implements CharSequence {
+    +byte[] getBytes(String charsetName)
+    +boolean equalsIgnoreCase(String anotherString)
+    +int compareTo(String anotherString)
+    +int compareToIgnoreCase(String str)
+    +boolean startsWith(String prefix, int toffset)
+    +boolean endsWith(String suffix)
+    +int indexOf(String str, int fromIndex)
+    +int lastIndexOf(String str, int fromIndex)
+    +String substring(int beginIndex, int endIndex)
+    +String concat(String str)
+    +String replace(char oldChar, char newChar)
+    +String replaceFirst(String regex, String replacement)
+    +String replaceAll(String regex, String replacement)
+    +String[] split(String regex)
+    +{static} String join(CharSequence delimiter, CharSequence... elements)
+    +String trim()
+    +<b><font color="red">String intern()
+}
+
+abstract class AbstractStringBuilder implements Appendable, CharSequence {
+    一个可变的字符序列
+    ---
+}
+
+class StringBuilder extends AbstractStringBuilder {
+    // 线程不安全，只能在单个线程内使用(大部分情况都满足需求)
+}
+
+class StringBuffer extends AbstractStringBuilder {
+    // 线程安全的
+}
+@enduml
