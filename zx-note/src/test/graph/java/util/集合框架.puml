@@ -9,6 +9,7 @@ namespace base{
     }
 
     interface Collection<E> extends Iterable{
+        ---
         +int size() // 集合中元素数目
         +boolean isEmpty()  // 是否为空
         +boolean contains(Object o) // 是否包含obj

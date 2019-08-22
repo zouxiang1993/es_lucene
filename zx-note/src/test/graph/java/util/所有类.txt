@@ -1,0 +1,45 @@
+集合框架:
+	Collection, AbstractCollection
+	List, AbstractList, AbstractSequentialList, ArrayList, LinkedList, Vector, Stack
+	AbstractQueue, ArrayDeque, Deque, PriorityQueue, Queue
+	Set, AbstractSet, EnumSet, HashSet, LinkedHashSet, JumboEnumSet, NavigableSet, TreeSet, SortedSet, RegularEnumSet
+	AbstractMap, EnumMap, HashMap, IdentityHashMap, Hashtable, LinkedHashMap, Map, NavigableMap, TreeMap, WeakHashMap, SortedMap
+	Properties, Dictionary
+	Iterator, ListIterator, PrimitiveIterator
+
+日期 & 时间:
+	Calendar, Date, GregorianCalendar, JapaneseImperialCalendar
+	TimeZone, SimpleTimeZone
+
+工具类:
+	Objects, Arrays, ArrayPrefixHelpers, ArraysParallelSortHelpers, Collections, UUID, BitSet
+
+排序:
+	DualPivotQuicksort, ComparableTimSort, TimSort
+
+
+Base64
+Comparator, Comparators
+IntSummaryStatistics, DoubleSummaryStatistics, LongSummaryStatistics
+Optional, OptionalDouble, OptionalInt, OptionalLong
+Currency
+Enumeration
+EventListener, EventListenerProxy
+EventObject
+Formattable, FormattableFlags, Formatter
+Locale, LocaleISOData
+Observer, Observable
+PropertyPermission, PropertyPermissionCollection
+Random
+RandomAccess
+RandomAccessSubList
+ResourceBundle, PropertyResourceBundle, ListResourceBundle
+Scanner
+ServiceLoader
+Spliterator
+Spliterators
+SplittableRandom
+StringJoiner
+StringTokenizer
+Timer, TimerTask, TimerThread, TaskQueue
+Tripwire

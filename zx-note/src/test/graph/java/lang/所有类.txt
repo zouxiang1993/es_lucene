@@ -11,6 +11,9 @@ String相关:
 异常相关:
 	Throwable, Exception, Error, StackTraceElement
 
+工具类:
+	Math, StrictMath, System, Runtime
+
 
 
 接口:
@@ -25,14 +28,6 @@ String相关:
 进程相关(例如java调用python):
 	Process, ProcessBuilder, ProcessEnvironment, ProcessImpl
 
-工具类:
-	Math, StrictMath
-
-运行时环境信息:
-	Runtime
-
 Package
 ClassLoader, ClassValue
-RuntimePermission
-SecurityManager
-System
+RuntimePermission, SecurityManager

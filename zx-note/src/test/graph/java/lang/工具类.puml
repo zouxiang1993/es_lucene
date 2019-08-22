@@ -17,4 +17,13 @@ class System {
     +{static} String clearProperty(String key)
 }
 
+class Runtime {
+    +{static} Runtime getRuntime()
+    +void addShutdownHook(Thread hook)
+    +Process exec(String command, String[] envp)
+    +int availableProcessors()
+    +long freeMemory()
+    +long totalMemory()
+    +long maxMemory()
+}
 @enduml
