@@ -1,0 +1,28 @@
+@startuml
+
+note as N1
+unchecked exception: ERROR 和 RuntimeException
+checked exception(编译器要求必须处理的异常): 其他...
+end note
+
+class Throwable {
+    -String detailMessage
+    -Throwable cause
+    -StackTraceElement[] stackTrace
+    ---
+    +Throwable initCause(Throwable cause)
+    +void printStackTrace()
+}
+
+class Error extends Throwable {
+    表示合理的应用程序不应该尝试捕获的严重问题
+}
+
+class Exception extends Throwable {
+
+}
+
+class RuntimeException extends Exception {
+
+}
+@enduml

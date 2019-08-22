@@ -8,25 +8,22 @@
 String相关:
 	String, AbstractStringBuilder, StringBuffer, StringBuilder, CharSequence, Appendable
 
-
-
-Exception & Error
+异常相关:
 	Throwable, Exception, Error, StackTraceElement
 
+
+
 接口:
-	AutoCloseable, Cloneable, Comparable, Iterable, Readable, Runnable
+	AutoCloseable, Cloneable, Comparable, Iterable, Readable
 
 注解:
 	Deprecated, Override, SuppressWarnings, FunctionalInterface, SafeVarargs
 
 线程相关:
-	Thread, ThreadGroup, ThreadLocal, InheritableThreadLocal
+	Runnable, Thread, ThreadGroup, ThreadLocal, InheritableThreadLocal
 
 进程相关(例如java调用python):
 	Process, ProcessBuilder, ProcessEnvironment, ProcessImpl
-
-反射:
-	Package
 
 工具类:
 	Math, StrictMath
@@ -34,6 +31,7 @@ Exception & Error
 运行时环境信息:
 	Runtime
 
+Package
 ClassLoader, ClassValue
 RuntimePermission
 SecurityManager

@@ -1,0 +1,20 @@
+@startuml
+class System {
+    // 标准输入、输出、错误流
+    +{static} InputStream in
+    +{static} PrintStream out
+    +{static} PrintStream err
+    ---
+    +{static} void arraycopy(Object src,  int  srcPos, Object dest, int destPos, int length)
+    +{static} String lineSeparator()
+    +{static} long currentTimeMillis()
+    +{static} long nanoTime()
+
+    +{static} Map<String,String> getenv()
+    +{static} String getenv(String name)
+    +{static} Properties getProperties()
+    +{static} String getProperty(String key, String def)
+    +{static} String clearProperty(String key)
+}
+
+@enduml
