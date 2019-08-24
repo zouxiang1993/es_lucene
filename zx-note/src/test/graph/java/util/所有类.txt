@@ -1,45 +1,21 @@
 集合框架:
 	Collection, AbstractCollection
-	List, AbstractList, AbstractSequentialList, ArrayList, LinkedList, Vector, Stack
-	AbstractQueue, ArrayDeque, Deque, PriorityQueue, Queue
-	Set, AbstractSet, EnumSet, HashSet, LinkedHashSet, JumboEnumSet, NavigableSet, TreeSet, SortedSet, RegularEnumSet
-	AbstractMap, EnumMap, HashMap, IdentityHashMap, Hashtable, LinkedHashMap, Map, NavigableMap, TreeMap, WeakHashMap, SortedMap
-	Properties, Dictionary
+	List, AbstractList, ArrayList, LinkedList, Vector, Stack
+	Map, AbstractMap, HashMap, IdentityHashMap, Hashtable, LinkedHashMap, NavigableMap, TreeMap, WeakHashMap, SortedMap, Properties
+	Set, AbstractSet, HashSet, LinkedHashSet, NavigableSet, TreeSet, SortedSet
+	Queue, AbstractQueue, ArrayDeque, Deque, PriorityQueue
 	Iterator, ListIterator, PrimitiveIterator
+
+排序:
+	DualPivotQuicksort, ComparableTimSort, TimSort
+
 
 日期 & 时间:
 	Calendar, Date, GregorianCalendar, JapaneseImperialCalendar
 	TimeZone, SimpleTimeZone
 
 工具类:
-	Objects, Arrays, ArrayPrefixHelpers, ArraysParallelSortHelpers, Collections, UUID, BitSet
+	Objects, Arrays, Collections, UUID, BitSet
 
-排序:
-	DualPivotQuicksort, ComparableTimSort, TimSort
-
-
-Base64
-Comparator, Comparators
-IntSummaryStatistics, DoubleSummaryStatistics, LongSummaryStatistics
-Optional, OptionalDouble, OptionalInt, OptionalLong
-Currency
-Enumeration
-EventListener, EventListenerProxy
-EventObject
-Formattable, FormattableFlags, Formatter
-Locale, LocaleISOData
-Observer, Observable
-PropertyPermission, PropertyPermissionCollection
-Random
-RandomAccess
-RandomAccessSubList
-ResourceBundle, PropertyResourceBundle, ListResourceBundle
-Scanner
-ServiceLoader
-Spliterator
-Spliterators
-SplittableRandom
-StringJoiner
-StringTokenizer
-Timer, TimerTask, TimerThread, TaskQueue
-Tripwire
+对int, double, long序列的统计方法，提供最大值 / 最小值 / 总和 / 总个数 / 平均值 等统计量
+    IntSummaryStatistics, DoubleSummaryStatistics, LongSummaryStatistics

@@ -20,19 +20,59 @@ interface Map<K,V>{
     +V putIfAbsent(K key, V value)
 }
 
+class IdentityHashMap implements Map {
+    使用 a==b 而不是a.equals(b)
+    来判断两个对象是否相等
+}
+
 class HashMap<K,V> implements Map{
-    // TODO:
+    // 散列查找
+}
+
+class LinkedHashMap<K,V> extends HashMap{
+    HashMap的iterator是无序的，
+    LinkedHashMap的iterator是有序的，
+    插入的顺序就是iterator输出的顺序
 }
 
 interface SortedMap<K,V> extends Map{
+    +Comparator<? super K> comparator()
+    +SortedMap<K,V> subMap(K fromKey, K toKey)
+    +SortedMap<K,V> headMap(K toKey)
+    +SortedMap<K,V> tailMap(K fromKey)
+    +K firstKey()
+    +K lastKey()
 }
 
 interface NavigableMap<K,V> extends SortedMap{
+    // 比K小的最大entry
+    +Map.Entry<K,V> lowerEntry(K key)
+    +K lowerKey(K key)
+    // 小于等于K的最大entry
+    +Map.Entry<K,V> floorEntry(K key)
+    +K floorKey(K key)
+    // 大于等于K的最小entry
+    +Map.Entry<K,V> ceilingEntry(K key)
+    +K ceilingKey(K key)
+    // 大于K的最小entry
+    +Map.Entry<K,V> higherEntry(K key)
+    +K higherKey(K key)
+    // 返回第一个entry
+    +Map.Entry<K,V> firstEntry()
+    +Map.Entry<K,V> lastEntry()
+    // 返回并移除第一个entry
+    +Map.Entry<K,V> pollFirstEntry()
+    +Map.Entry<K,V> pollLastEntry()
+    // 返回一个降序的视图
+    +NavigableMap<K,V> descendingMap()
+    +NavigableSet<K> navigableKeySet()
+    +NavigableSet<K> descendingKeySet()
 }
 
 
 
 class TreeMap<K,V> implements NavigableMap{
+    红黑树实现
 }
 
 @enduml

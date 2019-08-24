@@ -166,4 +166,13 @@ public class HashMapTest {
             throw new RuntimeException("should never be here");
         }
     }
+
+    @Test
+    public void test() {
+        int hash = 0b10101010101010101010101;
+        System.out.println(Integer.toBinaryString(hash));
+        System.out.println(Integer.toBinaryString(hash >>> 16));
+        int h;
+        System.out.println(Integer.toBinaryString((h=hash) ^ (h >>> 16)));
+    }
 }

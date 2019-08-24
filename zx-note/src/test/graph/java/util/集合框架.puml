@@ -125,7 +125,7 @@ namespace list{
     }
 
     class CopyOnWriteArrayList implements List{
-        // TODO:
+        // @see CopyOnWriteArrayList.md
     }
 
     class LinkedList implements List,queue::Deque{
@@ -133,6 +133,7 @@ namespace list{
     }
 
     class Vector<E> implements List{
+        // 线程安全的， 类似ArrayList
     }
 
     class Stack<E> extends Vector{
@@ -145,12 +146,14 @@ namespace set{
     interface SortedSet<E> extends Set{
     }
     class HashSet<E> implements Set{
+        用一个HashMap实例来实现的Set
     }
     class LinkedHashSet<E> extends HashSet{
     }
     interface NavigableSet<E> extends SortedSet{
     }
     class TreeSet<E> implements NavigableSet{
+        用一个TreeMap实例来实现的Set
     }
 }
 
