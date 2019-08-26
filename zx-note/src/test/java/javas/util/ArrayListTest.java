@@ -50,6 +50,17 @@ public class ArrayListTest {
         System.out.println(list.subList(7, 15).indexOf(3)+7);
     }
 
+    @Test
+    public void testClone(){
+        ArrayList arrayList = new ArrayList();
+        arrayList.add(1);
+        arrayList.add(2);
+        arrayList.add(3);
+
+        ArrayList clone = (ArrayList) arrayList.clone();
+        System.out.println(clone.size());
+        System.out.println(clone);
+    }
 
     private void print(List list) {
         if (list == null) {
@@ -61,4 +72,5 @@ public class ArrayListTest {
             System.out.println();
         }
     }
+
 }

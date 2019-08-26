@@ -1,0 +1,16 @@
+1. 书籍推荐
+    https://blog.csdn.net/notonlyrush/article/details/80401618
+
+
+博客:
+深入浅出Java Concurrency ：
+    http://www.blogjava.net/xylz/archive/2010/07/08/325587.html
+
+
+书籍：
+Java并发编程实战 :
+    http://www.java1234.com/a/javabook/javabase/2017/0907/8857.html
+Java并发编程的艺术 :
+    http://product.china-pub.com/4730532
+深入理解Java内存模型 :
+    https://www.infoq.cn/article/java_memory_model/
